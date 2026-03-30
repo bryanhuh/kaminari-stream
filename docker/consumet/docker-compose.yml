@@ -1,6 +1,7 @@
 services:
   consumet:
-    image: ghcr.io/consumet/api:latest
+    image: riimuru/consumet-api
+    platform: linux/amd64
     container_name: anime-app-consumet
     ports:
       - "3001:3000"
