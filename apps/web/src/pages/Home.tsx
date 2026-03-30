@@ -1,35 +1,14 @@
-import { useQuery } from "urql";
-import { TRENDING_QUERY, POPULAR_QUERY } from "../lib/anilist";
+import { useTrending, usePopular } from "../hooks/useAnime";
 import { useContinueWatching } from "../hooks/useWatchHistory";
 import AnimeGrid from "../components/AnimeGrid";
 import ContinueWatchingCard from "../components/ContinueWatchingCard";
 
-interface MediaItem {
-  id: number;
-  title: { romaji: string | null; english: string | null };
-  coverImage: { large: string | null; medium: string | null; color: string | null } | null;
-  averageScore: number | null;
-  format: string | null;
-  status: string | null;
-  episodes: number | null;
-}
-
-interface PageResult {
-  Page: {
-    media: MediaItem[];
-  };
-}
-
 export default function Home() {
-  const [trendingResult] = useQuery<PageResult>({
-    query: TRENDING_QUERY,
-    variables: { page: 1, perPage: 18 },
-  });
+  const { data: trendingData, isLoading: trendingLoading, error: trendingError } =
+    useTrending(1, 18);
 
-  const [popularResult] = useQuery<PageResult>({
-    query: POPULAR_QUERY,
-    variables: { page: 1, perPage: 12 },
-  });
+  const { data: popularData, isLoading: popularLoading, error: popularError } =
+    usePopular(1, 12);
 
   const { data: continueWatching } = useContinueWatching();
   const hasContinue = continueWatching && continueWatching.length > 0;
@@ -51,14 +30,14 @@ export default function Home() {
       {/* Trending */}
       <section>
         <h2 className="text-xl font-bold text-white mb-4">Trending Now</h2>
-        {trendingResult.error && (
+        {trendingError && (
           <p className="text-red-400 text-sm">
-            Failed to load trending: {trendingResult.error.message}
+            Failed to load trending: {(trendingError as Error).message}
           </p>
         )}
         <AnimeGrid
-          items={trendingResult.data?.Page.media ?? []}
-          loading={trendingResult.fetching}
+          items={trendingData?.Page.media ?? []}
+          loading={trendingLoading}
           skeletonCount={18}
         />
       </section>
@@ -66,14 +45,14 @@ export default function Home() {
       {/* Popular */}
       <section>
         <h2 className="text-xl font-bold text-white mb-4">All-Time Popular</h2>
-        {popularResult.error && (
+        {popularError && (
           <p className="text-red-400 text-sm">
-            Failed to load popular: {popularResult.error.message}
+            Failed to load popular: {(popularError as Error).message}
           </p>
         )}
         <AnimeGrid
-          items={popularResult.data?.Page.media ?? []}
-          loading={popularResult.fetching}
+          items={popularData?.Page.media ?? []}
+          loading={popularLoading}
           skeletonCount={12}
         />
       </section>

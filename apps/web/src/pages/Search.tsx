@@ -1,25 +1,7 @@
 import { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
-import { useQuery } from "urql";
-import { SEARCH_QUERY, TRENDING_QUERY } from "../lib/anilist";
+import { useTrending, useAnimeSearch } from "../hooks/useAnime";
 import AnimeGrid from "../components/AnimeGrid";
-
-interface MediaItem {
-  id: number;
-  title: { romaji: string | null; english: string | null };
-  coverImage: { large: string | null; medium: string | null; color: string | null } | null;
-  averageScore: number | null;
-  format: string | null;
-  status: string | null;
-  episodes: number | null;
-}
-
-interface PageResult {
-  Page: {
-    pageInfo: { total: number; hasNextPage: boolean };
-    media: MediaItem[];
-  };
-}
 
 export default function Search() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -41,21 +23,18 @@ export default function Search() {
 
   const isSearching = debouncedQuery.length > 0;
 
-  const [searchResult] = useQuery<PageResult>({
-    query: SEARCH_QUERY,
-    variables: { search: debouncedQuery, page: 1, perPage: 30 },
-    pause: !isSearching,
-  });
+  const { data: searchData, isLoading: searchLoading, error: searchError } =
+    useAnimeSearch(debouncedQuery, 1, 30);
 
-  const [browseResult] = useQuery<PageResult>({
-    query: TRENDING_QUERY,
-    variables: { page: 1, perPage: 30 },
-    pause: isSearching,
-  });
+  const { data: browseData, isLoading: browseLoading, error: browseError } =
+    useTrending(1, 30);
 
-  const result = isSearching ? searchResult : browseResult;
-  const items = result.data?.Page.media ?? [];
-  const total = result.data?.Page.pageInfo.total;
+  const items = isSearching
+    ? (searchData?.Page.media ?? [])
+    : (browseData?.Page.media ?? []);
+  const loading = isSearching ? searchLoading : browseLoading;
+  const error = isSearching ? searchError : browseError;
+  const total = isSearching ? searchData?.Page.pageInfo?.total : undefined;
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-8">
@@ -74,22 +53,22 @@ export default function Search() {
         <h2 className="text-xl font-bold text-white">
           {isSearching ? `Results for "${debouncedQuery}"` : "Browse All"}
         </h2>
-        {total != null && !result.fetching && (
+        {total != null && !loading && (
           <span className="text-sm text-gray-500">{total.toLocaleString()} titles</span>
         )}
       </div>
 
-      {result.error && (
+      {error && (
         <p className="text-red-400 text-sm mb-4">
-          Error: {result.error.message}
+          Error: {(error as Error).message}
         </p>
       )}
 
-      {!result.fetching && isSearching && items.length === 0 && (
+      {!loading && isSearching && items.length === 0 && (
         <p className="text-gray-500 text-sm">No results for "{debouncedQuery}"</p>
       )}
 
-      <AnimeGrid items={items} loading={result.fetching} skeletonCount={24} />
+      <AnimeGrid items={items} loading={loading} skeletonCount={24} />
     </div>
   );
 }

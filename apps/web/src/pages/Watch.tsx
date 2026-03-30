@@ -1,20 +1,11 @@
 import { useCallback, useRef } from "react";
 import { useSearchParams, Link } from "react-router-dom";
-import { useQuery } from "urql";
-import { ANIME_DETAIL_QUERY } from "../lib/anilist";
+import { useAnimeDetail } from "../hooks/useAnime";
 import { useStream } from "../hooks/useStream";
 import { useEpisodes } from "../hooks/useEpisodes";
 import { useAnimeHistory, useSaveProgress } from "../hooks/useWatchHistory";
 import VideoPlayer from "../components/VideoPlayer";
 import EpisodeList from "../components/EpisodeList";
-
-interface AnimeBasic {
-  Media: {
-    id: number;
-    title: { romaji: string | null; english: string | null };
-    coverImage: { medium: string | null } | null;
-  };
-}
 
 const SAVE_INTERVAL_SEC = 5;
 
@@ -26,13 +17,9 @@ export default function Watch() {
 
   const lastSavedAt = useRef<number>(0);
 
-  const [animeResult] = useQuery<AnimeBasic>({
-    query: ANIME_DETAIL_QUERY,
-    variables: { id: animeId },
-    pause: !animeId,
-  });
+  const { data: animeData } = useAnimeDetail(animeId);
 
-  const anime = animeResult.data?.Media;
+  const anime = animeData?.Media;
   const title = anime?.title.english ?? anime?.title.romaji ?? "Unknown";
   const cover = anime?.coverImage?.medium ?? null;
 
