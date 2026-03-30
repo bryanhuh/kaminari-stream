@@ -20,17 +20,19 @@ interface VideoPlayerProps {
 }
 
 function getBestSource(sources: StreamData["sources"]): string {
-  // Prefer 1080p > 720p > 480p > default > first available
   const order = ["1080p", "720p", "480p", "360p", "default"];
   for (const q of order) {
     const found = sources.find((s) => s.quality === q && s.isM3U8);
     if (found) return found.url;
   }
-  // Fall back to any m3u8 source
   const anyM3u8 = sources.find((s) => s.isM3U8);
   if (anyM3u8) return anyM3u8.url;
-  // Last resort: first source
   return sources[0]?.url ?? "";
+}
+
+function proxied(url: string, referer?: string): string {
+  if (!referer) return url;
+  return `/api/proxy/hls?url=${encodeURIComponent(url)}&referer=${encodeURIComponent(referer)}`;
 }
 
 export default function VideoPlayer({
@@ -40,7 +42,8 @@ export default function VideoPlayer({
   onTimeUpdate,
 }: VideoPlayerProps) {
   const playerRef = useRef<MediaPlayerInstance>(null);
-  const src = getBestSource(streamData.sources);
+  const referer = streamData.headers?.Referer;
+  const src = proxied(getBestSource(streamData.sources), referer);
 
   // Seek to saved position after media is ready
   useEffect(() => {

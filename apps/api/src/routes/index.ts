@@ -3,6 +3,7 @@ import episodesRouter from "./episodes";
 import streamRouter from "./stream";
 import historyRouter from "./history";
 import animeRouter from "./anime";
+import proxyRouter from "./proxy";
 
 const router = Router();
 
@@ -11,6 +12,7 @@ router.get("/health", (_req, res) => {
 });
 
 router.use("/anime", animeRouter);
+router.use("/proxy", proxyRouter);
 router.use("/episodes", episodesRouter);
 router.use("/stream", streamRouter);
 router.use("/history", historyRouter);
