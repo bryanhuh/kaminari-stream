@@ -12,14 +12,14 @@ router.get("/trending", async (req: Request, res: Response) => {
   const page = Number(req.query.page) || 1;
   const perPage = Number(req.query.perPage) || 18;
   const data = await getTrending(page, perPage);
-  res.json(data);
+  res.json({ data });
 });
 
 router.get("/popular", async (req: Request, res: Response) => {
   const page = Number(req.query.page) || 1;
   const perPage = Number(req.query.perPage) || 12;
   const data = await getPopular(page, perPage);
-  res.json(data);
+  res.json({ data });
 });
 
 router.get("/search", async (req: Request, res: Response) => {
@@ -31,7 +31,7 @@ router.get("/search", async (req: Request, res: Response) => {
   const page = Number(req.query.page) || 1;
   const perPage = Number(req.query.perPage) || 30;
   const data = await searchAnimeAnilist(q, page, perPage);
-  res.json(data);
+  res.json({ data });
 });
 
 router.get("/:id", async (req: Request, res: Response) => {
@@ -41,7 +41,7 @@ router.get("/:id", async (req: Request, res: Response) => {
     return;
   }
   const data = await getAnimeDetail(id);
-  res.json(data);
+  res.json({ data });
 });
 
 export default router;

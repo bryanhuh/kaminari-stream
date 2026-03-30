@@ -54,7 +54,7 @@ export interface AnimeDetail {
 export function useTrending(page = 1, perPage = 18) {
   return useQuery<PageResult>({
     queryKey: ["anime", "trending", page, perPage],
-    queryFn: () => api.get<PageResult>(`/anime/trending?page=${page}&perPage=${perPage}`),
+    queryFn: () => api.get<PageResult>(`/api/anime/trending?page=${page}&perPage=${perPage}`),
     staleTime: 1000 * 60 * 10,
   });
 }
@@ -62,7 +62,7 @@ export function useTrending(page = 1, perPage = 18) {
 export function usePopular(page = 1, perPage = 12) {
   return useQuery<PageResult>({
     queryKey: ["anime", "popular", page, perPage],
-    queryFn: () => api.get<PageResult>(`/anime/popular?page=${page}&perPage=${perPage}`),
+    queryFn: () => api.get<PageResult>(`/api/anime/popular?page=${page}&perPage=${perPage}`),
     staleTime: 1000 * 60 * 10,
   });
 }
@@ -71,7 +71,7 @@ export function useAnimeSearch(query: string, page = 1, perPage = 30) {
   return useQuery<PageResult>({
     queryKey: ["anime", "search", query, page, perPage],
     queryFn: () =>
-      api.get<PageResult>(`/anime/search?q=${encodeURIComponent(query)}&page=${page}&perPage=${perPage}`),
+      api.get<PageResult>(`/api/anime/search?q=${encodeURIComponent(query)}&page=${page}&perPage=${perPage}`),
     enabled: query.length > 0,
     staleTime: 1000 * 60 * 5,
   });
@@ -80,7 +80,7 @@ export function useAnimeSearch(query: string, page = 1, perPage = 30) {
 export function useAnimeDetail(id: number) {
   return useQuery<{ Media: AnimeDetail }>({
     queryKey: ["anime", "detail", id],
-    queryFn: () => api.get<{ Media: AnimeDetail }>(`/anime/${id}`),
+    queryFn: () => api.get<{ Media: AnimeDetail }>(`/api/anime/${id}`),
     enabled: !!id,
     staleTime: 1000 * 60 * 15,
   });
