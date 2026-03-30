@@ -1,20 +1,18 @@
 import { Routes, Route } from "react-router-dom";
-
-function Home() {
-  return (
-    <div className="min-h-screen bg-gray-950 text-white flex items-center justify-center">
-      <div className="text-center">
-        <h1 className="text-4xl font-bold mb-2">Anime App</h1>
-        <p className="text-gray-400">Phase 0 — scaffold complete</p>
-      </div>
-    </div>
-  );
-}
+import Navbar from "./components/Navbar";
+import Home from "./pages/Home";
+import Search from "./pages/Search";
+import AnimeDetail from "./pages/AnimeDetail";
 
 export default function App() {
   return (
-    <Routes>
-      <Route path="/" element={<Home />} />
-    </Routes>
+    <div className="min-h-screen bg-gray-950 text-white">
+      <Navbar />
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/search" element={<Search />} />
+        <Route path="/anime/:id" element={<AnimeDetail />} />
+      </Routes>
+    </div>
   );
 }
