@@ -2,6 +2,7 @@ import { useParams, Link } from "react-router-dom";
 import { useQuery } from "urql";
 import { ANIME_DETAIL_QUERY } from "../lib/anilist";
 import { useEpisodes } from "../hooks/useEpisodes";
+import { useAnimeHistory } from "../hooks/useWatchHistory";
 import AnimeCard from "../components/AnimeCard";
 import EpisodeList from "../components/EpisodeList";
 
@@ -67,6 +68,8 @@ export default function AnimeDetail() {
 
   const { data: episodesData, isLoading: episodesLoading, error: episodesError } =
     useEpisodes(anime?.id ?? 0, resolvedTitle);
+
+  const { data: animeHistory } = useAnimeHistory(anime?.id ?? 0);
 
   if (result.fetching) {
     return (
@@ -185,6 +188,7 @@ export default function AnimeDetail() {
               <EpisodeList
                 animeId={animeData.id}
                 episodes={episodesData?.episodes ?? []}
+                watchedEpisodes={animeHistory ?? []}
                 loading={episodesLoading}
                 error={episodesError?.message}
               />

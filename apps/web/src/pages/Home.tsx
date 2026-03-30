@@ -1,6 +1,8 @@
 import { useQuery } from "urql";
 import { TRENDING_QUERY, POPULAR_QUERY } from "../lib/anilist";
+import { useContinueWatching } from "../hooks/useWatchHistory";
 import AnimeGrid from "../components/AnimeGrid";
+import ContinueWatchingCard from "../components/ContinueWatchingCard";
 
 interface MediaItem {
   id: number;
@@ -29,8 +31,24 @@ export default function Home() {
     variables: { page: 1, perPage: 12 },
   });
 
+  const { data: continueWatching } = useContinueWatching();
+  const hasContinue = continueWatching && continueWatching.length > 0;
+
   return (
     <div className="max-w-7xl mx-auto px-4 py-8 flex flex-col gap-10">
+      {/* Continue Watching */}
+      {hasContinue && (
+        <section>
+          <h2 className="text-xl font-bold text-white mb-4">Continue Watching</h2>
+          <div className="flex gap-4 overflow-x-auto pb-2 scrollbar-thin">
+            {continueWatching.map((entry) => (
+              <ContinueWatchingCard key={`${entry.animeId}-${entry.episodeId}`} entry={entry} />
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* Trending */}
       <section>
         <h2 className="text-xl font-bold text-white mb-4">Trending Now</h2>
         {trendingResult.error && (
@@ -45,6 +63,7 @@ export default function Home() {
         />
       </section>
 
+      {/* Popular */}
       <section>
         <h2 className="text-xl font-bold text-white mb-4">All-Time Popular</h2>
         {popularResult.error && (
