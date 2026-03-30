@@ -1,7 +1,9 @@
 import { useParams, Link } from "react-router-dom";
 import { useQuery } from "urql";
 import { ANIME_DETAIL_QUERY } from "../lib/anilist";
+import { useEpisodes } from "../hooks/useEpisodes";
 import AnimeCard from "../components/AnimeCard";
+import EpisodeList from "../components/EpisodeList";
 
 interface Character {
   role: string;
@@ -60,6 +62,12 @@ export default function AnimeDetail() {
     pause: !id,
   });
 
+  const anime = result.data?.Media ?? null;
+  const resolvedTitle = anime?.title.english ?? anime?.title.romaji ?? null;
+
+  const { data: episodesData, isLoading: episodesLoading, error: episodesError } =
+    useEpisodes(anime?.id ?? 0, resolvedTitle);
+
   if (result.fetching) {
     return (
       <div className="animate-pulse">
@@ -90,16 +98,17 @@ export default function AnimeDetail() {
     );
   }
 
-  const anime = result.data.Media;
-  const title = anime.title.english ?? anime.title.romaji ?? "Unknown";
-  const studio = anime.studios.nodes[0]?.name;
-  const description = anime.description ? stripHtml(anime.description) : null;
+  // After the early returns above, result.data is guaranteed non-null
+  const animeData = result.data!.Media;
+  const title = resolvedTitle ?? "Unknown";
+  const studio = animeData.studios.nodes[0]?.name;
+  const description = animeData.description ? stripHtml(animeData.description) : null;
   const season =
-    anime.season && anime.seasonYear
-      ? `${anime.season.charAt(0) + anime.season.slice(1).toLowerCase()} ${anime.seasonYear}`
-      : anime.seasonYear?.toString();
+    animeData.season && animeData.seasonYear
+      ? `${animeData.season.charAt(0) + animeData.season.slice(1).toLowerCase()} ${animeData.seasonYear}`
+      : animeData.seasonYear?.toString();
 
-  const recommendations = anime.recommendations.nodes
+  const recommendations = animeData.recommendations.nodes
     .filter((n) => n.mediaRecommendation !== null)
     .slice(0, 6);
 
@@ -107,10 +116,10 @@ export default function AnimeDetail() {
     <div className="min-h-screen">
       {/* Banner */}
       <div className="relative h-56 md:h-72 overflow-hidden">
-        {anime.bannerImage ? (
+        {animeData.bannerImage ? (
           <>
             <img
-              src={anime.bannerImage}
+              src={animeData.bannerImage}
               alt=""
               className="w-full h-full object-cover"
             />
@@ -119,7 +128,7 @@ export default function AnimeDetail() {
         ) : (
           <div
             className="w-full h-full"
-            style={{ backgroundColor: anime.coverImage?.color ?? "#1f2937" }}
+            style={{ backgroundColor: animeData.coverImage?.color ?? "#1f2937" }}
           />
         )}
       </div>
@@ -128,7 +137,7 @@ export default function AnimeDetail() {
         {/* Header row */}
         <div className="flex gap-6 -mt-24 md:-mt-32 relative z-10 items-end mb-8">
           <img
-            src={anime.coverImage?.large ?? anime.coverImage?.medium ?? ""}
+            src={animeData.coverImage?.large ?? animeData.coverImage?.medium ?? ""}
             alt={title}
             className="w-36 md:w-48 rounded-lg shadow-2xl shrink-0 object-cover aspect-[3/4]"
           />
@@ -136,11 +145,11 @@ export default function AnimeDetail() {
             <h1 className="text-2xl md:text-3xl font-bold text-white leading-tight">
               {title}
             </h1>
-            {anime.title.romaji && anime.title.romaji !== title && (
-              <p className="text-gray-400 text-sm">{anime.title.romaji}</p>
+            {animeData.title.romaji && animeData.title.romaji !== title && (
+              <p className="text-gray-400 text-sm">{animeData.title.romaji}</p>
             )}
             <div className="flex flex-wrap gap-2">
-              {anime.genres.slice(0, 4).map((g) => (
+              {animeData.genres.slice(0, 4).map((g) => (
                 <span
                   key={g}
                   className="text-xs px-2 py-0.5 rounded-full bg-gray-800 text-gray-300"
@@ -163,27 +172,30 @@ export default function AnimeDetail() {
               </section>
             )}
 
-            {/* Episodes placeholder */}
+            {/* Episodes */}
             <section>
               <div className="flex items-center justify-between mb-3">
                 <h2 className="text-base font-semibold text-white">Episodes</h2>
-                {anime.episodes && (
-                  <span className="text-sm text-gray-500">{anime.episodes} total</span>
+                {(episodesData?.episodes.length ?? animeData.episodes) && (
+                  <span className="text-sm text-gray-500">
+                    {episodesData?.episodes.length ?? animeData.episodes} total
+                  </span>
                 )}
               </div>
-              <div className="rounded-lg border border-gray-800 p-6 text-center">
-                <p className="text-gray-500 text-sm">
-                  Episode list coming in Phase 2
-                </p>
-              </div>
+              <EpisodeList
+                animeId={animeData.id}
+                episodes={episodesData?.episodes ?? []}
+                loading={episodesLoading}
+                error={episodesError?.message}
+              />
             </section>
 
             {/* Characters */}
-            {anime.characters.edges.length > 0 && (
+            {animeData.characters.edges.length > 0 && (
               <section>
                 <h2 className="text-base font-semibold text-white mb-3">Characters</h2>
                 <div className="grid grid-cols-3 sm:grid-cols-6 gap-3">
-                  {anime.characters.edges.map(({ node, role }) => (
+                  {animeData.characters.edges.map(({ node, role }) => (
                     <div key={node.id} className="flex flex-col items-center gap-1 text-center">
                       <img
                         src={node.image.medium ?? ""}
@@ -232,16 +244,16 @@ export default function AnimeDetail() {
           {/* Right column — info sidebar */}
           <aside className="flex flex-col gap-1 text-sm lg:pt-0">
             <div className="rounded-lg bg-gray-900 p-4 flex flex-col gap-3">
-              <InfoRow label="Format" value={anime.format} />
-              <InfoRow label="Status" value={formatStatus(anime.status)} />
+              <InfoRow label="Format" value={animeData.format} />
+              <InfoRow label="Status" value={formatStatus(animeData.status)} />
               <InfoRow label="Season" value={season ?? null} />
               <InfoRow
                 label="Score"
-                value={anime.averageScore ? `${anime.averageScore} / 100` : null}
+                value={animeData.averageScore ? `${animeData.averageScore} / 100` : null}
               />
               <InfoRow
                 label="Episodes"
-                value={anime.episodes?.toString() ?? null}
+                value={animeData.episodes?.toString() ?? null}
               />
               <InfoRow label="Studio" value={studio ?? null} />
             </div>

@@ -3,7 +3,10 @@ import cors from "cors";
 import { config } from "./config";
 import { requestLogger } from "./middleware/requestLogger";
 import { errorHandler } from "./middleware/errorHandler";
+import { runMigrations } from "./db/migrate";
 import router from "./routes/index";
+
+runMigrations();
 
 const app = express();
 

@@ -3,6 +3,7 @@ import Navbar from "./components/Navbar";
 import Home from "./pages/Home";
 import Search from "./pages/Search";
 import AnimeDetail from "./pages/AnimeDetail";
+import Watch from "./pages/Watch";
 
 export default function App() {
   return (
@@ -12,6 +13,7 @@ export default function App() {
         <Route path="/" element={<Home />} />
         <Route path="/search" element={<Search />} />
         <Route path="/anime/:id" element={<AnimeDetail />} />
+        <Route path="/watch" element={<Watch />} />
       </Routes>
     </div>
   );
