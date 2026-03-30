@@ -5,7 +5,10 @@
   "scripts": {
     "dev": "turbo dev",
     "build": "turbo build",
-    "lint": "turbo lint",
+    "lint": "eslint \"apps/**/*.{ts,tsx}\" \"packages/**/*.{ts,tsx}\"",
+    "lint:fix": "eslint \"apps/**/*.{ts,tsx}\" \"packages/**/*.{ts,tsx}\" --fix",
+    "format": "prettier --write \"apps/**/*.{ts,tsx,json}\" \"packages/**/*.{ts,tsx}\"",
+    "format:check": "prettier --check \"apps/**/*.{ts,tsx,json}\" \"packages/**/*.{ts,tsx}\"",
     "typecheck": "turbo typecheck",
     "clean": "turbo clean"
   },
