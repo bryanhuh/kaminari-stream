@@ -34,6 +34,22 @@ export interface Episode {
   airDate: string | null;
 }
 
+export interface SpotlightAnime {
+  id: string;
+  title: string;
+  japaneseTitle: string;
+  banner: string;
+  url: string;
+  type: string;
+  genres: string[];
+  releaseDate: string;
+  quality: string;
+  sub: number;
+  dub: number;
+  description: string;
+  anilistId: number | null;
+}
+
 export interface RecentEpisode {
   id: string;
   title: string;
