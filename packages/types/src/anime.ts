@@ -34,6 +34,24 @@ export interface Episode {
   airDate: string | null;
 }
 
+export interface BrowseAnime {
+  id: string;
+  title: string;
+  japaneseTitle: string;
+  image: string;
+  type: string;
+  sub: number;
+  dub: number;
+  episodes: number;
+}
+
+export interface BrowseResponse {
+  currentPage: number;
+  hasNextPage: boolean;
+  totalPages: number;
+  results: BrowseAnime[];
+}
+
 export interface SpotlightAnime {
   id: string;
   title: string;
