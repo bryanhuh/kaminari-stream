@@ -4,6 +4,7 @@ import {
   browseNewReleases,
   browseTopAiring,
   browseMostPopular,
+  getSchedule,
 } from "../services/consumet";
 
 const router = Router();
@@ -34,6 +35,13 @@ router.get("/ongoing", async (req: Request, res: Response) => {
 router.get("/updates", async (req: Request, res: Response) => {
   const page = Number(req.query.page) || 1;
   const data = await browseMostPopular(page);
+  res.json({ data });
+});
+
+// GET /api/browse/schedule/:date  (date = YYYY-MM-DD)
+router.get("/schedule/:date", async (req: Request, res: Response) => {
+  const { date } = req.params;
+  const data = await getSchedule(date);
   res.json({ data });
 });
 

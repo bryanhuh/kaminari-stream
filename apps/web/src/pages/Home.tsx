@@ -4,6 +4,7 @@ import AnimeGrid from "../components/AnimeGrid";
 import ContinueWatchingCard from "../components/ContinueWatchingCard";
 import RecentEpisodeCard from "../components/RecentEpisodeCard";
 import HeroSpotlight from "../components/HeroSpotlight";
+import ScheduleSection from "../components/ScheduleSection";
 
 export default function Home() {
   const { data: trendingData, isLoading: trendingLoading, error: trendingError } =
@@ -63,6 +64,9 @@ export default function Home() {
           </div>
         )}
       </section>
+
+      {/* Schedule */}
+      <ScheduleSection />
 
       {/* Trending */}
       <section>

@@ -34,6 +34,14 @@ export interface Episode {
   airDate: string | null;
 }
 
+export interface ScheduleItem {
+  id: string;
+  title: string;
+  japaneseTitle: string;
+  airingTime: string;
+  airingEpisode: string;
+}
+
 export interface BrowseAnime {
   id: string;
   title: string;

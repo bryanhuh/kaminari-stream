@@ -109,6 +109,24 @@ interface ConsumetRecentEpisodesResponse {
   results: ConsumetRecentEpisode[];
 }
 
+// ── Schedule ───────────────────────────────────────────────────────────────────
+
+export interface ScheduleItem {
+  id: string;
+  title: string;
+  japaneseTitle: string;
+  airingTime: string;
+  airingEpisode: string;
+}
+
+export async function getSchedule(date: string): Promise<ScheduleItem[]> {
+  const res = await ofetch<{ results: ScheduleItem[] }>(
+    `${base}/anime/animekai/schedule/${encodeURIComponent(date)}`,
+    { timeout: 10000 }
+  );
+  return res.results ?? [];
+}
+
 // ── Browse ─────────────────────────────────────────────────────────────────────
 
 export interface BrowseAnime {
