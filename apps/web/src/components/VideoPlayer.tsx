@@ -53,10 +53,11 @@ export default function VideoPlayer({
     const player = playerRef.current;
     if (!player || initialTime <= 0) return;
 
+    let seeked = false;
     const unsub = player.subscribe(({ canSeek }) => {
-      if (canSeek) {
+      if (canSeek && !seeked) {
+        seeked = true;
         player.currentTime = initialTime;
-        unsub();
       }
     });
 
