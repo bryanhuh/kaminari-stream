@@ -4,6 +4,7 @@ import {
   getPopular,
   searchAnimeAnilist,
   getAnimeDetail,
+  browseAZ,
 } from "../services/anilist";
 import { getRecentEpisodes, getSpotlight } from "../services/consumet";
 
@@ -63,6 +64,28 @@ router.get("/recent-episodes", async (req: Request, res: Response) => {
       currentPage: recent.currentPage,
       hasNextPage: recent.hasNextPage,
       results: withAnilistIds,
+    },
+  });
+});
+
+// GET /api/anime/az?letter=A&page=1
+router.get("/az", async (req: Request, res: Response) => {
+  const letter = String(req.query.letter ?? "A").trim().charAt(0).toUpperCase();
+  const page = Number(req.query.page) || 1;
+  const result = await browseAZ(letter, page, 30);
+  // Filter to titles actually starting with the requested letter
+  const filtered = (result.Page.media as { title: { romaji: string | null; english: string | null } }[]).filter(
+    (m) => {
+      const t = (m.title.english ?? m.title.romaji ?? "").trim().toUpperCase();
+      return t.startsWith(letter);
+    }
+  );
+  res.json({
+    data: {
+      letter,
+      page,
+      hasNextPage: result.Page.pageInfo.hasNextPage,
+      media: filtered,
     },
   });
 });

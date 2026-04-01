@@ -78,6 +78,23 @@ export function useAnimeSearch(query: string, page = 1, perPage = 30) {
   });
 }
 
+interface AZResult {
+  letter: string;
+  page: number;
+  hasNextPage: boolean;
+  media: MediaItem[];
+}
+
+export function useAZBrowse(letter: string, page = 1) {
+  return useQuery<AZResult>({
+    queryKey: ["anime", "az", letter, page],
+    queryFn: () =>
+      api.get<AZResult>(`/api/anime/az?letter=${encodeURIComponent(letter)}&page=${page}`),
+    staleTime: 1000 * 60 * 10,
+    enabled: !!letter,
+  });
+}
+
 export function useSpotlight() {
   return useQuery<{ results: SpotlightAnime[] }>({
     queryKey: ["anime", "spotlight"],

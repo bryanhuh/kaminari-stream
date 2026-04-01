@@ -13,6 +13,8 @@ const MENU_ITEMS = [
   { label: "UPDATES", category: "updates" },
   { label: "ONGOING", category: "ongoing" },
   { label: "RECENT", category: "recent" },
+  { label: "SCHEDULE", category: "schedule" },
+  { label: "A-Z LIST", category: "az" },
 ] as const;
 
 export default function NavMenu({ open, onClose }: NavMenuProps) {
@@ -42,7 +44,11 @@ export default function NavMenu({ open, onClose }: NavMenuProps) {
   }, [open, onClose]);
 
   function navigate_to(category: string) {
-    navigate(`/browse?category=${category}`);
+    if (category === "schedule") {
+      navigate("/#schedule");
+    } else {
+      navigate(`/browse?category=${category}`);
+    }
     onClose();
   }
 

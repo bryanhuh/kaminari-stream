@@ -1,7 +1,8 @@
 import { useSearchParams, Link, useNavigate } from "react-router-dom";
 import { useBrowseGenre, useBrowseCategory } from "../hooks/useBrowse";
-import { useRecentEpisodes } from "../hooks/useAnime";
+import { useRecentEpisodes, useAZBrowse } from "../hooks/useAnime";
 import type { BrowseAnime } from "@anime-app/types";
+import AnimeGrid from "../components/AnimeGrid";
 
 const GENRES = [
   "Action", "Adventure", "Comedy", "Drama", "Fantasy", "Horror",
@@ -18,7 +19,7 @@ const TYPES = [
   { label: "Special", value: "SPECIAL" },
 ];
 
-type BrowseCategory = "genres" | "types" | "new-releases" | "updates" | "ongoing" | "recent";
+type BrowseCategory = "genres" | "types" | "new-releases" | "updates" | "ongoing" | "recent" | "az";
 
 function BrowseAnimeCard({ anime }: { anime: BrowseAnime }) {
   return (
@@ -93,7 +94,7 @@ function TypeGrid() {
   );
 }
 
-function AnimeGrid({ items, loading }: { items: BrowseAnime[]; loading: boolean }) {
+function BrowseGrid({ items, loading }: { items: BrowseAnime[]; loading: boolean }) {
   if (loading) {
     return (
       <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-4">
@@ -115,6 +116,8 @@ function AnimeGrid({ items, loading }: { items: BrowseAnime[]; loading: boolean 
   );
 }
 
+const ALPHABET = "#ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
+
 const CATEGORY_LABELS: Record<BrowseCategory, string> = {
   genres: "Genres",
   types: "Types",
@@ -122,6 +125,7 @@ const CATEGORY_LABELS: Record<BrowseCategory, string> = {
   updates: "Updates",
   ongoing: "Ongoing",
   recent: "Recent Episodes",
+  az: "A-Z List",
 };
 
 export default function Browse() {
@@ -131,6 +135,7 @@ export default function Browse() {
 
   const isListCategory = category === "new-releases" || category === "ongoing" || category === "updates";
   const isGenreDrill = category === "genres" && !!genre;
+  const azLetter = searchParams.get("letter") ?? "A";
 
   const { data: categoryData, isLoading: categoryLoading } = useBrowseCategory(
     isListCategory ? (category as "new-releases" | "ongoing" | "updates") : null
@@ -142,12 +147,18 @@ export default function Browse() {
 
   const { data: recentData, isLoading: recentLoading } = useRecentEpisodes();
 
+  const { data: azData, isLoading: azLoading } = useAZBrowse(
+    category === "az" ? azLetter : ""
+  );
+
   function selectGenre(g: string) {
     setSearchParams({ category: "genres", genre: g });
   }
 
   const pageTitle = isGenreDrill
     ? genre!
+    : category === "az"
+    ? `A-Z List — ${azLetter}`
     : CATEGORY_LABELS[category];
 
   return (
@@ -181,7 +192,7 @@ export default function Browse() {
 
       {/* Genre drill-down */}
       {isGenreDrill && (
-        <AnimeGrid items={genreData?.results ?? []} loading={genreLoading} />
+        <BrowseGrid items={genreData?.results ?? []} loading={genreLoading} />
       )}
 
       {/* Types */}
@@ -189,7 +200,34 @@ export default function Browse() {
 
       {/* List categories */}
       {isListCategory && (
-        <AnimeGrid items={categoryData?.results ?? []} loading={categoryLoading} />
+        <BrowseGrid items={categoryData?.results ?? []} loading={categoryLoading} />
+      )}
+
+      {/* A-Z */}
+      {category === "az" && (
+        <>
+          {/* Letter picker */}
+          <div className="flex flex-wrap gap-1.5 mb-6">
+            {ALPHABET.map((l) => (
+              <button
+                key={l}
+                onClick={() => setSearchParams({ category: "az", letter: l })}
+                className={`w-9 h-9 rounded-lg text-sm font-bold transition-colors ${
+                  l === azLetter
+                    ? "bg-primary-500 text-white"
+                    : "bg-gray-800 text-gray-400 hover:bg-gray-700 hover:text-white"
+                }`}
+              >
+                {l}
+              </button>
+            ))}
+          </div>
+          <AnimeGrid
+            items={azData?.media ?? []}
+            loading={azLoading}
+            skeletonCount={18}
+          />
+        </>
       )}
 
       {/* Recent */}

@@ -120,6 +120,26 @@ export async function searchAnimeAnilist(
   );
 }
 
+const AZ_QUERY = `
+  query AZBrowse($search: String, $page: Int, $perPage: Int) {
+    Page(page: $page, perPage: $perPage) {
+      pageInfo { hasNextPage total }
+      media(search: $search, type: ANIME, isAdult: false, sort: TITLE_ROMAJI) {
+        ${MEDIA_FIELDS}
+      }
+    }
+  }
+`;
+
+export async function browseAZ(letter: string, page = 1, perPage = 30) {
+  return request<{
+    Page: {
+      pageInfo: { hasNextPage: boolean; total: number };
+      media: unknown[];
+    };
+  }>(ANILIST_URL, AZ_QUERY, { search: letter, page, perPage });
+}
+
 export async function getAnimeDetail(id: number) {
   return request<{ Media: unknown }>(ANILIST_URL, DETAIL_QUERY, { id });
 }
