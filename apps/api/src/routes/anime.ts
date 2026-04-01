@@ -5,6 +5,7 @@ import {
   searchAnimeAnilist,
   getAnimeDetail,
 } from "../services/anilist";
+import { getRecentEpisodes } from "../services/consumet";
 
 const router = Router();
 
@@ -20,6 +21,32 @@ router.get("/popular", async (req: Request, res: Response) => {
   const perPage = Number(req.query.perPage) || 12;
   const data = await getPopular(page, perPage);
   res.json({ data });
+});
+
+router.get("/recent-episodes", async (req: Request, res: Response) => {
+  const page = Number(req.query.page) || 1;
+  const recent = await getRecentEpisodes(page);
+
+  // Resolve AniList IDs in parallel; failures produce null
+  const withAnilistIds = await Promise.all(
+    recent.results.map(async (ep) => {
+      try {
+        const result = await searchAnimeAnilist(ep.title, 1, 1);
+        const media = result.Page.media[0] as { id: number } | undefined;
+        return { ...ep, anilistId: media?.id ?? null };
+      } catch {
+        return { ...ep, anilistId: null };
+      }
+    })
+  );
+
+  res.json({
+    data: {
+      currentPage: recent.currentPage,
+      hasNextPage: recent.hasNextPage,
+      results: withAnilistIds,
+    },
+  });
 });
 
 router.get("/search", async (req: Request, res: Response) => {

@@ -91,6 +91,31 @@ export async function getStreamSources(episodeId: string): Promise<StreamData> {
   };
 }
 
+// ── Recent Episodes ────────────────────────────────────────────────────────────
+
+export interface ConsumetRecentEpisode {
+  id: string;
+  title: string;
+  url: string;
+  image: string;
+  episodeNumber: number;
+  releaseDate: string;
+  subOrDub: "sub" | "dub";
+}
+
+interface ConsumetRecentEpisodesResponse {
+  currentPage: number;
+  hasNextPage: boolean;
+  results: ConsumetRecentEpisode[];
+}
+
+export async function getRecentEpisodes(page = 1): Promise<ConsumetRecentEpisodesResponse> {
+  return ofetch<ConsumetRecentEpisodesResponse>(
+    `${base}/anime/animekai/recent-episodes`,
+    { query: { page }, timeout: 10000 }
+  );
+}
+
 export function toEpisodes(info: ConsumetAnimeInfo): Episode[] {
   return info.episodes.map((ep) => ({
     id: ep.id,
