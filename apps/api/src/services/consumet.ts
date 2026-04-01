@@ -109,6 +109,54 @@ interface ConsumetRecentEpisodesResponse {
   results: ConsumetRecentEpisode[];
 }
 
+// ── Browse ─────────────────────────────────────────────────────────────────────
+
+export interface BrowseAnime {
+  id: string;
+  title: string;
+  japaneseTitle: string;
+  image: string;
+  type: string;
+  sub: number;
+  dub: number;
+  episodes: number;
+}
+
+interface BrowseResponse {
+  currentPage: number;
+  hasNextPage: boolean;
+  totalPages: number;
+  results: BrowseAnime[];
+}
+
+export async function browseByGenre(genre: string, page = 1): Promise<BrowseResponse> {
+  return ofetch<BrowseResponse>(
+    `${base}/anime/animekai/genre/${encodeURIComponent(genre)}`,
+    { query: { page }, timeout: 10000 }
+  );
+}
+
+export async function browseNewReleases(page = 1): Promise<BrowseResponse> {
+  return ofetch<BrowseResponse>(
+    `${base}/anime/animekai/new-releases`,
+    { query: { page }, timeout: 10000 }
+  );
+}
+
+export async function browseTopAiring(page = 1): Promise<BrowseResponse> {
+  return ofetch<BrowseResponse>(
+    `${base}/anime/animekai/top-airing`,
+    { query: { page }, timeout: 10000 }
+  );
+}
+
+export async function browseMostPopular(page = 1): Promise<BrowseResponse> {
+  return ofetch<BrowseResponse>(
+    `${base}/anime/animekai/most-popular`,
+    { query: { page }, timeout: 10000 }
+  );
+}
+
 // ── Spotlight ──────────────────────────────────────────────────────────────────
 
 export interface ConsumetSpotlightAnime {
