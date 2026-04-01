@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { api } from "../lib/api";
+import type { RecentEpisodesResponse } from "@anime-app/types";
 
 export interface MediaItem {
   id: number;
@@ -73,6 +74,14 @@ export function useAnimeSearch(query: string, page = 1, perPage = 30) {
     queryFn: () =>
       api.get<PageResult>(`/api/anime/search?q=${encodeURIComponent(query)}&page=${page}&perPage=${perPage}`),
     enabled: query.length > 0,
+    staleTime: 1000 * 60 * 5,
+  });
+}
+
+export function useRecentEpisodes(page = 1) {
+  return useQuery<RecentEpisodesResponse>({
+    queryKey: ["anime", "recent-episodes", page],
+    queryFn: () => api.get<RecentEpisodesResponse>(`/api/anime/recent-episodes?page=${page}`),
     staleTime: 1000 * 60 * 5,
   });
 }
