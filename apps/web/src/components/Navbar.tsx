@@ -1,8 +1,10 @@
 import { Link, useNavigate } from "react-router-dom";
-import { FormEvent, useState } from "react";
+import { FormEvent, useState, useCallback } from "react";
+import NavMenu from "./NavMenu";
 
 export default function Navbar() {
   const [query, setQuery] = useState("");
+  const [menuOpen, setMenuOpen] = useState(false);
   const navigate = useNavigate();
 
   function handleSearch(e: FormEvent) {
@@ -11,9 +13,27 @@ export default function Navbar() {
     if (q) navigate(`/search?q=${encodeURIComponent(q)}`);
   }
 
+  const closeMenu = useCallback(() => setMenuOpen(false), []);
+
   return (
     <header className="sticky top-0 z-50 bg-gray-950/90 backdrop-blur border-b border-gray-800">
-      <div className="max-w-7xl mx-auto px-4 h-14 flex items-center gap-6">
+      <div className="max-w-7xl mx-auto px-4 h-14 flex items-center gap-4">
+
+        {/* Hamburger */}
+        <div className="relative shrink-0">
+          <button
+            onClick={() => setMenuOpen((v) => !v)}
+            aria-label="Open menu"
+            aria-expanded={menuOpen}
+            className="flex flex-col justify-center items-center w-9 h-9 gap-1.5 rounded-lg hover:bg-gray-800 transition-colors"
+          >
+            <span className={`block w-5 h-0.5 bg-gray-300 transition-all duration-200 ${menuOpen ? "rotate-45 translate-y-2" : ""}`} />
+            <span className={`block w-5 h-0.5 bg-gray-300 transition-all duration-200 ${menuOpen ? "opacity-0" : ""}`} />
+            <span className={`block w-5 h-0.5 bg-gray-300 transition-all duration-200 ${menuOpen ? "-rotate-45 -translate-y-2" : ""}`} />
+          </button>
+          <NavMenu open={menuOpen} onClose={closeMenu} />
+        </div>
+
         <Link to="/" className="text-white font-bold text-lg tracking-tight shrink-0">
           Anistream
         </Link>

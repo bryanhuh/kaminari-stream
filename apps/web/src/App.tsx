@@ -4,6 +4,7 @@ import Home from "./pages/Home";
 import Search from "./pages/Search";
 import AnimeDetail from "./pages/AnimeDetail";
 import Watch from "./pages/Watch";
+import Browse from "./pages/Browse";
 import ErrorBoundary from "./components/ErrorBoundary";
 
 export default function App() {
@@ -16,6 +17,7 @@ export default function App() {
           <Route path="/search" element={<ErrorBoundary><Search /></ErrorBoundary>} />
           <Route path="/anime/:id" element={<ErrorBoundary><AnimeDetail /></ErrorBoundary>} />
           <Route path="/watch" element={<ErrorBoundary><Watch /></ErrorBoundary>} />
+          <Route path="/browse" element={<ErrorBoundary><Browse /></ErrorBoundary>} />
         </Routes>
       </ErrorBoundary>
     </div>
