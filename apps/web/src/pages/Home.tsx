@@ -1,8 +1,9 @@
-import { useTrending, usePopular, useRecentEpisodes } from "../hooks/useAnime";
+import { useTrending, usePopular, useRecentEpisodes, useSpotlight } from "../hooks/useAnime";
 import { useContinueWatching } from "../hooks/useWatchHistory";
 import AnimeGrid from "../components/AnimeGrid";
 import ContinueWatchingCard from "../components/ContinueWatchingCard";
 import RecentEpisodeCard from "../components/RecentEpisodeCard";
+import HeroSpotlight from "../components/HeroSpotlight";
 
 export default function Home() {
   const { data: trendingData, isLoading: trendingLoading, error: trendingError } =
@@ -16,8 +17,18 @@ export default function Home() {
 
   const { data: recentData, isLoading: recentLoading } = useRecentEpisodes();
 
+  const { data: spotlightData, isLoading: spotlightLoading } = useSpotlight();
+
   return (
     <div className="max-w-7xl mx-auto px-4 py-8 flex flex-col gap-10">
+      {/* Hero Spotlight */}
+      {spotlightLoading && (
+        <div className="w-full rounded-xl bg-gray-800 animate-pulse" style={{ minHeight: "480px" }} />
+      )}
+      {!spotlightLoading && spotlightData && spotlightData.results.length > 0 && (
+        <HeroSpotlight items={spotlightData.results} />
+      )}
+
       {/* Continue Watching */}
       {hasContinue && (
         <section>

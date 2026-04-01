@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { api } from "../lib/api";
-import type { RecentEpisodesResponse } from "@anime-app/types";
+import type { RecentEpisodesResponse, SpotlightAnime } from "@anime-app/types";
 
 export interface MediaItem {
   id: number;
@@ -75,6 +75,14 @@ export function useAnimeSearch(query: string, page = 1, perPage = 30) {
       api.get<PageResult>(`/api/anime/search?q=${encodeURIComponent(query)}&page=${page}&perPage=${perPage}`),
     enabled: query.length > 0,
     staleTime: 1000 * 60 * 5,
+  });
+}
+
+export function useSpotlight() {
+  return useQuery<{ results: SpotlightAnime[] }>({
+    queryKey: ["anime", "spotlight"],
+    queryFn: () => api.get<{ results: SpotlightAnime[] }>("/api/anime/spotlight"),
+    staleTime: 1000 * 60 * 10,
   });
 }
 
