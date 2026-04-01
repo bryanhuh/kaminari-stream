@@ -47,7 +47,7 @@ function BrowseAnimeCard({ anime }: { anime: BrowseAnime }) {
         </div>
       </div>
       <div>
-        <p className="text-sm font-medium text-white leading-tight line-clamp-2 group-hover:text-indigo-400 transition-colors">
+        <p className="text-sm font-medium text-white leading-tight line-clamp-2 group-hover:text-primary-400 transition-colors">
           {anime.title}
         </p>
         <p className="text-xs text-gray-500 mt-0.5">
@@ -67,7 +67,7 @@ function GenreGrid({ onSelect }: { onSelect: (g: string) => void }) {
         <button
           key={g}
           onClick={() => onSelect(g)}
-          className="px-4 py-2 rounded-full border border-gray-700 text-sm text-gray-300 hover:border-indigo-500 hover:text-white hover:bg-indigo-500/10 transition-colors"
+          className="px-4 py-2 rounded-full border border-gray-700 text-sm text-gray-300 hover:border-primary-500 hover:text-white hover:bg-primary-500/10 transition-colors"
         >
           {g}
         </button>
@@ -84,7 +84,7 @@ function TypeGrid() {
         <button
           key={t.value}
           onClick={() => navigate(`/search?q=&type=${t.value}`)}
-          className="px-6 py-3 rounded-lg border border-gray-700 text-sm font-semibold text-gray-300 hover:border-indigo-500 hover:text-white hover:bg-indigo-500/10 transition-colors"
+          className="px-6 py-3 rounded-lg border border-gray-700 text-sm font-semibold text-gray-300 hover:border-primary-500 hover:text-white hover:bg-primary-500/10 transition-colors"
         >
           {t.label}
         </button>
@@ -217,7 +217,7 @@ export default function Browse() {
                       </div>
                     </div>
                     <div>
-                      <p className="text-sm font-medium text-white line-clamp-2 group-hover:text-indigo-400 transition-colors">{ep.title}</p>
+                      <p className="text-sm font-medium text-white line-clamp-2 group-hover:text-primary-400 transition-colors">{ep.title}</p>
                       <p className="text-xs text-gray-500 mt-0.5">Episode {ep.episodeNumber}</p>
                     </div>
                   </Link>

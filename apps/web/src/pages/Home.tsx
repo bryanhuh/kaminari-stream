@@ -32,7 +32,7 @@ export default function Home() {
       {/* Continue Watching */}
       {hasContinue && (
         <section>
-          <h2 className="text-xl font-bold text-white mb-4">Continue Watching</h2>
+          <h2 className="text-xl font-bold text-white mb-4 flex items-center gap-2"><span className="w-1 h-5 rounded-full bg-primary-500 shrink-0" />Continue Watching</h2>
           <div className="flex gap-4 overflow-x-auto pb-2 scrollbar-thin">
             {continueWatching.map((entry) => (
               <ContinueWatchingCard key={`${entry.animeId}-${entry.episodeId}`} entry={entry} />
@@ -43,7 +43,7 @@ export default function Home() {
 
       {/* Recent Episodes */}
       <section>
-        <h2 className="text-xl font-bold text-white mb-4">Recent Episodes</h2>
+        <h2 className="text-xl font-bold text-white mb-4 flex items-center gap-2"><span className="w-1 h-5 rounded-full bg-primary-500 shrink-0" />Recent Episodes</h2>
         {recentLoading && (
           <div className="flex gap-4 overflow-x-auto pb-2">
             {Array.from({ length: 10 }).map((_, i) => (
@@ -66,7 +66,7 @@ export default function Home() {
 
       {/* Trending */}
       <section>
-        <h2 className="text-xl font-bold text-white mb-4">Trending Now</h2>
+        <h2 className="text-xl font-bold text-white mb-4 flex items-center gap-2"><span className="w-1 h-5 rounded-full bg-primary-500 shrink-0" />Trending Now</h2>
         {trendingError && (
           <p className="text-red-400 text-sm">
             Failed to load trending: {(trendingError as Error).message}
@@ -81,7 +81,7 @@ export default function Home() {
 
       {/* Popular */}
       <section>
-        <h2 className="text-xl font-bold text-white mb-4">All-Time Popular</h2>
+        <h2 className="text-xl font-bold text-white mb-4 flex items-center gap-2"><span className="w-1 h-5 rounded-full bg-primary-500 shrink-0" />All-Time Popular</h2>
         {popularError && (
           <p className="text-red-400 text-sm">
             Failed to load popular: {(popularError as Error).message}

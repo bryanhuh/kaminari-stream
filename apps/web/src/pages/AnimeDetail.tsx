@@ -50,7 +50,7 @@ export default function AnimeDetail() {
         <p className="text-red-400">
           {(error as Error)?.message ?? "Anime not found"}
         </p>
-        <Link to="/" className="text-indigo-400 hover:underline mt-4 inline-block">
+        <Link to="/" className="text-primary-400 hover:underline mt-4 inline-block">
           Go home
         </Link>
       </div>

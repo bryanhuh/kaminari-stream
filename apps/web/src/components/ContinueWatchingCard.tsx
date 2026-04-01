@@ -39,13 +39,13 @@ export default function ContinueWatchingCard({ entry }: ContinueWatchingCardProp
         {/* Progress bar */}
         <div className="absolute bottom-0 left-0 right-0 h-1 bg-gray-700">
           <div
-            className="h-full bg-indigo-500"
+            className="h-full bg-primary-500"
             style={{ width: `${Math.round(pct * 100)}%` }}
           />
         </div>
       </div>
       <div className="flex flex-col gap-0.5">
-        <p className="text-sm font-medium text-white leading-tight line-clamp-2 group-hover:text-indigo-400 transition-colors">
+        <p className="text-sm font-medium text-white leading-tight line-clamp-2 group-hover:text-primary-400 transition-colors">
           {entry.animeTitle}
         </p>
         <p className="text-xs text-gray-500">Episode {entry.episodeNumber}</p>

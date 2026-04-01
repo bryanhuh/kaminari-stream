@@ -63,7 +63,7 @@ export default function EpisodeList({
               transition-colors overflow-hidden
               ${
                 isCurrent
-                  ? "bg-indigo-600 text-white"
+                  ? "bg-primary-600 text-white"
                   : progress?.done
                   ? "bg-gray-700 text-gray-400"
                   : "bg-gray-800 text-gray-300 hover:bg-gray-700 hover:text-white"
@@ -73,7 +73,7 @@ export default function EpisodeList({
             {/* Progress bar under the button */}
             {progress && !progress.done && !isCurrent && (
               <span
-                className="absolute bottom-0 left-0 h-0.5 bg-indigo-500"
+                className="absolute bottom-0 left-0 h-0.5 bg-primary-500"
                 style={{ width: `${Math.round(progress.pct * 100)}%` }}
               />
             )}

@@ -34,7 +34,7 @@ export default function Navbar() {
           <NavMenu open={menuOpen} onClose={closeMenu} />
         </div>
 
-        <Link to="/" className="text-white font-bold text-lg tracking-tight shrink-0">
+        <Link to="/" className="font-bold text-lg tracking-tight shrink-0 text-primary-400 hover:text-primary-300 transition-colors">
           Anistream
         </Link>
 
@@ -44,7 +44,7 @@ export default function Navbar() {
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Search anime..."
-            className="w-full bg-gray-800 text-sm text-white placeholder-gray-500 rounded-lg px-4 py-2 outline-none focus:ring-2 focus:ring-indigo-500"
+            className="w-full bg-gray-800 text-sm text-white placeholder-gray-500 rounded-lg px-4 py-2 outline-none focus:ring-2 focus:ring-primary-500"
           />
         </form>
 

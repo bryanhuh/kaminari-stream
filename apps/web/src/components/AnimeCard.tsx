@@ -50,7 +50,7 @@ export default function AnimeCard({
         )}
       </div>
       <div className="flex flex-col gap-0.5">
-        <p className="text-sm font-medium text-white leading-tight line-clamp-2 group-hover:text-indigo-400 transition-colors">
+        <p className="text-sm font-medium text-white leading-tight line-clamp-2 group-hover:text-primary-400 transition-colors">
           {title}
         </p>
         <p className="text-xs text-gray-500">

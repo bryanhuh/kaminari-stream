@@ -65,7 +65,7 @@ export default function Watch() {
     return (
       <div className="max-w-5xl mx-auto px-4 py-16 text-center">
         <p className="text-gray-400">Invalid watch URL.</p>
-        <Link to="/" className="text-indigo-400 hover:underline mt-2 inline-block">
+        <Link to="/" className="text-primary-400 hover:underline mt-2 inline-block">
           Go home
         </Link>
       </div>
@@ -91,7 +91,7 @@ export default function Watch() {
         {streamLoading && (
           <div className="w-full aspect-video bg-gray-900 rounded-lg flex items-center justify-center">
             <div className="flex flex-col items-center gap-3">
-              <div className="w-8 h-8 border-2 border-indigo-500 border-t-transparent rounded-full animate-spin" />
+              <div className="w-8 h-8 border-2 border-primary-500 border-t-transparent rounded-full animate-spin" />
               <p className="text-gray-500 text-sm">Loading stream...</p>
             </div>
           </div>

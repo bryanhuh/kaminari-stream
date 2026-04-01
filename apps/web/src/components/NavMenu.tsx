@@ -58,7 +58,7 @@ export default function NavMenu({ open, onClose }: NavMenuProps) {
           <button
             key={item.category}
             onClick={() => navigate_to(item.category)}
-            className={`w-full text-left px-7 py-3.5 text-lg font-bold tracking-wider text-gray-200 hover:text-white hover:bg-white/5 transition-colors ${
+            className={`w-full text-left px-7 py-3.5 text-lg font-bold tracking-wider text-gray-300 hover:text-primary-400 hover:bg-primary-500/5 transition-colors ${
               i < MENU_ITEMS.length - 1 ? "border-b border-gray-800/60" : ""
             }`}
           >

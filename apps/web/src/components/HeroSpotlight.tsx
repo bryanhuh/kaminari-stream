@@ -62,7 +62,7 @@ export default function HeroSpotlight({ items }: HeroSpotlightProps) {
         <div className="max-w-xl">
           {/* Rank badge */}
           <div className="flex items-center gap-2 mb-3">
-            <span className="text-xs font-bold text-indigo-400 uppercase tracking-widest">
+            <span className="text-xs font-bold text-primary-400 uppercase tracking-widest">
               #{active + 1} Spotlight
             </span>
             <span className="text-xs text-gray-500">•</span>
@@ -101,7 +101,7 @@ export default function HeroSpotlight({ items }: HeroSpotlightProps) {
             {current.anilistId ? (
               <Link
                 to={`/anime/${current.anilistId}`}
-                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-sm transition-colors"
+                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-primary-600 hover:bg-primary-500 text-white font-semibold text-sm transition-colors"
               >
                 <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
                   <path d="M8 5v14l11-7z" />
@@ -113,13 +113,13 @@ export default function HeroSpotlight({ items }: HeroSpotlightProps) {
             <div className="flex items-center gap-3 text-xs text-gray-400">
               {current.sub > 0 && (
                 <span className="flex items-center gap-1">
-                  <span className="w-1.5 h-1.5 rounded-full bg-indigo-400" />
+                  <span className="w-1.5 h-1.5 rounded-full bg-primary-400" />
                   Sub {current.sub} eps
                 </span>
               )}
               {current.dub > 0 && (
                 <span className="flex items-center gap-1">
-                  <span className="w-1.5 h-1.5 rounded-full bg-purple-400" />
+                  <span className="w-1.5 h-1.5 rounded-full bg-primary-300" />
                   Dub {current.dub} eps
                 </span>
               )}
@@ -161,7 +161,7 @@ export default function HeroSpotlight({ items }: HeroSpotlightProps) {
                 aria-label={`Slide ${i + 1}`}
                 className={`rounded-full transition-all duration-300 ${
                   i === active
-                    ? "w-6 h-1.5 bg-indigo-400"
+                    ? "w-6 h-1.5 bg-primary-400"
                     : "w-1.5 h-1.5 bg-white/30 hover:bg-white/60"
                 }`}
               />
