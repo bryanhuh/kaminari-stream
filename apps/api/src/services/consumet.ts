@@ -109,6 +109,35 @@ interface ConsumetRecentEpisodesResponse {
   results: ConsumetRecentEpisode[];
 }
 
+// ── Spotlight ──────────────────────────────────────────────────────────────────
+
+export interface ConsumetSpotlightAnime {
+  id: string;
+  title: string;
+  japaneseTitle: string;
+  banner: string;
+  url: string;
+  type: string;
+  genres: string[];
+  releaseDate: string;
+  quality: string;
+  sub: number;
+  dub: number;
+  description: string;
+}
+
+interface ConsumetSpotlightResponse {
+  results: ConsumetSpotlightAnime[];
+}
+
+export async function getSpotlight(): Promise<ConsumetSpotlightAnime[]> {
+  const res = await ofetch<ConsumetSpotlightResponse>(
+    `${base}/anime/animekai/spotlight`,
+    { timeout: 10000 }
+  );
+  return res.results ?? [];
+}
+
 export async function getRecentEpisodes(page = 1): Promise<ConsumetRecentEpisodesResponse> {
   return ofetch<ConsumetRecentEpisodesResponse>(
     `${base}/anime/animekai/recent-episodes`,
