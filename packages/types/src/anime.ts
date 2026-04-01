@@ -34,6 +34,23 @@ export interface Episode {
   airDate: string | null;
 }
 
+export interface RecentEpisode {
+  id: string;
+  title: string;
+  url: string;
+  image: string;
+  episodeNumber: number;
+  releaseDate: string;
+  subOrDub: "sub" | "dub";
+  anilistId: number | null;
+}
+
+export interface RecentEpisodesResponse {
+  currentPage: number;
+  hasNextPage: boolean;
+  results: RecentEpisode[];
+}
+
 export interface StreamSource {
   url: string;
   quality: string;
