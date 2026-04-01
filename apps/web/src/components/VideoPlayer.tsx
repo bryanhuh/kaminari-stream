@@ -43,7 +43,10 @@ export default function VideoPlayer({
 }: VideoPlayerProps) {
   const playerRef = useRef<MediaPlayerInstance>(null);
   const referer = streamData.headers?.Referer;
-  const src = proxied(getBestSource(streamData.sources), referer);
+  const rawSrc = getBestSource(streamData.sources);
+  const srcUrl = proxied(rawSrc, referer);
+  // Vidstack can't sniff HLS type from the proxy URL, so provide it explicitly
+  const src = { src: srcUrl, type: "application/x-mpegurl" as const };
 
   // Seek to saved position after media is ready
   useEffect(() => {
