@@ -3,6 +3,26 @@ import { config } from "../config";
 
 const ANILIST_URL = config.anilistUrl ?? "https://graphql.anilist.co";
 
+// Retry wrapper: on 429, wait and retry up to maxRetries times
+async function withRetry<T>(fn: () => Promise<T>, maxRetries = 3): Promise<T> {
+  let delay = 1000;
+  for (let attempt = 0; attempt <= maxRetries; attempt++) {
+    try {
+      return await fn();
+    } catch (err: unknown) {
+      const status =
+        (err as { response?: { status?: number } })?.response?.status;
+      if (status === 429 && attempt < maxRetries) {
+        await new Promise((r) => setTimeout(r, delay));
+        delay *= 2;
+        continue;
+      }
+      throw err;
+    }
+  }
+  throw new Error("unreachable");
+}
+
 // ── Shared media fields ────────────────────────────────────────────────────────
 
 const MEDIA_FIELDS = `
@@ -95,17 +115,21 @@ const DETAIL_QUERY = `
 // ── Public helpers ─────────────────────────────────────────────────────────────
 
 export async function getTrending(page = 1, perPage = 18) {
-  return request<{ Page: { media: unknown[] } }>(ANILIST_URL, TRENDING_QUERY, {
-    page,
-    perPage,
-  });
+  return withRetry(() =>
+    request<{ Page: { media: unknown[] } }>(ANILIST_URL, TRENDING_QUERY, {
+      page,
+      perPage,
+    })
+  );
 }
 
 export async function getPopular(page = 1, perPage = 12) {
-  return request<{ Page: { media: unknown[] } }>(ANILIST_URL, POPULAR_QUERY, {
-    page,
-    perPage,
-  });
+  return withRetry(() =>
+    request<{ Page: { media: unknown[] } }>(ANILIST_URL, POPULAR_QUERY, {
+      page,
+      perPage,
+    })
+  );
 }
 
 export async function searchAnimeAnilist(
@@ -113,10 +137,12 @@ export async function searchAnimeAnilist(
   page = 1,
   perPage = 30
 ) {
-  return request<{ Page: { pageInfo: { total: number; hasNextPage: boolean }; media: unknown[] } }>(
-    ANILIST_URL,
-    SEARCH_QUERY,
-    { search, page, perPage }
+  return withRetry(() =>
+    request<{ Page: { pageInfo: { total: number; hasNextPage: boolean }; media: unknown[] } }>(
+      ANILIST_URL,
+      SEARCH_QUERY,
+      { search, page, perPage }
+    )
   );
 }
 
@@ -132,14 +158,18 @@ const AZ_QUERY = `
 `;
 
 export async function browseAZ(letter: string, page = 1, perPage = 30) {
-  return request<{
-    Page: {
-      pageInfo: { hasNextPage: boolean; total: number };
-      media: unknown[];
-    };
-  }>(ANILIST_URL, AZ_QUERY, { search: letter, page, perPage });
+  return withRetry(() =>
+    request<{
+      Page: {
+        pageInfo: { hasNextPage: boolean; total: number };
+        media: unknown[];
+      };
+    }>(ANILIST_URL, AZ_QUERY, { search: letter, page, perPage })
+  );
 }
 
 export async function getAnimeDetail(id: number) {
-  return request<{ Media: unknown }>(ANILIST_URL, DETAIL_QUERY, { id });
+  return withRetry(() =>
+    request<{ Media: unknown }>(ANILIST_URL, DETAIL_QUERY, { id })
+  );
 }
