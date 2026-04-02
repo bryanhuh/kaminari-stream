@@ -1,5 +1,6 @@
 import { Routes, Route } from "react-router-dom";
 import Navbar from "./components/Navbar";
+import Footer from "./components/Footer";
 import Home from "./pages/Home";
 import Search from "./pages/Search";
 import AnimeDetail from "./pages/AnimeDetail";
@@ -9,17 +10,20 @@ import ErrorBoundary from "./components/ErrorBoundary";
 
 export default function App() {
   return (
-    <div className="min-h-screen bg-[#0a0a0f] text-white">
+    <div className="min-h-screen bg-[#0a0a0f] text-white flex flex-col">
       <Navbar />
-      <ErrorBoundary>
-        <Routes>
-          <Route path="/" element={<ErrorBoundary><Home /></ErrorBoundary>} />
-          <Route path="/search" element={<ErrorBoundary><Search /></ErrorBoundary>} />
-          <Route path="/anime/:id" element={<ErrorBoundary><AnimeDetail /></ErrorBoundary>} />
-          <Route path="/watch" element={<ErrorBoundary><Watch /></ErrorBoundary>} />
-          <Route path="/browse" element={<ErrorBoundary><Browse /></ErrorBoundary>} />
-        </Routes>
-      </ErrorBoundary>
+      <main className="flex-1">
+        <ErrorBoundary>
+          <Routes>
+            <Route path="/" element={<ErrorBoundary><Home /></ErrorBoundary>} />
+            <Route path="/search" element={<ErrorBoundary><Search /></ErrorBoundary>} />
+            <Route path="/anime/:id" element={<ErrorBoundary><AnimeDetail /></ErrorBoundary>} />
+            <Route path="/watch" element={<ErrorBoundary><Watch /></ErrorBoundary>} />
+            <Route path="/browse" element={<ErrorBoundary><Browse /></ErrorBoundary>} />
+          </Routes>
+        </ErrorBoundary>
+      </main>
+      <Footer />
     </div>
   );
 }
