@@ -32,12 +32,12 @@ export default function HeroSpotlight({ items }: HeroSpotlightProps) {
 
   return (
     <div
-      className="relative w-full overflow-hidden rounded-xl"
-      style={{ minHeight: "480px" }}
+      className="relative w-full overflow-hidden rounded-2xl"
+      style={{ minHeight: "560px" }}
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
     >
-      {/* Banner images — preload adjacent */}
+      {/* Banner images */}
       {items.map((item, i) => (
         <div
           key={item.id}
@@ -53,30 +53,38 @@ export default function HeroSpotlight({ items }: HeroSpotlightProps) {
         </div>
       ))}
 
-      {/* Gradient overlays */}
-      <div className="absolute inset-0 z-10 bg-gradient-to-r from-black/90 via-black/50 to-transparent" />
-      <div className="absolute inset-0 z-10 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
+      {/* Gradient overlays — cinematic bottom + left fade */}
+      <div className="absolute inset-0 z-10 bg-gradient-to-r from-[#0a0a0f]/95 via-[#0a0a0f]/60 to-transparent" />
+      <div className="absolute inset-0 z-10 bg-gradient-to-t from-[#0a0a0f] via-[#0a0a0f]/20 to-transparent" />
 
       {/* Content */}
-      <div className="relative z-20 flex flex-col justify-end h-full p-8 md:p-12" style={{ minHeight: "480px" }}>
-        <div className="max-w-xl">
-          {/* Rank badge */}
+      <div className="relative z-20 flex flex-col justify-end h-full p-8 md:p-12" style={{ minHeight: "560px" }}>
+        <div className="max-w-lg">
+          {/* Top meta */}
           <div className="flex items-center gap-2 mb-3">
             <span className="text-xs font-bold text-primary-400 uppercase tracking-widest">
               #{active + 1} Spotlight
             </span>
-            <span className="text-xs text-gray-500">•</span>
-            <span className="text-xs text-gray-400">{current.type}</span>
-            <span className="text-xs text-gray-500">•</span>
-            <span className="text-xs text-gray-400">{current.releaseDate}</span>
+            {current.type && (
+              <>
+                <span className="text-[#5d6169]">·</span>
+                <span className="text-xs text-[#bfc1c6] uppercase tracking-wide">{current.type}</span>
+              </>
+            )}
+            {current.releaseDate && (
+              <>
+                <span className="text-[#5d6169]">·</span>
+                <span className="text-xs text-[#bfc1c6]">{current.releaseDate}</span>
+              </>
+            )}
           </div>
 
           {/* Title */}
-          <h1 className="text-3xl md:text-4xl font-bold text-white leading-tight mb-1 drop-shadow-lg">
+          <h1 className="text-3xl md:text-5xl font-extrabold text-white leading-tight mb-1 drop-shadow-lg tracking-tight">
             {current.title}
           </h1>
           {current.japaneseTitle && (
-            <p className="text-sm text-gray-400 mb-3">{current.japaneseTitle}</p>
+            <p className="text-sm text-[#5d6169] mb-4">{current.japaneseTitle}</p>
           )}
 
           {/* Genres */}
@@ -84,7 +92,7 @@ export default function HeroSpotlight({ items }: HeroSpotlightProps) {
             {current.genres.slice(0, 4).map((g) => (
               <span
                 key={g}
-                className="text-xs px-2.5 py-0.5 rounded-full border border-white/20 text-gray-300 bg-white/5 backdrop-blur-sm"
+                className="text-xs px-2.5 py-1 rounded-full border border-white/15 text-[#bfc1c6] bg-white/5 backdrop-blur-sm"
               >
                 {g}
               </span>
@@ -92,16 +100,16 @@ export default function HeroSpotlight({ items }: HeroSpotlightProps) {
           </div>
 
           {/* Description */}
-          <p className="text-sm text-gray-300 leading-relaxed line-clamp-3 mb-5 max-w-lg">
+          <p className="text-sm text-[#bfc1c6] leading-relaxed line-clamp-3 mb-6 max-w-md">
             {current.description}
           </p>
 
-          {/* Episode counts + CTA */}
-          <div className="flex items-center gap-4">
+          {/* CTAs */}
+          <div className="flex items-center gap-3">
             {current.anilistId ? (
               <Link
                 to={`/anime/${current.anilistId}`}
-                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-primary-600 hover:bg-primary-500 text-white font-semibold text-sm transition-colors"
+                className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-primary-500 hover:bg-primary-400 text-white font-bold text-sm transition-colors shadow-lg shadow-primary-500/20"
               >
                 <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
                   <path d="M8 5v14l11-7z" />
@@ -110,16 +118,17 @@ export default function HeroSpotlight({ items }: HeroSpotlightProps) {
               </Link>
             ) : null}
 
-            <div className="flex items-center gap-3 text-xs text-gray-400">
+            {/* Sub/Dub counts */}
+            <div className="flex items-center gap-3 text-xs text-[#bfc1c6]">
               {current.sub > 0 && (
-                <span className="flex items-center gap-1">
+                <span className="flex items-center gap-1.5">
                   <span className="w-1.5 h-1.5 rounded-full bg-primary-400" />
                   Sub {current.sub} eps
                 </span>
               )}
               {current.dub > 0 && (
-                <span className="flex items-center gap-1">
-                  <span className="w-1.5 h-1.5 rounded-full bg-primary-300" />
+                <span className="flex items-center gap-1.5">
+                  <span className="w-1.5 h-1.5 rounded-full bg-white/40" />
                   Dub {current.dub} eps
                 </span>
               )}
@@ -132,28 +141,28 @@ export default function HeroSpotlight({ items }: HeroSpotlightProps) {
           <>
             <button
               onClick={prev}
-              className="absolute left-4 top-1/2 -translate-y-1/2 z-30 w-9 h-9 rounded-full bg-black/50 hover:bg-black/70 text-white flex items-center justify-center transition-colors backdrop-blur-sm"
+              className="absolute left-4 top-1/2 -translate-y-1/2 z-30 w-10 h-10 rounded-full bg-black/60 hover:bg-black/80 text-white flex items-center justify-center transition-colors backdrop-blur-sm border border-white/10"
               aria-label="Previous"
             >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
               </svg>
             </button>
             <button
               onClick={next}
-              className="absolute right-4 top-1/2 -translate-y-1/2 z-30 w-9 h-9 rounded-full bg-black/50 hover:bg-black/70 text-white flex items-center justify-center transition-colors backdrop-blur-sm"
+              className="absolute right-4 top-1/2 -translate-y-1/2 z-30 w-10 h-10 rounded-full bg-black/60 hover:bg-black/80 text-white flex items-center justify-center transition-colors backdrop-blur-sm border border-white/10"
               aria-label="Next"
             >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
               </svg>
             </button>
           </>
         )}
 
-        {/* Dots */}
+        {/* Dots — bottom center */}
         {items.length > 1 && (
-          <div className="absolute bottom-5 right-8 z-30 flex items-center gap-1.5">
+          <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-30 flex items-center gap-2">
             {items.map((_, i) => (
               <button
                 key={i}
@@ -161,8 +170,8 @@ export default function HeroSpotlight({ items }: HeroSpotlightProps) {
                 aria-label={`Slide ${i + 1}`}
                 className={`rounded-full transition-all duration-300 ${
                   i === active
-                    ? "w-6 h-1.5 bg-primary-400"
-                    : "w-1.5 h-1.5 bg-white/30 hover:bg-white/60"
+                    ? "w-6 h-2 bg-primary-500"
+                    : "w-2 h-2 bg-white/25 hover:bg-white/50"
                 }`}
               />
             ))}
