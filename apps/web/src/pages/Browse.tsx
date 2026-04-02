@@ -23,8 +23,8 @@ type BrowseCategory = "genres" | "types" | "new-releases" | "updates" | "ongoing
 
 function BrowseAnimeCard({ anime }: { anime: BrowseAnime }) {
   return (
-    <div className="group flex flex-col gap-2">
-      <div className="relative overflow-hidden rounded-lg aspect-[3/4] bg-gray-800">
+    <div className="group flex flex-col gap-2.5">
+      <div className="relative overflow-hidden rounded-xl aspect-[3/4] bg-[#111118]">
         {anime.image ? (
           <img
             src={anime.image}
@@ -32,26 +32,28 @@ function BrowseAnimeCard({ anime }: { anime: BrowseAnime }) {
             className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
           />
         ) : (
-          <div className="w-full h-full flex items-center justify-center text-gray-600 text-xs">No image</div>
+          <div className="w-full h-full flex items-center justify-center text-[#5d6169] text-xs">No image</div>
         )}
-        <div className="absolute top-2 left-2">
-          <span className="text-xs bg-black/60 text-gray-300 px-1.5 py-0.5 rounded uppercase tracking-wide">
-            {anime.type}
-          </span>
-        </div>
-        <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/40">
-          <div className="w-10 h-10 rounded-full bg-white/90 flex items-center justify-center">
-            <svg className="w-4 h-4 text-gray-900 ml-0.5" fill="currentColor" viewBox="0 0 24 24">
+        {anime.type && (
+          <div className="absolute top-2 left-2">
+            <span className="text-xs bg-black/70 text-[#bfc1c6] px-1.5 py-0.5 rounded uppercase tracking-wide backdrop-blur-sm">
+              {anime.type}
+            </span>
+          </div>
+        )}
+        <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200 bg-black/50">
+          <div className="w-11 h-11 rounded-full bg-primary-500/90 flex items-center justify-center shadow-lg">
+            <svg className="w-5 h-5 text-white ml-0.5" fill="currentColor" viewBox="0 0 24 24">
               <path d="M8 5v14l11-7z" />
             </svg>
           </div>
         </div>
       </div>
-      <div>
-        <p className="text-sm font-medium text-white leading-tight line-clamp-2 group-hover:text-primary-400 transition-colors">
+      <div className="px-0.5">
+        <p className="text-sm font-semibold text-white leading-tight line-clamp-2 group-hover:text-primary-400 transition-colors">
           {anime.title}
         </p>
-        <p className="text-xs text-gray-500 mt-0.5">
+        <p className="text-xs text-[#5d6169] mt-0.5">
           {anime.sub > 0 && `Sub ${anime.sub}`}
           {anime.sub > 0 && anime.dub > 0 && " · "}
           {anime.dub > 0 && `Dub ${anime.dub}`}
@@ -68,7 +70,7 @@ function GenreGrid({ onSelect }: { onSelect: (g: string) => void }) {
         <button
           key={g}
           onClick={() => onSelect(g)}
-          className="px-4 py-2 rounded-full border border-gray-700 text-sm text-gray-300 hover:border-primary-500 hover:text-white hover:bg-primary-500/10 transition-colors"
+          className="px-4 py-2 rounded-full border border-[#2a2a38] text-sm text-[#bfc1c6] hover:border-primary-500 hover:text-white hover:bg-primary-500/10 transition-colors"
         >
           {g}
         </button>
@@ -85,7 +87,7 @@ function TypeGrid() {
         <button
           key={t.value}
           onClick={() => navigate(`/search?q=&type=${t.value}`)}
-          className="px-6 py-3 rounded-lg border border-gray-700 text-sm font-semibold text-gray-300 hover:border-primary-500 hover:text-white hover:bg-primary-500/10 transition-colors"
+          className="px-6 py-3 rounded-xl border border-[#2a2a38] text-sm font-semibold text-[#bfc1c6] hover:border-primary-500 hover:text-white hover:bg-primary-500/10 transition-colors"
         >
           {t.label}
         </button>
@@ -100,8 +102,8 @@ function BrowseGrid({ items, loading }: { items: BrowseAnime[]; loading: boolean
       <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-4">
         {Array.from({ length: 18 }).map((_, i) => (
           <div key={i}>
-            <div className="rounded-lg aspect-[3/4] bg-gray-800 animate-pulse" />
-            <div className="h-3 bg-gray-800 animate-pulse rounded mt-2 w-4/5" />
+            <div className="rounded-xl aspect-[3/4] bg-[#111118] animate-pulse" />
+            <div className="h-3 bg-[#111118] animate-pulse rounded mt-2 w-4/5" />
           </div>
         ))}
       </div>
@@ -125,7 +127,7 @@ const CATEGORY_LABELS: Record<BrowseCategory, string> = {
   updates: "Updates",
   ongoing: "Ongoing",
   recent: "Recent Episodes",
-  az: "A-Z List",
+  az: "A–Z List",
 };
 
 export default function Browse() {
@@ -158,13 +160,13 @@ export default function Browse() {
   const pageTitle = isGenreDrill
     ? genre!
     : category === "az"
-    ? `A-Z List — ${azLetter}`
+    ? `A–Z List — ${azLetter}`
     : CATEGORY_LABELS[category];
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-8">
       {/* Breadcrumb */}
-      <div className="flex items-center gap-2 text-sm text-gray-500 mb-6">
+      <div className="flex items-center gap-2 text-sm text-[#5d6169] mb-5">
         <Link to="/" className="hover:text-white transition-colors">Home</Link>
         <span>/</span>
         {isGenreDrill ? (
@@ -176,14 +178,18 @@ export default function Browse() {
               Genres
             </button>
             <span>/</span>
-            <span className="text-gray-300">{genre}</span>
+            <span className="text-[#bfc1c6]">{genre}</span>
           </>
         ) : (
-          <span className="text-gray-300">{pageTitle}</span>
+          <span className="text-[#bfc1c6]">{pageTitle}</span>
         )}
       </div>
 
-      <h1 className="text-2xl font-bold text-white mb-6">{pageTitle}</h1>
+      {/* Page title with cyan underline accent */}
+      <div className="mb-8">
+        <h1 className="text-3xl font-extrabold text-white tracking-tight mb-2">{pageTitle}</h1>
+        <div className="w-12 h-1 rounded-full bg-primary-500" />
+      </div>
 
       {/* Genres category */}
       {category === "genres" && !genre && (
@@ -214,8 +220,8 @@ export default function Browse() {
                 onClick={() => setSearchParams({ category: "az", letter: l })}
                 className={`w-9 h-9 rounded-lg text-sm font-bold transition-colors ${
                   l === azLetter
-                    ? "bg-primary-500 text-white"
-                    : "bg-gray-800 text-gray-400 hover:bg-gray-700 hover:text-white"
+                    ? "bg-primary-500 text-white shadow-md shadow-primary-500/20"
+                    : "bg-[#111118] text-[#bfc1c6] hover:bg-[#1a1a24] hover:text-white border border-[#2a2a38]"
                 }`}
               >
                 {l}
@@ -236,8 +242,8 @@ export default function Browse() {
           {recentLoading
             ? Array.from({ length: 18 }).map((_, i) => (
                 <div key={i}>
-                  <div className="rounded-lg aspect-[3/4] bg-gray-800 animate-pulse" />
-                  <div className="h-3 bg-gray-800 animate-pulse rounded mt-2 w-4/5" />
+                  <div className="rounded-xl aspect-[3/4] bg-[#111118] animate-pulse" />
+                  <div className="h-3 bg-[#111118] animate-pulse rounded mt-2 w-4/5" />
                 </div>
               ))
             : recentData?.results.map((ep) => {
@@ -245,18 +251,25 @@ export default function Browse() {
                   ? `/watch?animeId=${ep.anilistId}&episodeId=${encodeURIComponent(ep.id)}&ep=${ep.episodeNumber}`
                   : "#";
                 return (
-                  <Link key={`${ep.id}-${ep.episodeNumber}`} to={to} className="group flex flex-col gap-2">
-                    <div className="relative overflow-hidden rounded-lg aspect-[3/4] bg-gray-800">
+                  <Link key={`${ep.id}-${ep.episodeNumber}`} to={to} className="group flex flex-col gap-2.5">
+                    <div className="relative overflow-hidden rounded-xl aspect-[3/4] bg-[#111118]">
                       {ep.image && (
                         <img src={ep.image} alt={ep.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
                       )}
+                      <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200 bg-black/50">
+                        <div className="w-11 h-11 rounded-full bg-primary-500/90 flex items-center justify-center shadow-lg">
+                          <svg className="w-5 h-5 text-white ml-0.5" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M8 5v14l11-7z" />
+                          </svg>
+                        </div>
+                      </div>
                       <div className="absolute top-2 right-2">
-                        <span className="text-xs bg-black/60 text-gray-300 px-1.5 py-0.5 rounded uppercase">{ep.subOrDub}</span>
+                        <span className="text-xs bg-black/70 text-[#bfc1c6] px-1.5 py-0.5 rounded uppercase backdrop-blur-sm">{ep.subOrDub}</span>
                       </div>
                     </div>
-                    <div>
-                      <p className="text-sm font-medium text-white line-clamp-2 group-hover:text-primary-400 transition-colors">{ep.title}</p>
-                      <p className="text-xs text-gray-500 mt-0.5">Episode {ep.episodeNumber}</p>
+                    <div className="px-0.5">
+                      <p className="text-sm font-semibold text-white line-clamp-2 group-hover:text-primary-400 transition-colors">{ep.title}</p>
+                      <p className="text-xs text-[#5d6169] mt-0.5">Episode {ep.episodeNumber}</p>
                     </div>
                   </Link>
                 );
