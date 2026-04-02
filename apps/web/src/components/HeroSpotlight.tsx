@@ -32,8 +32,8 @@ export default function HeroSpotlight({ items }: HeroSpotlightProps) {
 
   return (
     <div
-      className="relative w-full overflow-hidden rounded-2xl"
-      style={{ minHeight: "560px" }}
+      className="relative w-full overflow-hidden"
+      style={{ minHeight: "600px" }}
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
     >
@@ -58,7 +58,7 @@ export default function HeroSpotlight({ items }: HeroSpotlightProps) {
       <div className="absolute inset-0 z-10 bg-gradient-to-t from-[#0a0a0f] via-[#0a0a0f]/20 to-transparent" />
 
       {/* Content */}
-      <div className="relative z-20 flex flex-col justify-end h-full p-8 md:p-12" style={{ minHeight: "560px" }}>
+      <div className="relative z-20 flex flex-col justify-end h-full p-8 md:p-16" style={{ minHeight: "600px" }}>
         <div className="max-w-lg">
           {/* Top meta */}
           <div className="flex items-center gap-2 mb-3">
