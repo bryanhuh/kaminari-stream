@@ -9,7 +9,7 @@ import ErrorBoundary from "./components/ErrorBoundary";
 
 export default function App() {
   return (
-    <div className="min-h-screen bg-gray-950 text-white">
+    <div className="min-h-screen bg-[#0a0a0f] text-white">
       <Navbar />
       <ErrorBoundary>
         <Routes>

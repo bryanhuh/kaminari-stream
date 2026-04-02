@@ -78,30 +78,30 @@ export default function Watch() {
   return (
     <div className="max-w-6xl mx-auto px-4 py-6 flex flex-col gap-6">
       {/* Breadcrumb */}
-      <div className="flex items-center gap-2 text-sm text-gray-500">
+      <div className="flex items-center gap-2 text-sm text-[#5d6169]">
         <Link to={`/anime/${animeId}`} className="hover:text-white transition-colors">
           {title !== "Unknown" ? title : "Anime"}
         </Link>
         <span>/</span>
-        <span className="text-gray-300">{episodeTitle}</span>
+        <span className="text-[#bfc1c6]">{episodeTitle}</span>
       </div>
 
       {/* Player */}
       <div className="w-full">
         {streamLoading && (
-          <div className="w-full aspect-video bg-gray-900 rounded-lg flex items-center justify-center">
+          <div className="w-full aspect-video bg-[#111118] rounded-xl flex items-center justify-center">
             <div className="flex flex-col items-center gap-3">
               <div className="w-8 h-8 border-2 border-primary-500 border-t-transparent rounded-full animate-spin" />
-              <p className="text-gray-500 text-sm">Loading stream...</p>
+              <p className="text-[#5d6169] text-sm">Loading stream...</p>
             </div>
           </div>
         )}
         {streamError && (
-          <div className="w-full aspect-video bg-gray-900 rounded-lg flex flex-col items-center justify-center gap-2">
+          <div className="w-full aspect-video bg-[#111118] rounded-xl flex flex-col items-center justify-center gap-2">
             <p className="text-red-400 text-sm">Failed to load stream</p>
-            <p className="text-gray-600 text-xs">{streamError.message}</p>
-            <p className="text-gray-600 text-xs mt-1">
-              Make sure Consumet is running: <code className="text-gray-500">docker compose up -d</code>
+            <p className="text-[#5d6169] text-xs">{streamError.message}</p>
+            <p className="text-[#5d6169] text-xs mt-1">
+              Make sure Consumet is running: <code className="text-[#bfc1c6]">docker compose up -d</code>
             </p>
           </div>
         )}
@@ -119,7 +119,7 @@ export default function Watch() {
       <div>
         <h1 className="text-base font-semibold text-white">{pageTitle}</h1>
         {savedEntry && savedEntry.durationSeconds > 0 && (
-          <p className="text-xs text-gray-500 mt-1">
+          <p className="text-xs text-[#5d6169] mt-1">
             Resumed from {formatTime(savedEntry.progressSeconds)}
           </p>
         )}
