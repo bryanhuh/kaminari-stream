@@ -10,6 +10,20 @@ import { getRecentEpisodes, getSpotlight } from "../services/consumet";
 
 const router = Router();
 
+// Run `items` through `fn` with at most `concurrency` in-flight at a time
+async function mapWithConcurrency<T, R>(
+  items: T[],
+  fn: (item: T) => Promise<R>,
+  concurrency: number
+): Promise<R[]> {
+  const results: R[] = [];
+  for (let i = 0; i < items.length; i += concurrency) {
+    const batch = await Promise.all(items.slice(i, i + concurrency).map(fn));
+    results.push(...batch);
+  }
+  return results;
+}
+
 router.get("/trending", async (req: Request, res: Response) => {
   const page = Number(req.query.page) || 1;
   const perPage = Number(req.query.perPage) || 18;
@@ -27,8 +41,9 @@ router.get("/popular", async (req: Request, res: Response) => {
 router.get("/spotlight", async (req: Request, res: Response) => {
   const items = await getSpotlight();
 
-  const withAnilistIds = await Promise.all(
-    items.map(async (anime) => {
+  const withAnilistIds = await mapWithConcurrency(
+    items,
+    async (anime) => {
       try {
         const result = await searchAnimeAnilist(anime.title, 1, 1);
         const media = result.Page.media[0] as { id: number } | undefined;
@@ -36,7 +51,8 @@ router.get("/spotlight", async (req: Request, res: Response) => {
       } catch {
         return { ...anime, anilistId: null };
       }
-    })
+    },
+    3
   );
 
   res.json({ data: { results: withAnilistIds } });
@@ -46,9 +62,10 @@ router.get("/recent-episodes", async (req: Request, res: Response) => {
   const page = Number(req.query.page) || 1;
   const recent = await getRecentEpisodes(page);
 
-  // Resolve AniList IDs in parallel; failures produce null
-  const withAnilistIds = await Promise.all(
-    recent.results.map(async (ep) => {
+  // Resolve AniList IDs in batches of 3 to avoid rate limiting
+  const withAnilistIds = await mapWithConcurrency(
+    recent.results,
+    async (ep) => {
       try {
         const result = await searchAnimeAnilist(ep.title, 1, 1);
         const media = result.Page.media[0] as { id: number } | undefined;
@@ -56,7 +73,8 @@ router.get("/recent-episodes", async (req: Request, res: Response) => {
       } catch {
         return { ...ep, anilistId: null };
       }
-    })
+    },
+    3
   );
 
   res.json({
@@ -108,8 +126,17 @@ router.get("/:id", async (req: Request, res: Response) => {
     res.status(400).json({ error: "Invalid anime id" });
     return;
   }
-  const data = await getAnimeDetail(id);
-  res.json({ data });
+  try {
+    const data = await getAnimeDetail(id);
+    res.json({ data });
+  } catch (err: unknown) {
+    const status = (err as { response?: { status?: number } })?.response?.status;
+    if (status === 429) {
+      res.status(429).json({ error: "Rate limited by AniList. Please try again shortly." });
+    } else {
+      res.status(500).json({ error: "Failed to fetch anime detail" });
+    }
+  }
 });
 
 export default router;
