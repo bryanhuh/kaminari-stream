@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import { useTrending, usePopular, useRecentEpisodes, useSpotlight } from "../hooks/useAnime";
 import { useContinueWatching } from "../hooks/useWatchHistory";
 import AnimeGrid from "../components/AnimeGrid";
@@ -5,6 +6,25 @@ import ContinueWatchingCard from "../components/ContinueWatchingCard";
 import RecentEpisodeCard from "../components/RecentEpisodeCard";
 import HeroSpotlight from "../components/HeroSpotlight";
 import ScheduleSection from "../components/ScheduleSection";
+
+function SectionHeader({ title, viewAllHref }: { title: string; viewAllHref?: string }) {
+  return (
+    <div className="flex items-center justify-between mb-5">
+      <h2 className="text-2xl font-bold text-white tracking-tight">{title}</h2>
+      {viewAllHref && (
+        <Link
+          to={viewAllHref}
+          className="text-sm font-medium text-primary-500 hover:text-primary-400 transition-colors flex items-center gap-1"
+        >
+          View All
+          <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+          </svg>
+        </Link>
+      )}
+    </div>
+  );
+}
 
 export default function Home() {
   const { data: trendingData, isLoading: trendingLoading, error: trendingError } =
@@ -21,10 +41,10 @@ export default function Home() {
   const { data: spotlightData, isLoading: spotlightLoading } = useSpotlight();
 
   return (
-    <div className="max-w-7xl mx-auto px-4 py-8 flex flex-col gap-10">
+    <div className="max-w-7xl mx-auto px-4 py-8 flex flex-col gap-12">
       {/* Hero Spotlight */}
       {spotlightLoading && (
-        <div className="w-full rounded-xl bg-gray-800 animate-pulse" style={{ minHeight: "480px" }} />
+        <div className="w-full rounded-2xl bg-[#111118] animate-pulse" style={{ minHeight: "560px" }} />
       )}
       {!spotlightLoading && spotlightData && spotlightData.results.length > 0 && (
         <HeroSpotlight items={spotlightData.results} />
@@ -33,7 +53,7 @@ export default function Home() {
       {/* Continue Watching */}
       {hasContinue && (
         <section>
-          <h2 className="text-xl font-bold text-white mb-4 flex items-center gap-2"><span className="w-1 h-5 rounded-full bg-primary-500 shrink-0" />Continue Watching</h2>
+          <SectionHeader title="Continue Watching" />
           <div className="flex gap-4 overflow-x-auto pb-2 scrollbar-thin">
             {continueWatching.map((entry) => (
               <ContinueWatchingCard key={`${entry.animeId}-${entry.episodeId}`} entry={entry} />
@@ -44,14 +64,14 @@ export default function Home() {
 
       {/* Recent Episodes */}
       <section>
-        <h2 className="text-xl font-bold text-white mb-4 flex items-center gap-2"><span className="w-1 h-5 rounded-full bg-primary-500 shrink-0" />Recent Episodes</h2>
+        <SectionHeader title="Recent Episodes" viewAllHref="/browse?category=recent" />
         {recentLoading && (
           <div className="flex gap-4 overflow-x-auto pb-2">
             {Array.from({ length: 10 }).map((_, i) => (
               <div key={i} className="shrink-0 w-40">
-                <div className="rounded-lg aspect-[3/4] bg-gray-800 animate-pulse" />
-                <div className="h-3 bg-gray-800 animate-pulse rounded mt-2 w-4/5" />
-                <div className="h-2.5 bg-gray-800 animate-pulse rounded mt-1 w-1/2" />
+                <div className="rounded-xl aspect-[3/4] bg-[#111118] animate-pulse" />
+                <div className="h-3 bg-[#111118] animate-pulse rounded mt-2 w-4/5" />
+                <div className="h-2.5 bg-[#111118] animate-pulse rounded mt-1 w-1/2" />
               </div>
             ))}
           </div>
@@ -70,12 +90,12 @@ export default function Home() {
 
       {/* Trending */}
       <section>
-        <h2 className="text-xl font-bold text-white mb-4 flex items-center gap-2"><span className="w-1 h-5 rounded-full bg-primary-500 shrink-0" />Trending Now</h2>
         {trendingError && (
-          <p className="text-red-400 text-sm">
+          <p className="text-red-400 text-sm mb-3">
             Failed to load trending: {(trendingError as Error).message}
           </p>
         )}
+        <SectionHeader title="Trending Now" viewAllHref="/browse?category=trending" />
         <AnimeGrid
           items={trendingData?.Page.media ?? []}
           loading={trendingLoading}
@@ -85,12 +105,12 @@ export default function Home() {
 
       {/* Popular */}
       <section>
-        <h2 className="text-xl font-bold text-white mb-4 flex items-center gap-2"><span className="w-1 h-5 rounded-full bg-primary-500 shrink-0" />All-Time Popular</h2>
         {popularError && (
-          <p className="text-red-400 text-sm">
+          <p className="text-red-400 text-sm mb-3">
             Failed to load popular: {(popularError as Error).message}
           </p>
         )}
+        <SectionHeader title="All-Time Popular" viewAllHref="/browse?category=popular" />
         <AnimeGrid
           items={popularData?.Page.media ?? []}
           loading={popularLoading}
