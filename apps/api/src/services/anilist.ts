@@ -3,7 +3,30 @@ import { config } from "../config";
 
 const ANILIST_URL = config.anilistUrl ?? "https://graphql.anilist.co";
 
-// Retry wrapper: on 429, wait and retry up to maxRetries times
+// ── Simple TTL cache ────────────────────────────────────────────────────────────
+// Prevents hammering AniList when the same endpoint is called repeatedly
+// (e.g. during dev HMR re-renders or duplicate client requests).
+
+interface CacheEntry<T> { value: T; expiresAt: number }
+const cache = new Map<string, CacheEntry<unknown>>();
+
+function cached<T>(key: string, ttlMs: number, fn: () => Promise<T>): Promise<T> {
+  const hit = cache.get(key) as CacheEntry<T> | undefined;
+  if (hit && hit.expiresAt > Date.now()) return Promise.resolve(hit.value);
+  return fn().then((value) => {
+    cache.set(key, { value, expiresAt: Date.now() + ttlMs });
+    return value;
+  });
+}
+
+// TTLs: list queries cached 5 min; detail queries cached 10 min; search 1 min
+const TTL_LIST   = 5 * 60 * 1000;
+const TTL_DETAIL = 10 * 60 * 1000;
+const TTL_SEARCH = 60 * 1000;
+
+// ── Retry wrapper ───────────────────────────────────────────────────────────────
+// On 429, waits with exponential backoff before retrying (up to maxRetries).
+
 async function withRetry<T>(fn: () => Promise<T>, maxRetries = 3): Promise<T> {
   let delay = 1000;
   for (let attempt = 0; attempt <= maxRetries; attempt++) {
@@ -114,34 +137,36 @@ const DETAIL_QUERY = `
 
 // ── Public helpers ─────────────────────────────────────────────────────────────
 
-export async function getTrending(page = 1, perPage = 18) {
-  return withRetry(() =>
-    request<{ Page: { media: unknown[] } }>(ANILIST_URL, TRENDING_QUERY, {
-      page,
-      perPage,
-    })
+export function getTrending(page = 1, perPage = 18) {
+  return cached(`trending:${page}:${perPage}`, TTL_LIST, () =>
+    withRetry(() =>
+      request<{ Page: { media: unknown[] } }>(ANILIST_URL, TRENDING_QUERY, {
+        page,
+        perPage,
+      })
+    )
   );
 }
 
-export async function getPopular(page = 1, perPage = 12) {
-  return withRetry(() =>
-    request<{ Page: { media: unknown[] } }>(ANILIST_URL, POPULAR_QUERY, {
-      page,
-      perPage,
-    })
+export function getPopular(page = 1, perPage = 12) {
+  return cached(`popular:${page}:${perPage}`, TTL_LIST, () =>
+    withRetry(() =>
+      request<{ Page: { media: unknown[] } }>(ANILIST_URL, POPULAR_QUERY, {
+        page,
+        perPage,
+      })
+    )
   );
 }
 
-export async function searchAnimeAnilist(
-  search: string,
-  page = 1,
-  perPage = 30
-) {
-  return withRetry(() =>
-    request<{ Page: { pageInfo: { total: number; hasNextPage: boolean }; media: unknown[] } }>(
-      ANILIST_URL,
-      SEARCH_QUERY,
-      { search, page, perPage }
+export function searchAnimeAnilist(search: string, page = 1, perPage = 30) {
+  return cached(`search:${search}:${page}:${perPage}`, TTL_SEARCH, () =>
+    withRetry(() =>
+      request<{ Page: { pageInfo: { total: number; hasNextPage: boolean }; media: unknown[] } }>(
+        ANILIST_URL,
+        SEARCH_QUERY,
+        { search, page, perPage }
+      )
     )
   );
 }
@@ -157,19 +182,23 @@ const AZ_QUERY = `
   }
 `;
 
-export async function browseAZ(letter: string, page = 1, perPage = 30) {
-  return withRetry(() =>
-    request<{
-      Page: {
-        pageInfo: { hasNextPage: boolean; total: number };
-        media: unknown[];
-      };
-    }>(ANILIST_URL, AZ_QUERY, { search: letter, page, perPage })
+export function browseAZ(letter: string, page = 1, perPage = 30) {
+  return cached(`az:${letter}:${page}:${perPage}`, TTL_LIST, () =>
+    withRetry(() =>
+      request<{
+        Page: {
+          pageInfo: { hasNextPage: boolean; total: number };
+          media: unknown[];
+        };
+      }>(ANILIST_URL, AZ_QUERY, { search: letter, page, perPage })
+    )
   );
 }
 
-export async function getAnimeDetail(id: number) {
-  return withRetry(() =>
-    request<{ Media: unknown }>(ANILIST_URL, DETAIL_QUERY, { id })
+export function getAnimeDetail(id: number) {
+  return cached(`detail:${id}`, TTL_DETAIL, () =>
+    withRetry(() =>
+      request<{ Media: unknown }>(ANILIST_URL, DETAIL_QUERY, { id })
+    )
   );
 }
