@@ -6,6 +6,7 @@ import ContinueWatchingCard from "../components/ContinueWatchingCard";
 import RecentEpisodeCard from "../components/RecentEpisodeCard";
 import HeroSpotlight from "../components/HeroSpotlight";
 import ScheduleSection from "../components/ScheduleSection";
+import PromoSection from "../components/PromoSection";
 
 function SectionHeader({ title, viewAllHref }: { title: string; viewAllHref?: string }) {
   return (
@@ -84,10 +85,8 @@ export default function Home() {
         )}
       </section>
 
-      {/* ── CONTAINED SECTIONS ── */}
-      <div className="max-w-7xl mx-auto px-6 w-full py-12 flex flex-col gap-14">
-
-        {/* Continue Watching */}
+      {/* ── CONTAINED SECTIONS (continue watching + schedule) ── */}
+      <div className="max-w-7xl mx-auto px-6 w-full pt-12 flex flex-col gap-14">
         {hasContinue && (
           <section>
             <SectionHeader title="Continue Watching" />
@@ -98,11 +97,17 @@ export default function Home() {
             </div>
           </section>
         )}
-
-        {/* Schedule */}
         <ScheduleSection />
+      </div>
 
-        {/* Trending */}
+      {/* ── FULL-WIDTH PROMO BANNER (featured anime) ── */}
+      {trendingData && trendingData.Page.media.length > 0 && (
+        <PromoSection anime={trendingData.Page.media[0]} loading={trendingLoading} />
+      )}
+      {trendingLoading && <PromoSection anime={null as never} loading={true} />}
+
+      {/* ── CONTAINED SECTIONS (trending + popular grids) ── */}
+      <div className="max-w-7xl mx-auto px-6 w-full pb-16 flex flex-col gap-14">
         <section>
           {trendingError && (
             <p className="text-red-400 text-sm mb-3">
@@ -117,7 +122,6 @@ export default function Home() {
           />
         </section>
 
-        {/* Popular */}
         <section>
           {popularError && (
             <p className="text-red-400 text-sm mb-3">
