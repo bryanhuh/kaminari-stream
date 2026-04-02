@@ -111,6 +111,14 @@ export function useRecentEpisodes(page = 1) {
   });
 }
 
+export function useSeasonAnime() {
+  return useQuery<PageResult>({
+    queryKey: ["anime", "season"],
+    queryFn: () => api.get<PageResult>("/api/anime/season"),
+    staleTime: 1000 * 60 * 10,
+  });
+}
+
 export function useAnimeDetail(id: number) {
   return useQuery<{ Media: AnimeDetail }>({
     queryKey: ["anime", "detail", id],

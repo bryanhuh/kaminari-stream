@@ -171,6 +171,24 @@ export function searchAnimeAnilist(search: string, page = 1, perPage = 30) {
   );
 }
 
+const SEASON_QUERY = `
+  query Season($season: MediaSeason, $year: Int, $perPage: Int) {
+    Page(perPage: $perPage) {
+      media(season: $season, seasonYear: $year, type: ANIME, isAdult: false, sort: POPULARITY_DESC) {
+        ${MEDIA_FIELDS}
+      }
+    }
+  }
+`;
+
+function currentSeason(): { season: string; year: number } {
+  const month = new Date().getMonth() + 1;
+  const year = new Date().getFullYear();
+  const season =
+    month <= 3 ? "WINTER" : month <= 6 ? "SPRING" : month <= 9 ? "SUMMER" : "FALL";
+  return { season, year };
+}
+
 const AZ_QUERY = `
   query AZBrowse($search: String, $page: Int, $perPage: Int) {
     Page(page: $page, perPage: $perPage) {
@@ -181,6 +199,19 @@ const AZ_QUERY = `
     }
   }
 `;
+
+export function getSeasonAnime(perPage = 18) {
+  const { season, year } = currentSeason();
+  return cached(`season:${season}:${year}:${perPage}`, TTL_LIST, () =>
+    withRetry(() =>
+      request<{ Page: { media: unknown[] } }>(ANILIST_URL, SEASON_QUERY, {
+        season,
+        year,
+        perPage,
+      })
+    )
+  );
+}
 
 export function browseAZ(letter: string, page = 1, perPage = 30) {
   return cached(`az:${letter}:${page}:${perPage}`, TTL_LIST, () =>

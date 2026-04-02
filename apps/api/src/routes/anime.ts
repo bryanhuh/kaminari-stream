@@ -5,6 +5,7 @@ import {
   searchAnimeAnilist,
   getAnimeDetail,
   browseAZ,
+  getSeasonAnime,
 } from "../services/anilist";
 import { getRecentEpisodes, getSpotlight } from "../services/consumet";
 
@@ -109,6 +110,15 @@ router.get("/recent-episodes", async (req: Request, res: Response) => {
         results: withAnilistIds,
       },
     });
+  } catch (err) {
+    handleAnilistError(err, res);
+  }
+});
+
+router.get("/season", async (_req: Request, res: Response) => {
+  try {
+    const data = await getSeasonAnime(18);
+    res.json({ data });
   } catch (err) {
     handleAnilistError(err, res);
   }
