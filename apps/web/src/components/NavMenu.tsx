@@ -7,21 +7,20 @@ interface NavMenuProps {
 }
 
 const MENU_ITEMS = [
-  { label: "GENRES", category: "genres" },
-  { label: "TYPES", category: "types" },
-  { label: "NEW RELEASES", category: "new-releases" },
-  { label: "UPDATES", category: "updates" },
-  { label: "ONGOING", category: "ongoing" },
-  { label: "RECENT", category: "recent" },
-  { label: "SCHEDULE", category: "schedule" },
-  { label: "A-Z LIST", category: "az" },
+  { label: "Genres", category: "genres" },
+  { label: "Types", category: "types" },
+  { label: "New Releases", category: "new-releases" },
+  { label: "Updates", category: "updates" },
+  { label: "Ongoing", category: "ongoing" },
+  { label: "Recent", category: "recent" },
+  { label: "Schedule", category: "schedule" },
+  { label: "A–Z List", category: "az" },
 ] as const;
 
 export default function NavMenu({ open, onClose }: NavMenuProps) {
   const navigate = useNavigate();
   const ref = useRef<HTMLDivElement>(null);
 
-  // Close on outside click
   useEffect(() => {
     if (!open) return;
     function handler(e: MouseEvent) {
@@ -33,7 +32,6 @@ export default function NavMenu({ open, onClose }: NavMenuProps) {
     return () => document.removeEventListener("mousedown", handler);
   }, [open, onClose]);
 
-  // Close on Escape
   useEffect(() => {
     if (!open) return;
     function handler(e: KeyboardEvent) {
@@ -45,7 +43,7 @@ export default function NavMenu({ open, onClose }: NavMenuProps) {
 
   function navigate_to(category: string) {
     if (category === "schedule") {
-      navigate("/#schedule");
+      navigate("/browse?category=schedule");
     } else {
       navigate(`/browse?category=${category}`);
     }
@@ -55,18 +53,16 @@ export default function NavMenu({ open, onClose }: NavMenuProps) {
   return (
     <div
       ref={ref}
-      className={`absolute top-full left-0 mt-1 z-50 transition-all duration-200 ${
+      className={`absolute top-full left-0 mt-2 z-50 transition-all duration-200 ${
         open ? "opacity-100 translate-y-0 pointer-events-auto" : "opacity-0 -translate-y-2 pointer-events-none"
       }`}
     >
-      <div className="bg-gray-900/95 backdrop-blur-sm border border-gray-800 rounded-2xl shadow-2xl py-3 min-w-[220px]">
-        {MENU_ITEMS.map((item, i) => (
+      <div className="bg-[#111118]/98 backdrop-blur-md border border-[#2a2a38] rounded-xl shadow-2xl py-2 min-w-[200px]">
+        {MENU_ITEMS.map((item) => (
           <button
             key={item.category}
             onClick={() => navigate_to(item.category)}
-            className={`w-full text-left px-7 py-3.5 text-lg font-bold tracking-wider text-gray-300 hover:text-primary-400 hover:bg-primary-500/5 transition-colors ${
-              i < MENU_ITEMS.length - 1 ? "border-b border-gray-800/60" : ""
-            }`}
+            className="w-full text-left px-4 py-2.5 text-sm font-medium text-[#bfc1c6] hover:text-white hover:bg-white/5 transition-colors"
           >
             {item.label}
           </button>
