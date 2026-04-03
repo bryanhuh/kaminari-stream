@@ -10,6 +10,7 @@ export interface MediaItem {
   format: string | null;
   status: string | null;
   episodes: number | null;
+  description?: string | null;
   bannerImage?: string | null;
   trailer?: { id: string; site: string } | null;
 }

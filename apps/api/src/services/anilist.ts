@@ -240,6 +240,7 @@ const SHOWS_QUERY = `
       pageInfo { hasNextPage total }
       media(format: TV, type: ANIME, isAdult: false, sort: TRENDING_DESC, status: RELEASING, genre: $genre) {
         ${MEDIA_FIELDS}
+        description(asHtml: false)
         bannerImage
         trailer { id site }
       }
@@ -275,6 +276,7 @@ const MOVIES_QUERY = `
       pageInfo { hasNextPage total }
       media(format: MOVIE, type: ANIME, isAdult: false, sort: TRENDING_DESC, genre: $genre) {
         ${MEDIA_FIELDS}
+        description(asHtml: false)
         bannerImage
         trailer { id site }
       }
