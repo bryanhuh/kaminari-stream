@@ -6,6 +6,9 @@ import {
   getAnimeDetail,
   browseAZ,
   getSeasonAnime,
+  getTVShows,
+  getMovies,
+  getRandomAnime,
 } from "../services/anilist";
 import { getRecentEpisodes, getSpotlight } from "../services/consumet";
 
@@ -159,6 +162,37 @@ router.get("/search", async (req: Request, res: Response) => {
   try {
     const data = await searchAnimeAnilist(q, page, perPage);
     res.json({ data });
+  } catch (err) {
+    handleAnilistError(err, res);
+  }
+});
+
+router.get("/shows", async (req: Request, res: Response) => {
+  const page = Number(req.query.page) || 1;
+  const perPage = Number(req.query.perPage) || 24;
+  try {
+    const data = await getTVShows(page, perPage);
+    res.json({ data });
+  } catch (err) {
+    handleAnilistError(err, res);
+  }
+});
+
+router.get("/movies", async (req: Request, res: Response) => {
+  const page = Number(req.query.page) || 1;
+  const perPage = Number(req.query.perPage) || 24;
+  try {
+    const data = await getMovies(page, perPage);
+    res.json({ data });
+  } catch (err) {
+    handleAnilistError(err, res);
+  }
+});
+
+router.get("/random", async (_req: Request, res: Response) => {
+  try {
+    const anime = await getRandomAnime();
+    res.json({ data: anime });
   } catch (err) {
     handleAnilistError(err, res);
   }

@@ -233,3 +233,53 @@ export function getAnimeDetail(id: number) {
     )
   );
 }
+
+const FORMAT_QUERY = `
+  query FormatBrowse($format: MediaFormat, $page: Int, $perPage: Int) {
+    Page(page: $page, perPage: $perPage) {
+      pageInfo { hasNextPage total }
+      media(format: $format, type: ANIME, isAdult: false, sort: POPULARITY_DESC) {
+        ${MEDIA_FIELDS}
+      }
+    }
+  }
+`;
+
+export function getTVShows(page = 1, perPage = 24) {
+  return cached(`tvshows:${page}:${perPage}`, TTL_LIST, () =>
+    withRetry(() =>
+      request<{ Page: { pageInfo: { hasNextPage: boolean; total: number }; media: unknown[] } }>(
+        ANILIST_URL, FORMAT_QUERY, { format: "TV", page, perPage }
+      )
+    )
+  );
+}
+
+export function getMovies(page = 1, perPage = 24) {
+  return cached(`movies:${page}:${perPage}`, TTL_LIST, () =>
+    withRetry(() =>
+      request<{ Page: { pageInfo: { hasNextPage: boolean; total: number }; media: unknown[] } }>(
+        ANILIST_URL, FORMAT_QUERY, { format: "MOVIE", page, perPage }
+      )
+    )
+  );
+}
+
+const RANDOM_QUERY = `
+  query Random($page: Int) {
+    Page(page: $page, perPage: 50) {
+      media(type: ANIME, isAdult: false, sort: POPULARITY_DESC, format: TV) {
+        ${MEDIA_FIELDS}
+      }
+    }
+  }
+`;
+
+export async function getRandomAnime() {
+  const page = Math.ceil(Math.random() * 3);
+  const data = await withRetry(() =>
+    request<{ Page: { media: unknown[] } }>(ANILIST_URL, RANDOM_QUERY, { page })
+  );
+  const items = data.Page.media;
+  return items[Math.floor(Math.random() * items.length)];
+}
