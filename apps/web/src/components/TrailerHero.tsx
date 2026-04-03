@@ -20,6 +20,7 @@ declare global {
           events?: {
             onReady?: (e: { target: YTPlayer }) => void;
             onStateChange?: (e: { data: number }) => void;
+            onError?: (e: { data: number }) => void;
           };
         }
       ) => YTPlayer;
@@ -200,7 +201,10 @@ export function TrailerHero({ trailers }: { trailers: TrailerEntry[] }) {
       playerRef.current = new window.YT.Player(playerId, {
         videoId: trailers[0].videoId,
         playerVars: { autoplay: 1, mute: 1, controls: 0, showinfo: 0, rel: 0, modestbranding: 1, iv_load_policy: 3, disablekb: 1, playsinline: 1 },
-        events: { onStateChange: (e) => { if (e.data === 0) advance(); } },
+        events: {
+          onStateChange: (e) => { if (e.data === 0) advance(); },
+          onError: () => { advance(); },
+        },
       });
     }
 
