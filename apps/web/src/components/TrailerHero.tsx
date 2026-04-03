@@ -275,6 +275,11 @@ export function StaticHero({ anime }: { anime: MediaItem }) {
       <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0f] via-transparent to-[#0a0a0f]/20" />
       <div className="absolute bottom-0 left-0 right-0 px-6 sm:px-8 pb-10 max-w-7xl mx-auto">
         <AnimeInfo anime={anime} />
+        {anime.description && (
+          <p className="text-sm text-[#bfc1c6] max-w-lg mb-5 line-clamp-3 leading-relaxed">
+            {anime.description}
+          </p>
+        )}
         <HeroActions
           animeId={anime.id}
           muted={false}
