@@ -127,3 +127,26 @@ export function useAnimeDetail(id: number) {
     staleTime: 1000 * 60 * 15,
   });
 }
+
+interface FormatPageResult {
+  Page: {
+    pageInfo: { hasNextPage: boolean; total: number };
+    media: MediaItem[];
+  };
+}
+
+export function useShows(page = 1, perPage = 24) {
+  return useQuery<FormatPageResult>({
+    queryKey: ["anime", "shows", page, perPage],
+    queryFn: () => api.get<FormatPageResult>(`/api/anime/shows?page=${page}&perPage=${perPage}`),
+    staleTime: 1000 * 60 * 10,
+  });
+}
+
+export function useMovies(page = 1, perPage = 24) {
+  return useQuery<FormatPageResult>({
+    queryKey: ["anime", "movies", page, perPage],
+    queryFn: () => api.get<FormatPageResult>(`/api/anime/movies?page=${page}&perPage=${perPage}`),
+    staleTime: 1000 * 60 * 10,
+  });
+}
