@@ -238,7 +238,7 @@ const SHOWS_QUERY = `
   query ShowsBrowse($page: Int, $perPage: Int, $genre: String) {
     Page(page: $page, perPage: $perPage) {
       pageInfo { hasNextPage total }
-      media(format: TV, type: ANIME, isAdult: false, sort: POPULARITY_DESC, genre: $genre) {
+      media(format: TV, type: ANIME, isAdult: false, sort: TRENDING_DESC, status: RELEASING, genre: $genre) {
         ${MEDIA_FIELDS}
         bannerImage
         trailer { id site }
@@ -259,7 +259,7 @@ const FORMAT_QUERY = `
 `;
 
 export function getTVShows(page = 1, perPage = 24, genre?: string) {
-  const key = `tvshows:${page}:${perPage}:${genre ?? ""}`;
+  const key = `tvshows-trending:${page}:${perPage}:${genre ?? ""}`;
   return cached(key, TTL_LIST, () =>
     withRetry(() =>
       request<{ Page: { pageInfo: { hasNextPage: boolean; total: number }; media: unknown[] } }>(
