@@ -150,6 +150,23 @@ export function useShows(page = 1, perPage = 24, genre?: string) {
   });
 }
 
+export function useNextSeason(perPage = 12) {
+  return useQuery<PageResult>({
+    queryKey: ["anime", "next-season", perPage],
+    queryFn: () => api.get<PageResult>(`/api/anime/next-season`),
+    staleTime: 1000 * 60 * 60,
+  });
+}
+
+export function useGenreRecommendations(genre?: string) {
+  return useQuery<PageResult>({
+    queryKey: ["anime", "recommendations", genre ?? ""],
+    queryFn: () => api.get<PageResult>(`/api/anime/recommendations?genre=${encodeURIComponent(genre!)}`),
+    enabled: !!genre,
+    staleTime: 1000 * 60 * 10,
+  });
+}
+
 export function useMovies(page = 1, perPage = 24, genre?: string) {
   return useQuery<FormatPageResult>({
     queryKey: ["anime", "movies", page, perPage, genre ?? ""],
