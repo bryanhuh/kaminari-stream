@@ -42,7 +42,7 @@ export default function PromoSection({ anime, loading }: PromoSectionProps) {
           {/* Meta badges */}
           <div className="flex items-center gap-2 flex-wrap">
             {anime.averageScore && (
-              <span className="flex items-center gap-1 bg-primary-500 text-white text-xs font-bold px-2.5 py-1 rounded-full">
+              <span className="flex items-center gap-1 bg-primary-500 text-[#0a0a0f] text-xs font-bold px-2.5 py-1 rounded-full">
                 <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 24 24">
                   <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
                 </svg>
@@ -68,7 +68,7 @@ export default function PromoSection({ anime, loading }: PromoSectionProps) {
 
           <Link
             to={`/anime/${anime.id}`}
-            className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-primary-500 hover:bg-primary-400 text-white font-bold text-sm transition-colors self-start shadow-lg"
+            className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-primary-500 hover:bg-primary-400 text-[#0a0a0f] font-bold text-sm transition-colors self-start shadow-lg"
             style={{ boxShadow: `0 8px 24px ${color}40` }}
           >
             <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">

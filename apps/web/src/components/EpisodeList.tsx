@@ -63,7 +63,7 @@ export default function EpisodeList({
               transition-colors overflow-hidden
               ${
                 isCurrent
-                  ? "bg-primary-600 text-white"
+                  ? "bg-primary-600 text-[#0a0a0f]"
                   : progress?.done
                   ? "bg-gray-700 text-gray-400"
                   : "bg-gray-800 text-gray-300 hover:bg-gray-700 hover:text-white"

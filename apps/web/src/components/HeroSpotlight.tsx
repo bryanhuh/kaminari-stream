@@ -109,7 +109,7 @@ export default function HeroSpotlight({ items }: HeroSpotlightProps) {
             {current.anilistId ? (
               <Link
                 to={`/anime/${current.anilistId}`}
-                className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-primary-500 hover:bg-primary-400 text-white font-bold text-sm transition-colors shadow-lg shadow-primary-500/20"
+                className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-primary-500 hover:bg-primary-400 text-[#0a0a0f] font-bold text-sm transition-colors shadow-lg shadow-primary-500/20"
               >
                 <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
                   <path d="M8 5v14l11-7z" />

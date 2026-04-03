@@ -220,7 +220,7 @@ export default function Browse() {
                 onClick={() => setSearchParams({ category: "az", letter: l })}
                 className={`w-9 h-9 rounded-lg text-sm font-bold transition-colors ${
                   l === azLetter
-                    ? "bg-primary-500 text-white shadow-md shadow-primary-500/20"
+                    ? "bg-primary-500 text-[#0a0a0f] shadow-md shadow-primary-500/20"
                     : "bg-[#111118] text-[#bfc1c6] hover:bg-[#1a1a24] hover:text-white border border-[#2a2a38]"
                 }`}
               >

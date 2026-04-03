@@ -53,7 +53,7 @@ export default function ScheduleSection() {
               onClick={() => setOffset(d)}
               className={`shrink-0 px-4 py-1.5 rounded-full text-sm font-medium transition-colors ${
                 active
-                  ? "bg-primary-500 text-white shadow-md shadow-primary-500/20"
+                  ? "bg-primary-500 text-[#0a0a0f] shadow-md shadow-primary-500/20"
                   : "bg-[#111118] text-[#bfc1c6] hover:bg-[#1a1a24] hover:text-white border border-[#2a2a38]"
               }`}
             >

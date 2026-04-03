@@ -34,7 +34,7 @@ export default function RecentEpisodeCard({ episode }: RecentEpisodeCardProps) {
         </div>
         {/* Episode number badge — bottom left */}
         <div className="absolute bottom-2 left-2">
-          <span className="text-xs font-bold bg-primary-500 text-white px-2 py-0.5 rounded-full shadow">
+          <span className="text-xs font-bold bg-primary-500 text-[#0a0a0f] px-2 py-0.5 rounded-full shadow">
             EP {episode.episodeNumber}
           </span>
         </div>

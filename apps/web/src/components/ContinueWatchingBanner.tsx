@@ -59,7 +59,7 @@ export default function ContinueWatchingBanner({ entries }: Props) {
 
           <Link
             to={watchUrl}
-            className="inline-flex items-center gap-2 px-6 py-2.5 rounded-full bg-primary-500 hover:bg-primary-400 text-white font-bold text-sm transition-colors self-start shadow-lg shadow-primary-500/20 mt-1"
+            className="inline-flex items-center gap-2 px-6 py-2.5 rounded-full bg-primary-500 hover:bg-primary-400 text-[#0a0a0f] font-bold text-sm transition-colors self-start shadow-lg shadow-primary-500/20 mt-1"
           >
             <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
               <path d="M8 5v14l11-7z" />

@@ -63,7 +63,7 @@ export default function AuthModal({ open, onClose }: AuthModalProps) {
                 onClick={() => setTab(t)}
                 className={`flex-1 py-2 text-sm font-semibold rounded-lg transition-colors ${
                   tab === t
-                    ? "bg-primary-500 text-white shadow"
+                    ? "bg-primary-500 text-[#0a0a0f] shadow"
                     : "text-[#5d6169] hover:text-white"
                 }`}
               >
@@ -115,7 +115,7 @@ function SignInForm({ onSuccess }: { onSuccess: () => void }) {
       </div>
       <button
         type="submit"
-        className="w-full py-2.5 bg-primary-500 hover:bg-primary-400 text-white font-semibold text-sm rounded-lg transition-colors mt-1"
+        className="w-full py-2.5 bg-primary-500 hover:bg-primary-400 text-[#0a0a0f] font-semibold text-sm rounded-lg transition-colors mt-1"
       >
         Sign In
       </button>
@@ -162,7 +162,7 @@ function SignUpForm({ onSuccess }: { onSuccess: () => void }) {
       </div>
       <button
         type="submit"
-        className="w-full py-2.5 bg-primary-500 hover:bg-primary-400 text-white font-semibold text-sm rounded-lg transition-colors mt-1"
+        className="w-full py-2.5 bg-primary-500 hover:bg-primary-400 text-[#0a0a0f] font-semibold text-sm rounded-lg transition-colors mt-1"
       >
         Create Account
       </button>
