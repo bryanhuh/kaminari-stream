@@ -6,6 +6,8 @@ import {
   getAnimeDetail,
   browseAZ,
   getSeasonAnime,
+  getNextSeasonAnime,
+  getByGenre,
   getTVShows,
   getMovies,
   getRandomAnime,
@@ -195,6 +197,29 @@ router.get("/random", async (_req: Request, res: Response) => {
   try {
     const anime = await getRandomAnime();
     res.json({ data: anime });
+  } catch (err) {
+    handleAnilistError(err, res);
+  }
+});
+
+router.get("/next-season", async (_req: Request, res: Response) => {
+  try {
+    const data = await getNextSeasonAnime(12);
+    res.json({ data });
+  } catch (err) {
+    handleAnilistError(err, res);
+  }
+});
+
+router.get("/recommendations", async (req: Request, res: Response) => {
+  const genre = String(req.query.genre ?? "").trim();
+  if (!genre) {
+    res.status(400).json({ error: "Missing query param: genre" });
+    return;
+  }
+  try {
+    const data = await getByGenre(genre, 6);
+    res.json({ data });
   } catch (err) {
     handleAnilistError(err, res);
   }

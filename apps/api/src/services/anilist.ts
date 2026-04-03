@@ -189,6 +189,15 @@ function currentSeason(): { season: string; year: number } {
   return { season, year };
 }
 
+function nextSeason(): { season: string; year: number } {
+  const month = new Date().getMonth() + 1;
+  const year = new Date().getFullYear();
+  if (month <= 3) return { season: "SPRING", year };
+  if (month <= 6) return { season: "SUMMER", year };
+  if (month <= 9) return { season: "FALL", year };
+  return { season: "WINTER", year: year + 1 };
+}
+
 const AZ_QUERY = `
   query AZBrowse($search: String, $page: Int, $perPage: Int) {
     Page(page: $page, perPage: $perPage) {
@@ -304,6 +313,44 @@ const RANDOM_QUERY = `
     }
   }
 `;
+
+const NEXT_SEASON_QUERY = `
+  query NextSeason($season: MediaSeason, $year: Int, $perPage: Int) {
+    Page(perPage: $perPage) {
+      media(season: $season, seasonYear: $year, type: ANIME, isAdult: false, sort: POPULARITY_DESC) {
+        ${MEDIA_FIELDS}
+        bannerImage
+      }
+    }
+  }
+`;
+
+export function getNextSeasonAnime(perPage = 12) {
+  const { season, year } = nextSeason();
+  return cached(`next-season:${season}:${year}:${perPage}`, TTL_LIST, () =>
+    withRetry(() =>
+      request<{ Page: { media: unknown[] } }>(ANILIST_URL, NEXT_SEASON_QUERY, { season, year, perPage })
+    )
+  );
+}
+
+const GENRE_QUERY = `
+  query GenreAnime($genre: String, $perPage: Int) {
+    Page(perPage: $perPage) {
+      media(genre: $genre, type: ANIME, isAdult: false, sort: POPULARITY_DESC) {
+        ${MEDIA_FIELDS}
+      }
+    }
+  }
+`;
+
+export function getByGenre(genre: string, perPage = 6) {
+  return cached(`genre:${genre}:${perPage}`, TTL_LIST, () =>
+    withRetry(() =>
+      request<{ Page: { media: unknown[] } }>(ANILIST_URL, GENRE_QUERY, { genre, perPage })
+    )
+  );
+}
 
 export async function getRandomAnime() {
   const page = Math.ceil(Math.random() * 3);
