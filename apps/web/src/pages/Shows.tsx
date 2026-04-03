@@ -124,12 +124,27 @@ interface TrailerEntry {
   videoId: string;
 }
 
+/**
+ * AniList's trailer.id is sometimes a full URL, a short URL, or has extra
+ * query params. Extract a clean 11-char YouTube video ID or return null.
+ */
+function parseYouTubeId(raw: string | undefined | null): string | null {
+  if (!raw) return null;
+  const s = raw.trim();
+  // Already a standard 11-char video ID
+  if (/^[A-Za-z0-9_-]{11}$/.test(s)) return s;
+  // Try to pull the ID out of common URL formats
+  const m = s.match(
+    /(?:youtu\.be\/|[?&]v=|\/embed\/|\/shorts\/)([A-Za-z0-9_-]{11})/
+  );
+  return m?.[1] ?? null;
+}
+
 function loadYTScript(onReady: () => void) {
   if (window.YT?.Player) {
     onReady();
     return;
   }
-  // Chain onto any existing callback
   const prev = window.onYouTubeIframeAPIReady;
   window.onYouTubeIframeAPIReady = () => {
     prev?.();
@@ -142,35 +157,43 @@ function loadYTScript(onReady: () => void) {
   }
 }
 
+const PLAYER_EL_ID = "yt-shows-hero-player";
+
 function ShowsHero({ trailers }: { trailers: TrailerEntry[] }) {
   const navigate = useNavigate();
   const [currentIndex, setCurrentIndex] = useState(0);
   const [muted, setMuted] = useState(true);
   const playerRef = useRef<YTPlayer | null>(null);
-  const playerDivRef = useRef<HTMLDivElement>(null);
-  const indexRef = useRef(0); // stable ref for YT callbacks
+  const indexRef = useRef(0);
   const mountedRef = useRef(true);
+  const trailersRef = useRef(trailers);
+  trailersRef.current = trailers;
 
+  // Stable advance — uses refs, never stale
   const advance = useCallback(() => {
     if (!mountedRef.current) return;
-    const next = (indexRef.current + 1) % trailers.length;
+    const list = trailersRef.current;
+    const next = (indexRef.current + 1) % list.length;
     indexRef.current = next;
     setCurrentIndex(next);
-    playerRef.current?.loadVideoById(trailers[next].videoId);
-  }, [trailers]);
+    playerRef.current?.loadVideoById(list[next].videoId);
+  }, []);
 
-  // Initialise/re-initialise player when trailer list changes
   useEffect(() => {
     mountedRef.current = true;
-    if (!trailers.length || !playerDivRef.current) return;
+    if (!trailers.length) return;
 
     indexRef.current = 0;
     setCurrentIndex(0);
 
     function initPlayer() {
-      if (!playerDivRef.current || !mountedRef.current) return;
+      if (!mountedRef.current) return;
+      // The element must exist in the DOM at this point
+      const el = document.getElementById(PLAYER_EL_ID);
+      if (!el) return;
+
       playerRef.current?.destroy();
-      playerRef.current = new window.YT.Player(playerDivRef.current, {
+      playerRef.current = new window.YT.Player(PLAYER_EL_ID, {
         videoId: trailers[0].videoId,
         playerVars: {
           autoplay: 1,
@@ -185,8 +208,7 @@ function ShowsHero({ trailers }: { trailers: TrailerEntry[] }) {
         },
         events: {
           onStateChange: (e) => {
-            // 0 = ENDED
-            if (e.data === 0) advance();
+            if (e.data === 0) advance(); // 0 = ENDED
           },
         },
       });
@@ -199,12 +221,9 @@ function ShowsHero({ trailers }: { trailers: TrailerEntry[] }) {
       playerRef.current?.destroy();
       playerRef.current = null;
     };
+  // Re-init only when the trailer list identity changes (new data load)
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [trailers]);
-
-  // Keep advance callback fresh without re-creating player
-  const advanceRef = useRef(advance);
-  advanceRef.current = advance;
 
   function toggleMute() {
     setMuted((v) => {
@@ -223,10 +242,10 @@ function ShowsHero({ trailers }: { trailers: TrailerEntry[] }) {
 
   return (
     <div className="relative w-full h-[62vh] min-h-[400px] overflow-hidden bg-[#0a0a0f] mb-8">
-      {/* YouTube player div — API replaces this element */}
-      <div className="absolute inset-0 scale-[1.04] pointer-events-none">
+      {/* YT API replaces the element with id=PLAYER_EL_ID */}
+      <div className="absolute inset-0 scale-[1.04] pointer-events-none overflow-hidden">
         <div
-          ref={playerDivRef}
+          id={PLAYER_EL_ID}
           className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"
           style={{
             width: "max(100vw, calc(100vh * 16 / 9))",
@@ -394,11 +413,15 @@ export default function Shows() {
   const items = data?.Page.media ?? [];
   const hasNext = data?.Page.pageInfo.hasNextPage ?? false;
 
-  // Build trailer playlist from first 10 items with YouTube trailers
+  // Build trailer playlist from first 10 items — validate each video ID
   const trailers: TrailerEntry[] = items
     .slice(0, 10)
-    .filter((a) => a.trailer?.site === "youtube" && a.trailer.id)
-    .map((a) => ({ anime: a, videoId: a.trailer!.id }));
+    .reduce<TrailerEntry[]>((acc, a) => {
+      if (a.trailer?.site !== "youtube") return acc;
+      const videoId = parseYouTubeId(a.trailer.id);
+      if (videoId) acc.push({ anime: a, videoId });
+      return acc;
+    }, []);
 
   const firstAnime = items[0] ?? null;
 
