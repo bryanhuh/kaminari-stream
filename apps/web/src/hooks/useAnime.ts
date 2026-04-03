@@ -149,10 +149,14 @@ export function useShows(page = 1, perPage = 24, genre?: string) {
   });
 }
 
-export function useMovies(page = 1, perPage = 24) {
+export function useMovies(page = 1, perPage = 24, genre?: string) {
   return useQuery<FormatPageResult>({
-    queryKey: ["anime", "movies", page, perPage],
-    queryFn: () => api.get<FormatPageResult>(`/api/anime/movies?page=${page}&perPage=${perPage}`),
+    queryKey: ["anime", "movies", page, perPage, genre ?? ""],
+    queryFn: () => {
+      const params = new URLSearchParams({ page: String(page), perPage: String(perPage) });
+      if (genre) params.set("genre", genre);
+      return api.get<FormatPageResult>(`/api/anime/movies?${params}`);
+    },
     staleTime: 1000 * 60 * 10,
   });
 }
