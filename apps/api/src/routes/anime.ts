@@ -170,8 +170,9 @@ router.get("/search", async (req: Request, res: Response) => {
 router.get("/shows", async (req: Request, res: Response) => {
   const page = Number(req.query.page) || 1;
   const perPage = Number(req.query.perPage) || 24;
+  const genre = req.query.genre ? String(req.query.genre) : undefined;
   try {
-    const data = await getTVShows(page, perPage);
+    const data = await getTVShows(page, perPage, genre);
     res.json({ data });
   } catch (err) {
     handleAnilistError(err, res);

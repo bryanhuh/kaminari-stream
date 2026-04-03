@@ -234,6 +234,19 @@ export function getAnimeDetail(id: number) {
   );
 }
 
+const SHOWS_QUERY = `
+  query ShowsBrowse($page: Int, $perPage: Int, $genre: String) {
+    Page(page: $page, perPage: $perPage) {
+      pageInfo { hasNextPage total }
+      media(format: TV, type: ANIME, isAdult: false, sort: POPULARITY_DESC, genre: $genre) {
+        ${MEDIA_FIELDS}
+        bannerImage
+        trailer { id site }
+      }
+    }
+  }
+`;
+
 const FORMAT_QUERY = `
   query FormatBrowse($format: MediaFormat, $page: Int, $perPage: Int) {
     Page(page: $page, perPage: $perPage) {
@@ -245,11 +258,12 @@ const FORMAT_QUERY = `
   }
 `;
 
-export function getTVShows(page = 1, perPage = 24) {
-  return cached(`tvshows:${page}:${perPage}`, TTL_LIST, () =>
+export function getTVShows(page = 1, perPage = 24, genre?: string) {
+  const key = `tvshows:${page}:${perPage}:${genre ?? ""}`;
+  return cached(key, TTL_LIST, () =>
     withRetry(() =>
       request<{ Page: { pageInfo: { hasNextPage: boolean; total: number }; media: unknown[] } }>(
-        ANILIST_URL, FORMAT_QUERY, { format: "TV", page, perPage }
+        ANILIST_URL, SHOWS_QUERY, { page, perPage, genre: genre || undefined }
       )
     )
   );
