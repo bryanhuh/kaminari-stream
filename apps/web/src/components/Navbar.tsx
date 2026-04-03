@@ -150,24 +150,22 @@ export default function Navbar() {
               )}
             </button>
 
-            {/* Notification bell — only for logged-in users */}
-            {isLoggedIn && (
-              <div ref={notifRef} className="relative">
-                <button
-                  onClick={() => setNotifsOpen((v) => !v)}
-                  aria-label="Notifications"
-                  className={`relative flex items-center justify-center w-9 h-9 rounded-lg transition-colors ${
-                    notifsOpen ? "text-white bg-white/10" : "text-[#bfc1c6] hover:text-white hover:bg-white/5"
-                  }`}
-                >
-                  <svg className="w-[18px] h-[18px]" fill="none" stroke="currentColor" strokeWidth={1.8} viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M14.857 17.082a23.848 23.848 0 0 0 5.454-1.31A8.967 8.967 0 0 1 18 9.75V9A6 6 0 0 0 6 9v.75a8.967 8.967 0 0 1-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 0 1-5.714 0m5.714 0a3 3 0 1 1-5.714 0" />
-                  </svg>
-                  <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-primary-500 border-2 border-[#0a0a0f]" />
-                </button>
-                <NotificationPanel open={notifsOpen} onClose={() => setNotifsOpen(false)} />
-              </div>
-            )}
+            {/* Notification bell */}
+            <div ref={notifRef} className="relative">
+              <button
+                onClick={() => setNotifsOpen((v) => !v)}
+                aria-label="Notifications"
+                className={`relative flex items-center justify-center w-9 h-9 rounded-lg transition-colors ${
+                  notifsOpen ? "text-white bg-white/10" : "text-[#bfc1c6] hover:text-white hover:bg-white/5"
+                }`}
+              >
+                <svg className="w-[18px] h-[18px]" fill="none" stroke="currentColor" strokeWidth={1.8} viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M14.857 17.082a23.848 23.848 0 0 0 5.454-1.31A8.967 8.967 0 0 1 18 9.75V9A6 6 0 0 0 6 9v.75a8.967 8.967 0 0 1-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 0 1-5.714 0m5.714 0a3 3 0 1 1-5.714 0" />
+                </svg>
+                <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-primary-500 border-2 border-[#0a0a0f]" />
+              </button>
+              <NotificationPanel open={notifsOpen} onClose={() => setNotifsOpen(false)} />
+            </div>
 
             {/* Account */}
             <button
