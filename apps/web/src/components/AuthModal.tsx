@@ -50,7 +50,7 @@ export default function AuthModal({ open, onClose }: AuthModalProps) {
         <div className="p-8">
           {/* Logo */}
           <div className="text-center mb-6">
-            <span className="text-2xl font-extrabold text-primary-500 tracking-tight">Anistream</span>
+            <span className="text-2xl font-extrabold text-primary-500 tracking-tight">raijin.</span>
             <p className="text-sm text-[#5d6169] mt-1">Your anime, your way.</p>
           </div>
 

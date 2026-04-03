@@ -9,7 +9,7 @@ export default function Footer() {
           {/* Brand */}
           <div className="flex flex-col gap-1.5">
             <Link to="/" className="font-extrabold text-xl text-primary-500 tracking-tight">
-              Anistream
+              raijin.
             </Link>
             <p className="text-xs text-[#5d6169] max-w-sm leading-relaxed">
               A hobby project for anime fans. Built with love and caffeine.
@@ -33,7 +33,7 @@ export default function Footer() {
           <p className="text-xs text-[#5d6169] leading-relaxed">
             <span className="text-[#bfc1c6] font-medium">Disclaimer:</span>{" "}
             All content available on this site is provided by non-affiliated third parties.
-            Anistream does not host, upload, or own any of the video files or media displayed here.
+            raijin. does not host, upload, or own any of the video files or media displayed here.
             All trademarks, service marks, trade names, and other intellectual property rights belong
             to their respective owners.
           </p>
@@ -48,7 +48,7 @@ export default function Footer() {
         {/* Bottom bar */}
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 pt-2 border-t border-[#1e1e28]">
           <p className="text-xs text-[#5d6169]">
-            © {new Date().getFullYear()} Anistream — For educational &amp; hobby use only.
+            © {new Date().getFullYear()} raijin. — For educational &amp; hobby use only.
           </p>
           <p className="text-xs text-[#5d6169]">
             Data provided by{" "}

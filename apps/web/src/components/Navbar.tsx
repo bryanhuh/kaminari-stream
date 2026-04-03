@@ -67,9 +67,9 @@ export default function Navbar() {
           {/* Logo */}
           <Link
             to="/"
-            className="font-extrabold text-xl tracking-tight shrink-0 text-primary-500 hover:text-primary-400 transition-colors"
+            className="font-extrabold text-2xl tracking-tight shrink-0 text-primary-500 hover:text-primary-400 transition-colors"
           >
-            Anistream
+            raijin.
           </Link>
 
           {/* Desktop nav links */}
