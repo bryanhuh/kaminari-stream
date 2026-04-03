@@ -14,14 +14,12 @@ export default function Movies() {
   const items = data?.Page.media ?? [];
   const hasNext = data?.Page.pageInfo.hasNextPage ?? false;
 
-  const trailers: TrailerEntry[] = items
-    .slice(0, 10)
-    .reduce<TrailerEntry[]>((acc, a) => {
-      if (a.trailer?.site !== "youtube") return acc;
-      const videoId = parseYouTubeId(a.trailer.id);
-      if (videoId) acc.push({ anime: a, videoId });
-      return acc;
-    }, []);
+  const trailers: TrailerEntry[] = items.reduce<TrailerEntry[]>((acc, a) => {
+    if (a.trailer?.site !== "youtube") return acc;
+    const videoId = parseYouTubeId(a.trailer.id);
+    if (videoId) acc.push({ anime: a, videoId });
+    return acc;
+  }, []);
 
   const firstAnime = items[0] ?? null;
 
@@ -32,7 +30,7 @@ export default function Movies() {
 
   return (
     <div>
-      {!isLoading && firstAnime && page === 1 && (
+      {!isLoading && firstAnime && (
         trailers.length > 0
           ? <TrailerHero trailers={trailers} />
           : <StaticHero anime={firstAnime} />
