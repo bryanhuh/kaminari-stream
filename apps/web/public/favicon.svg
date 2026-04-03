@@ -2,5 +2,5 @@
   <!-- Background -->
   <rect width="48" height="48" rx="10" fill="#0a0a0f"/>
   <!-- Lightning bolt — Raijin mark -->
-  <path d="M29 4L12 27h11L18 44l19-23H26L29 4Z" fill="#00AEEF"/>
+  <path d="M29 4L12 27h11L18 44l19-23H26L29 4Z" fill="#FFD561"/>
 </svg>
