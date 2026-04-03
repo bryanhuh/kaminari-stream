@@ -269,11 +269,25 @@ export function getTVShows(page = 1, perPage = 24, genre?: string) {
   );
 }
 
-export function getMovies(page = 1, perPage = 24) {
-  return cached(`movies:${page}:${perPage}`, TTL_LIST, () =>
+const MOVIES_QUERY = `
+  query MoviesBrowse($page: Int, $perPage: Int, $genre: String) {
+    Page(page: $page, perPage: $perPage) {
+      pageInfo { hasNextPage total }
+      media(format: MOVIE, type: ANIME, isAdult: false, sort: TRENDING_DESC, genre: $genre) {
+        ${MEDIA_FIELDS}
+        bannerImage
+        trailer { id site }
+      }
+    }
+  }
+`;
+
+export function getMovies(page = 1, perPage = 24, genre?: string) {
+  const key = `movies-trending:${page}:${perPage}:${genre ?? ""}`;
+  return cached(key, TTL_LIST, () =>
     withRetry(() =>
       request<{ Page: { pageInfo: { hasNextPage: boolean; total: number }; media: unknown[] } }>(
-        ANILIST_URL, FORMAT_QUERY, { format: "MOVIE", page, perPage }
+        ANILIST_URL, MOVIES_QUERY, { page, perPage, genre: genre || undefined }
       )
     )
   );
