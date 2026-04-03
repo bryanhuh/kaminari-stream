@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { useAuth } from "../context/AuthContext";
 
 interface AuthModalProps {
   open: boolean;
@@ -71,16 +72,22 @@ export default function AuthModal({ open, onClose }: AuthModalProps) {
             ))}
           </div>
 
-          {tab === "signin" ? <SignInForm /> : <SignUpForm />}
+          {tab === "signin" ? <SignInForm onSuccess={onClose} /> : <SignUpForm onSuccess={onClose} />}
         </div>
       </div>
     </div>
   );
 }
 
-function SignInForm() {
+function SignInForm({ onSuccess }: { onSuccess: () => void }) {
+  const { login } = useAuth();
+  function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    login();
+    onSuccess();
+  }
   return (
-    <form onSubmit={(e) => e.preventDefault()} className="flex flex-col gap-4">
+    <form onSubmit={handleSubmit} className="flex flex-col gap-4">
       <div>
         <label className="block text-xs font-semibold text-[#bfc1c6] mb-1.5">Email</label>
         <input
@@ -120,9 +127,15 @@ function SignInForm() {
   );
 }
 
-function SignUpForm() {
+function SignUpForm({ onSuccess }: { onSuccess: () => void }) {
+  const { login } = useAuth();
+  function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    login();
+    onSuccess();
+  }
   return (
-    <form onSubmit={(e) => e.preventDefault()} className="flex flex-col gap-4">
+    <form onSubmit={handleSubmit} className="flex flex-col gap-4">
       <div>
         <label className="block text-xs font-semibold text-[#bfc1c6] mb-1.5">Username</label>
         <input
