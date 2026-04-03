@@ -10,6 +10,8 @@ export interface MediaItem {
   format: string | null;
   status: string | null;
   episodes: number | null;
+  bannerImage?: string | null;
+  trailer?: { id: string; site: string } | null;
 }
 
 interface PageResult {
@@ -135,10 +137,14 @@ interface FormatPageResult {
   };
 }
 
-export function useShows(page = 1, perPage = 24) {
+export function useShows(page = 1, perPage = 24, genre?: string) {
   return useQuery<FormatPageResult>({
-    queryKey: ["anime", "shows", page, perPage],
-    queryFn: () => api.get<FormatPageResult>(`/api/anime/shows?page=${page}&perPage=${perPage}`),
+    queryKey: ["anime", "shows", page, perPage, genre ?? ""],
+    queryFn: () => {
+      const params = new URLSearchParams({ page: String(page), perPage: String(perPage) });
+      if (genre) params.set("genre", genre);
+      return api.get<FormatPageResult>(`/api/anime/shows?${params}`);
+    },
     staleTime: 1000 * 60 * 10,
   });
 }
