@@ -76,7 +76,7 @@ export async function getAnimeInfo(providerAnimeId: string): Promise<ConsumetAni
 
 export async function getStreamSources(episodeId: string): Promise<StreamData> {
   const res = await ofetch<ConsumetWatchResponse>(
-    `${base}/anime/animekai/watch/${encodeURIComponent(episodeId)}`,
+    `${base}/anime/animekai/watch/${episodeId}`,
     { timeout: 15000 }
   );
 
