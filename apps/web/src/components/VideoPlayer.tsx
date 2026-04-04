@@ -17,6 +17,8 @@ interface VideoPlayerProps {
   title: string;
   initialTime?: number;
   onTimeUpdate?: (currentTime: number, duration: number) => void;
+  sourceUrl?: string;
+  onEnded?: () => void;
 }
 
 function getBestSource(sources: StreamData["sources"]): string {
@@ -40,10 +42,12 @@ export default function VideoPlayer({
   title,
   initialTime = 0,
   onTimeUpdate,
+  sourceUrl,
+  onEnded,
 }: VideoPlayerProps) {
   const playerRef = useRef<MediaPlayerInstance>(null);
   const referer = streamData.headers?.Referer;
-  const rawSrc = getBestSource(streamData.sources);
+  const rawSrc = sourceUrl ?? getBestSource(streamData.sources);
   const srcUrl = proxied(rawSrc, referer);
   // Vidstack can't sniff HLS type from the proxy URL, so provide it explicitly
   const src = { src: srcUrl, type: "application/x-mpegurl" as const };
@@ -74,6 +78,7 @@ export default function VideoPlayer({
         const duration = playerRef.current?.duration ?? 0;
         onTimeUpdate?.(detail.currentTime, duration);
       }}
+      onEnded={onEnded}
       crossOrigin="anonymous"
     >
       <MediaProvider />
