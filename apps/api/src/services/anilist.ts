@@ -19,10 +19,11 @@ function cached<T>(key: string, ttlMs: number, fn: () => Promise<T>): Promise<T>
   });
 }
 
-// TTLs: list queries cached 5 min; detail queries cached 10 min; search 1 min
-const TTL_LIST   = 5 * 60 * 1000;
-const TTL_DETAIL = 10 * 60 * 1000;
-const TTL_SEARCH = 60 * 1000;
+// TTLs: longer caches reduce upstream AniList calls and rate-limit exposure.
+// List pages change infrequently; detail data almost never changes mid-session.
+const TTL_LIST   = 15 * 60 * 1000;  // 15 min (was 5)
+const TTL_DETAIL = 30 * 60 * 1000;  // 30 min (was 10)
+const TTL_SEARCH =  5 * 60 * 1000;  //  5 min (was 1)
 
 // ── Retry wrapper ───────────────────────────────────────────────────────────────
 // On 429, waits with exponential backoff before retrying (up to maxRetries).
