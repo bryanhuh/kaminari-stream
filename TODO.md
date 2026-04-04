@@ -4,8 +4,8 @@
 
 - [x] **Watchlist / Favorites** — Let users bookmark anime to watch later. Needs a new SQLite table, API routes (add/remove/list), and UI (heart/bookmark button on AnimeCard, AnimeDetail, and a `/watchlist` page).
 - [x] **Watch History page** — Dedicated `/history` page listing all watched episodes with progress, grouped by anime. Data already exists in SQLite — just needs a page + route.
-- [ ] **404 page** — Fallback route in the router for unmatched URLs.
-- [ ] **Search filters** — Genre, format (TV/Movie/OVA), year, and status filters on the `/search` page.
+- [x] **404 page** — Fallback route in the router for unmatched URLs.
+- [x] **Search filters** — Genre, format (TV/Movie/OVA), year, and status filters on the `/search` page.
 
 ## Medium Priority
 
@@ -13,6 +13,9 @@
 - [ ] **Remove from watch history** — Allow users to delete individual entries from their history (button on history page and/or continue watching banner).
 - [ ] **Mobile bottom navigation bar** — Persistent bottom nav on mobile with Home, Browse, Search, History shortcuts.
 - [ ] **Dynamic page titles & meta** — Set `<title>` and `<meta name="description">` per page (anime name on detail/watch pages, search query on search page, etc.).
+- [ ] **Loading states / Suspense boundaries** — Add top-level loading indicators and `Suspense` boundaries for route transitions and async data fetching.
+- [ ] **Accessibility improvements** — Add skip-to-content link, focus management on route changes, and ARIA labels across interactive elements.
+- [ ] **SEO / Open Graph tags** — Add `<meta description>`, Open Graph, and Twitter Card tags per page (use `react-helmet` or equivalent).
 
 ## Lower Priority / Nice to Have
 
@@ -21,6 +24,8 @@
 - [ ] **PWA manifest** — Add `manifest.json` and service worker so the app is installable to home screen on mobile.
 - [ ] **Ratings / reviews** — Allow logged-in users to rate anime (1–10 stars) and leave a short review on the anime detail page.
 - [ ] **Episode progress bars on EpisodeList** — Show a thin progress bar on partially-watched episode cards (data already available from watch history).
+- [ ] **Error tracking / monitoring** — Integrate Sentry or similar service so runtime errors are captured beyond `console.error` in ErrorBoundary.
+- [ ] **Analytics** — Basic page-view / event tracking to understand usage patterns.
 
 ## Done ✅
 
