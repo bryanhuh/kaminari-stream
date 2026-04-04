@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import WatchlistButton from "./WatchlistButton";
 
 interface AnimeCardProps {
   id: number;
@@ -17,6 +18,7 @@ export default function AnimeCard({
   coverImage,
   score,
   format,
+  status,
   episodes,
 }: AnimeCardProps) {
   return (
@@ -42,6 +44,20 @@ export default function AnimeCard({
               <path d="M8 5v14l11-7z" />
             </svg>
           </div>
+        </div>
+
+        {/* Watchlist icon button */}
+        <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+          <WatchlistButton
+            animeId={id}
+            animeTitle={title}
+            animeCover={coverImage}
+            format={format}
+            episodes={episodes}
+            score={score}
+            status={status}
+            variant="icon"
+          />
         </div>
 
         {/* Score badge */}
