@@ -8,6 +8,8 @@ import Watch from "./pages/Watch";
 import Browse from "./pages/Browse";
 import Shows from "./pages/Shows";
 import Movies from "./pages/Movies";
+import Watchlist from "./pages/Watchlist";
+import History from "./pages/History";
 import ErrorBoundary from "./components/ErrorBoundary";
 import RateLimitToast from "./components/RateLimitToast";
 
@@ -25,6 +27,8 @@ export default function App() {
             <Route path="/browse" element={<ErrorBoundary><Browse /></ErrorBoundary>} />
             <Route path="/shows" element={<ErrorBoundary><Shows /></ErrorBoundary>} />
             <Route path="/movies" element={<ErrorBoundary><Movies /></ErrorBoundary>} />
+            <Route path="/watchlist" element={<ErrorBoundary><Watchlist /></ErrorBoundary>} />
+            <Route path="/history" element={<ErrorBoundary><History /></ErrorBoundary>} />
           </Routes>
         </ErrorBoundary>
       </main>
