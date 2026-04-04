@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import {
   MediaPlayer,
   MediaProvider,
@@ -38,6 +38,12 @@ function proxied(url: string, referer?: string): string {
   return `/api/proxy/hls?url=${encodeURIComponent(url)}&referer=${encodeURIComponent(referer)}`;
 }
 
+// Subtitle VTT files on anime CDNs require the same referer + CORS bypass.
+// We reuse the HLS proxy since it pipes any content-type through.
+function proxiedVtt(url: string, referer?: string): string {
+  return `/api/proxy/hls?url=${encodeURIComponent(url)}&referer=${encodeURIComponent(referer ?? "")}`;
+}
+
 export default function VideoPlayer({
   streamData,
   title,
@@ -50,8 +56,13 @@ export default function VideoPlayer({
   const referer = streamData.headers?.Referer;
   const rawSrc = sourceUrl ?? getBestSource(streamData.sources);
   const srcUrl = proxied(rawSrc, referer);
-  // Vidstack can't sniff HLS type from the proxy URL, so provide it explicitly
-  const src = { src: srcUrl, type: "application/x-mpegurl" as const };
+
+  // Memoize src so Vidstack only reloads when the URL genuinely changes,
+  // not on every parent render (which caused flickering).
+  const src = useMemo(
+    () => ({ src: srcUrl, type: "application/x-mpegurl" as const }),
+    [srcUrl]
+  );
 
   // Seek to saved position after media is ready
   useEffect(() => {
@@ -83,16 +94,19 @@ export default function VideoPlayer({
       crossOrigin="anonymous"
     >
       <MediaProvider>
-        {streamData.subtitles?.map((sub, i) => (
-          <Track
-            key={`${i}-${sub.lang}`}
-            src={sub.url}
-            kind="subtitles"
-            label={sub.lang}
-            lang={sub.lang}
-            default={sub.lang.toLowerCase().includes("english")}
-          />
-        ))}
+        {streamData.subtitles
+          // Consumet includes "Thumbnails" (seek-preview sprites) — skip those.
+          ?.filter((sub) => sub.lang.toLowerCase() !== "thumbnails")
+          .map((sub, i) => (
+            <Track
+              key={`${i}-${sub.lang}`}
+              src={proxiedVtt(sub.url, referer)}
+              kind="subtitles"
+              label={sub.lang}
+              lang={sub.lang}
+              default={sub.lang.toLowerCase().includes("english")}
+            />
+          ))}
       </MediaProvider>
       <DefaultVideoLayout icons={defaultLayoutIcons} />
     </MediaPlayer>
