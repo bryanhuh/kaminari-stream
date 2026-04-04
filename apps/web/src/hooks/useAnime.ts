@@ -29,17 +29,36 @@ export interface AnimeDetail {
   coverImage: { large: string | null; medium: string | null; color: string | null } | null;
   bannerImage: string | null;
   episodes: number | null;
+  duration: number | null;
   status: string | null;
   season: string | null;
   seasonYear: number | null;
+  startDate: { year: number | null; month: number | null; day: number | null } | null;
+  endDate: { year: number | null; month: number | null; day: number | null } | null;
   averageScore: number | null;
+  popularity: number | null;
   genres: string[];
   format: string | null;
+  source: string | null;
+  trailer: { id: string; site: string } | null;
   studios: { nodes: { id: number; name: string }[] };
   characters: {
     edges: {
       role: string;
-      node: { id: number; name: { full: string }; image: { medium: string | null } };
+      voiceActors: { id: number; name: { full: string }; image: { medium: string | null } }[];
+      node: { id: number; name: { full: string }; image: { large: string | null; medium: string | null } };
+    }[];
+  };
+  relations: {
+    edges: {
+      relationType: string;
+      node: {
+        id: number;
+        title: { romaji: string | null; english: string | null };
+        coverImage: { medium: string | null; color: string | null };
+        format: string | null;
+        type: string | null;
+      };
     }[];
   };
   recommendations: {

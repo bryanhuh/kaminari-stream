@@ -101,22 +101,45 @@ const DETAIL_QUERY = `
       coverImage { large medium color }
       bannerImage
       episodes
+      duration
       status
       season
       seasonYear
+      startDate { year month day }
+      endDate { year month day }
       averageScore
+      popularity
       genres
       format
+      source
+      trailer { id site }
       studios(isMain: true) {
         nodes { id name }
       }
-      characters(sort: ROLE, perPage: 6) {
+      characters(sort: ROLE, perPage: 12) {
         edges {
           role
-          node {
+          voiceActors(language: JAPANESE) {
             id
             name { full }
             image { medium }
+          }
+          node {
+            id
+            name { full }
+            image { large medium }
+          }
+        }
+      }
+      relations {
+        edges {
+          relationType(version: 2)
+          node {
+            id
+            title { romaji english }
+            coverImage { medium color }
+            format
+            type
           }
         }
       }
