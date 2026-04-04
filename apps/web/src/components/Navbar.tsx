@@ -48,6 +48,8 @@ export default function Navbar() {
     { label: "Home", to: "/" },
     { label: "Shows", to: "/shows" },
     { label: "Movies", to: "/movies" },
+    { label: "Watchlist", to: "/watchlist" },
+    { label: "History", to: "/history" },
   ];
 
   return (
