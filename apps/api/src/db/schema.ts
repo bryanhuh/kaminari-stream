@@ -11,6 +11,20 @@ export const providerIdCache = sqliteTable("provider_id_cache", {
     .default(sql`(datetime('now'))`),
 });
 
+export const watchlist = sqliteTable("watchlist", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  animeId: integer("anime_id").notNull().unique(),
+  animeTitle: text("anime_title").notNull(),
+  animeCover: text("anime_cover"),
+  format: text("format"),
+  episodes: integer("episodes"),
+  score: integer("score"),
+  status: text("status"),
+  addedAt: text("added_at")
+    .notNull()
+    .default(sql`(datetime('now'))`),
+});
+
 export const watchHistory = sqliteTable("watch_history", {
   id: integer("id").primaryKey({ autoIncrement: true }),
   animeId: integer("anime_id").notNull(),
