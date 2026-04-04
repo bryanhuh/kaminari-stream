@@ -5,6 +5,7 @@ import historyRouter from "./history";
 import animeRouter from "./anime";
 import proxyRouter from "./proxy";
 import browseRouter from "./browse";
+import watchlistRouter from "./watchlist";
 
 const router = Router();
 
@@ -18,5 +19,6 @@ router.use("/episodes", episodesRouter);
 router.use("/stream", streamRouter);
 router.use("/history", historyRouter);
 router.use("/browse", browseRouter);
+router.use("/watchlist", watchlistRouter);
 
 export default router;
