@@ -10,6 +10,7 @@ import Shows from "./pages/Shows";
 import Movies from "./pages/Movies";
 import Watchlist from "./pages/Watchlist";
 import History from "./pages/History";
+import NotFound from "./pages/NotFound";
 import ErrorBoundary from "./components/ErrorBoundary";
 import RateLimitToast from "./components/RateLimitToast";
 
@@ -29,6 +30,7 @@ export default function App() {
             <Route path="/movies" element={<ErrorBoundary><Movies /></ErrorBoundary>} />
             <Route path="/watchlist" element={<ErrorBoundary><Watchlist /></ErrorBoundary>} />
             <Route path="/history" element={<ErrorBoundary><History /></ErrorBoundary>} />
+            <Route path="*" element={<NotFound />} />
           </Routes>
         </ErrorBoundary>
       </main>
