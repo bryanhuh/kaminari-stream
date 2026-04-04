@@ -9,6 +9,7 @@ import Browse from "./pages/Browse";
 import Shows from "./pages/Shows";
 import Movies from "./pages/Movies";
 import ErrorBoundary from "./components/ErrorBoundary";
+import RateLimitToast from "./components/RateLimitToast";
 
 export default function App() {
   return (
@@ -28,6 +29,7 @@ export default function App() {
         </ErrorBoundary>
       </main>
       <Footer />
+      <RateLimitToast />
     </div>
   );
 }
