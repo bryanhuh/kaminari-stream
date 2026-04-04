@@ -2,6 +2,7 @@ import { useEffect, useRef } from "react";
 import {
   MediaPlayer,
   MediaProvider,
+  Track,
   type MediaPlayerInstance,
 } from "@vidstack/react";
 import {
@@ -81,7 +82,18 @@ export default function VideoPlayer({
       onEnded={onEnded}
       crossOrigin="anonymous"
     >
-      <MediaProvider />
+      <MediaProvider>
+        {streamData.subtitles?.map((sub, i) => (
+          <Track
+            key={i}
+            src={sub.url}
+            kind="subtitles"
+            label={sub.lang}
+            lang={sub.lang}
+            default={sub.lang.toLowerCase().includes("english")}
+          />
+        ))}
+      </MediaProvider>
       <DefaultVideoLayout icons={defaultLayoutIcons} />
     </MediaPlayer>
   );
