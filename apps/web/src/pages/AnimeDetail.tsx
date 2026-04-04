@@ -5,6 +5,7 @@ import { useEpisodes } from "../hooks/useEpisodes";
 import { useAnimeHistory } from "../hooks/useWatchHistory";
 import AnimeCard from "../components/AnimeCard";
 import EpisodeList from "../components/EpisodeList";
+import WatchlistButton from "../components/WatchlistButton";
 
 function formatStatus(s: string | null) {
   if (!s) return null;
@@ -208,8 +209,8 @@ export default function AnimeDetail() {
             </div>
 
             {/* CTA */}
-            {firstEpisode && (
-              <div className="flex gap-3 mt-1">
+            <div className="flex gap-3 mt-1">
+              {firstEpisode && (
                 <Link
                   to={`/watch?animeId=${anime.id}&episodeId=${encodeURIComponent(firstEpisode.id)}&ep=${firstEpisode.number}`}
                   className="flex items-center gap-2 bg-primary-500 hover:bg-primary-400 text-[#0a0a0f] font-bold text-sm px-5 py-2.5 rounded-full transition-colors shadow-lg shadow-primary-500/20"
@@ -219,8 +220,17 @@ export default function AnimeDetail() {
                   </svg>
                   Watch Now
                 </Link>
-              </div>
-            )}
+              )}
+              <WatchlistButton
+                animeId={anime.id}
+                animeTitle={title}
+                animeCover={anime.coverImage?.large ?? anime.coverImage?.medium}
+                format={anime.format}
+                episodes={anime.episodes}
+                score={anime.averageScore}
+                status={anime.status}
+              />
+            </div>
           </div>
         </div>
 
