@@ -26,14 +26,14 @@ export default function Footer() {
             </nav>
           </div>
 
-          {/* Divider with mascot sitting on it */}
+          {/* Divider with mascot peeking from right */}
           <div className="relative">
             <div className="border-t border-[#1e1e28]" />
-            <div className="absolute -top-[100px] right-0 pointer-events-none select-none hidden sm:block">
+            <div className="absolute -top-[36px] right-0 pointer-events-none select-none hidden sm:block">
               <img
                 src="/mascot.png"
                 alt="raijin. mascot"
-                className="h-[148px] w-auto drop-shadow-[0_0_24px_rgba(255,213,97,0.25)]"
+                className="h-[120px] w-auto drop-shadow-[0_0_24px_rgba(255,213,97,0.25)]"
               />
             </div>
           </div>
