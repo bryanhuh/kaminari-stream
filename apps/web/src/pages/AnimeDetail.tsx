@@ -109,10 +109,14 @@ export default function AnimeDetail() {
   return (
     <div className="min-h-screen">
       {/* Banner */}
-      <div className="relative h-72 md:h-96 overflow-hidden">
+      <div className="group relative h-72 md:h-96 overflow-hidden cursor-pointer">
         {anime.bannerImage ? (
           <>
-            <img src={anime.bannerImage} alt="" className="w-full h-full object-cover" />
+            <img
+              src={anime.bannerImage}
+              alt=""
+              className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+            />
             <div className="absolute inset-0 bg-gradient-to-b from-black/10 via-[#0a0a0f]/50 to-[#0a0a0f]" />
           </>
         ) : (
@@ -122,6 +126,22 @@ export default function AnimeDetail() {
               background: `linear-gradient(to bottom, ${anime.coverImage?.color ?? "#1e1e28"}88 0%, #0a0a0f 100%)`,
             }}
           />
+        )}
+
+        {/* Play button overlay — only shown when there's a banner and an episode to watch */}
+        {anime.bannerImage && firstEpisode && (
+          <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+            <Link
+              to={`/watch?animeId=${anime.id}&episodeId=${encodeURIComponent(firstEpisode.id)}&ep=${firstEpisode.number}`}
+              onClick={(e) => e.stopPropagation()}
+              className="flex items-center justify-center w-20 h-20 rounded-full bg-black/40 border-2 border-white/30 backdrop-blur-sm hover:bg-black/60 hover:border-white/50 hover:scale-110 transition-all duration-200"
+              aria-label={`Watch ${title}`}
+            >
+              <svg className="w-8 h-8 text-white ml-1" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M8 5v14l11-7z" />
+              </svg>
+            </Link>
+          </div>
         )}
       </div>
 
