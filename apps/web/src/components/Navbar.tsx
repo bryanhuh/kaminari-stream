@@ -69,9 +69,20 @@ export default function Navbar() {
           {/* Logo */}
           <Link
             to="/"
-            className="font-extrabold text-2xl tracking-tight shrink-0 text-primary-500 hover:text-primary-400 transition-colors"
+            className="font-extrabold text-2xl tracking-tight shrink-0 text-primary-500 hover:text-primary-400 transition-colors flex items-baseline"
           >
-            raijin.
+            raiji
+            <span className="relative">
+              n
+              <img
+                src="/mascot-logo.png"
+                alt=""
+                aria-hidden="true"
+                className="absolute pointer-events-none select-none"
+                style={{ height: 38, width: "auto", bottom: "60%", left: "40%" }}
+              />
+            </span>
+            .
           </Link>
 
           {/* Desktop nav links */}
