@@ -188,6 +188,15 @@ export default function Watch() {
         <div className="relative max-w-7xl mx-auto px-4 pt-4 pb-6 flex flex-col gap-3">
           {/* ZONE B: Now Playing bar */}
           <div className="flex items-center gap-3">
+            <button
+              onClick={() => navigate(-1)}
+              className="shrink-0 flex items-center justify-center w-8 h-8 rounded-full hover:bg-white/10 text-[#bfc1c6] hover:text-white transition-colors"
+              aria-label="Go back"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
+              </svg>
+            </button>
             {cover && (
               <img
                 src={cover}
@@ -204,12 +213,6 @@ export default function Watch() {
               </Link>
               <span className="text-xs text-[#5d6169]">{episodeTitle}</span>
             </div>
-            <Link
-              to={`/anime/${animeId}`}
-              className="shrink-0 text-xs px-3 py-1.5 rounded-full border border-[#2a2a38] text-[#bfc1c6] hover:text-white hover:border-[#5d6169] transition-colors"
-            >
-              View Details
-            </Link>
           </div>
 
           {/* ZONE C: Player grid + sidebar */}
@@ -269,24 +272,24 @@ export default function Watch() {
             watchHistory={(animeHistory ?? []) as WatchHistoryEntry[]}
           />
 
-          {/* ZONE D: Controls */}
-          <div className="bg-[#111118]/60 backdrop-blur-sm border border-[#1e1e28] rounded-xl px-4 py-3 flex flex-col gap-2.5">
-            <div className="flex flex-wrap items-center gap-2">
+          {/* ZONE D: Controls — compact bar attached under player */}
+          <div className="flex flex-col gap-1.5 mt-1">
+            <div className="flex flex-wrap items-center gap-1.5">
               {/* Prev */}
               {prevEp ? (
                 <Link
                   to={`/watch?animeId=${animeId}&episodeId=${encodeURIComponent(prevEp.id)}&ep=${prevEp.number}`}
-                  className="flex items-center gap-1.5 px-4 py-2 rounded-full bg-[#1e1e28] hover:bg-[#2a2a38] text-[#bfc1c6] hover:text-white text-sm font-medium transition-colors"
+                  className="flex items-center gap-1 px-3 py-1.5 rounded-md bg-[#1e1e28] hover:bg-[#2a2a38] text-[#bfc1c6] hover:text-white text-xs font-medium transition-colors"
                 >
-                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                  <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 19l-7-7 7-7" />
                   </svg>
                   Prev
                 </Link>
               ) : (
-                <span className="flex items-center gap-1.5 px-4 py-2 rounded-full bg-[#111118] text-[#3a3a48] text-sm font-medium cursor-not-allowed">
-                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                <span className="flex items-center gap-1 px-3 py-1.5 rounded-md bg-[#111118] text-[#3a3a48] text-xs font-medium cursor-not-allowed">
+                  <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 19l-7-7 7-7" />
                   </svg>
                   Prev
                 </span>
@@ -295,14 +298,14 @@ export default function Watch() {
               {/* AutoNext */}
               <button
                 onClick={toggleAutoNext}
-                className={`flex items-center gap-1.5 px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+                className={`flex items-center gap-1 px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${
                   autoNext
                     ? "bg-primary-500/20 border border-primary-500/40 text-primary-400"
                     : "bg-[#1e1e28] text-[#5d6169] hover:text-[#bfc1c6] border border-transparent"
                 }`}
               >
-                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 5l7 7-7 7M5 5l7 7-7 7" />
+                <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M13 5l7 7-7 7M5 5l7 7-7 7" />
                 </svg>
                 Auto Next
               </button>
@@ -311,18 +314,18 @@ export default function Watch() {
               {nextEp ? (
                 <Link
                   to={`/watch?animeId=${animeId}&episodeId=${encodeURIComponent(nextEp.id)}&ep=${nextEp.number}`}
-                  className="flex items-center gap-1.5 px-4 py-2 rounded-full bg-[#1e1e28] hover:bg-[#2a2a38] text-[#bfc1c6] hover:text-white text-sm font-medium transition-colors"
+                  className="flex items-center gap-1 px-3 py-1.5 rounded-md bg-[#1e1e28] hover:bg-[#2a2a38] text-[#bfc1c6] hover:text-white text-xs font-medium transition-colors"
                 >
                   Next
-                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                  <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
                   </svg>
                 </Link>
               ) : (
-                <span className="flex items-center gap-1.5 px-4 py-2 rounded-full bg-[#111118] text-[#3a3a48] text-sm font-medium cursor-not-allowed">
+                <span className="flex items-center gap-1 px-3 py-1.5 rounded-md bg-[#111118] text-[#3a3a48] text-xs font-medium cursor-not-allowed">
                   Next
-                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                  <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
                   </svg>
                 </span>
               )}
@@ -330,21 +333,21 @@ export default function Watch() {
               {/* Servers */}
               {streamData && streamData.sources.length > 0 && (
                 <>
-                  <span className="text-[#2a2a38] select-none mx-1">|</span>
-                  <span className="text-xs text-[#5d6169] font-medium tracking-wider uppercase">Servers</span>
+                  <span className="text-[#2a2a38] select-none px-0.5">|</span>
+                  <span className="text-[10px] text-[#5d6169] font-bold tracking-widest uppercase">Servers</span>
                   {streamData.sources.map((source, idx) => (
                     <button
                       key={idx}
                       onClick={() => setSelectedSourceIndex(idx)}
-                      className={`relative flex flex-col items-center px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+                      className={`relative flex flex-col items-center px-2.5 py-1 rounded-md text-xs font-semibold transition-all ${
                         selectedSourceIndex === idx
-                          ? "bg-primary-500 text-[#0a0a0f] shadow-lg shadow-primary-500/25"
+                          ? "bg-primary-500 text-[#0a0a0f] shadow-md shadow-primary-500/25"
                           : "bg-[#1e1e28] text-[#bfc1c6] hover:bg-[#2a2a38] hover:text-white"
                       }`}
                     >
                       Server {idx + 1}
                       {source.quality && (
-                        <span className={`text-[10px] font-normal leading-none mt-0.5 ${selectedSourceIndex === idx ? "text-[#0a0a0f]/70" : "text-[#5d6169]"}`}>
+                        <span className={`text-[9px] font-normal leading-none mt-0.5 ${selectedSourceIndex === idx ? "text-[#0a0a0f]/70" : "text-[#5d6169]"}`}>
                           {source.quality}
                         </span>
                       )}
@@ -356,24 +359,17 @@ export default function Watch() {
                 </>
               )}
 
-              {/* Keyboard hints */}
-              <span className="hidden md:block ml-auto text-xs text-[#3a3a48]">
-                P prev · N next
+              <span className="hidden md:flex ml-auto items-center gap-2 text-[10px] text-[#3a3a48]">
+                <span>P prev</span>
+                <span>·</span>
+                <span>N next</span>
               </span>
             </div>
 
-            {/* Episode info row */}
-            <div className="flex items-center justify-between">
-              <p className="text-xs text-[#5d6169]">
-                {episodeTitle}
-                {episodes.length > 0 && ` of ${episodes.length}`}
-              </p>
-              {streamData && streamData.sources.length > 1 && (
-                <p className="text-xs text-[#5d6169]">
-                  If a server doesn't load, try another
-                </p>
-              )}
-            </div>
+            {/* Episode count */}
+            <p className="text-[11px] text-[#5d6169]">
+              {episodeTitle}{episodes.length > 0 && ` of ${episodes.length}`}
+            </p>
           </div>
         </div>
       </div>
@@ -393,41 +389,88 @@ export default function Watch() {
           />
         </section>
 
-        {/* Synopsis & Details */}
+        {/* Synopsis & Details — AnimeKai style */}
         {anime && (
-          <section className="grid grid-cols-1 lg:grid-cols-[1fr_260px] gap-8">
-            {/* Left: synopsis + genres */}
-            <div className="flex flex-col gap-4">
-              <h2 className="text-lg font-bold text-white">Synopsis</h2>
-              <div className="flex flex-wrap gap-2">
-                {anime.genres.slice(0, 5).map((g) => (
-                  <span key={g} className="text-xs px-2.5 py-1 rounded-full border border-[#2a2a38] text-[#bfc1c6] bg-white/5">
+          <section className="flex flex-col sm:flex-row gap-6">
+            {/* Cover */}
+            <div className="shrink-0">
+              <img
+                src={anime.coverImage?.large ?? anime.coverImage?.medium ?? ""}
+                alt={title}
+                className="w-40 sm:w-48 rounded-xl object-cover border border-[#1e1e28] shadow-lg"
+                style={{ aspectRatio: "3/4" }}
+              />
+            </div>
+
+            {/* Details */}
+            <div className="flex flex-col gap-3 min-w-0 flex-1">
+              {/* Title block */}
+              <div className="flex flex-col gap-1">
+                <h2 className="text-2xl font-extrabold text-white leading-tight">{title}</h2>
+                {anime.title.romaji && anime.title.romaji !== title && (
+                  <p className="text-sm text-[#5d6169]">{anime.title.romaji}</p>
+                )}
+                {anime.title.native && (
+                  <p className="text-sm text-[#5d6169]">{anime.title.native}</p>
+                )}
+              </div>
+
+              {/* Badges */}
+              <div className="flex flex-wrap items-center gap-2">
+                {anime.format && (
+                  <span className="text-xs px-2.5 py-0.5 rounded-full bg-primary-500/15 border border-primary-500/30 text-primary-400 font-semibold uppercase tracking-wide">
+                    {anime.format.replace(/_/g, " ")}
+                  </span>
+                )}
+                {anime.status && (
+                  <span className="text-xs px-2.5 py-0.5 rounded-full bg-[#1e1e28] border border-[#2a2a38] text-[#bfc1c6]">
+                    {formatStatus(anime.status)}
+                  </span>
+                )}
+                {season && (
+                  <span className="text-xs px-2.5 py-0.5 rounded-full bg-[#1e1e28] border border-[#2a2a38] text-[#bfc1c6]">
+                    {season}
+                  </span>
+                )}
+                {anime.averageScore && (
+                  <span className="text-xs px-2.5 py-0.5 rounded-full bg-[#1e1e28] border border-[#2a2a38] text-primary-400 font-semibold">
+                    ★ {(anime.averageScore / 10).toFixed(1)}
+                  </span>
+                )}
+              </div>
+
+              {/* Genres */}
+              <div className="flex flex-wrap gap-1.5">
+                {anime.genres.slice(0, 6).map((g) => (
+                  <span key={g} className="text-xs px-2 py-0.5 rounded-full border border-[#2a2a38] text-[#5d6169] hover:text-[#bfc1c6] hover:border-[#5d6169] transition-colors cursor-default">
                     {g}
                   </span>
                 ))}
               </div>
-              {description && (
-                <p className="text-[#bfc1c6] text-sm leading-relaxed">{description}</p>
-              )}
-            </div>
 
-            {/* Right: info card */}
-            <div className="rounded-xl bg-[#111118] border border-[#1e1e28] p-5 flex flex-col gap-0 h-fit">
-              {[
-                { label: "Format", value: anime.format ? anime.format.replace(/_/g, " ") : null },
-                { label: "Status", value: formatStatus(anime.status) },
-                { label: "Season", value: season },
-                { label: "Studio", value: studio },
-                { label: "Episodes", value: anime.episodes?.toString() ?? null },
-                { label: "Score", value: anime.averageScore ? `${(anime.averageScore / 10).toFixed(1)} / 10` : null },
-              ]
-                .filter((r) => r.value)
-                .map((r) => (
-                  <div key={r.label} className="flex justify-between gap-2 py-2.5 border-b border-[#1e1e28] last:border-0 text-sm">
-                    <span className="text-[#5d6169]">{r.label}</span>
-                    <span className="text-[#bfc1c6] font-medium text-right">{r.value}</span>
-                  </div>
-                ))}
+              {/* Synopsis */}
+              {description && (
+                <p className="text-[#bfc1c6] text-sm leading-relaxed line-clamp-4">{description}</p>
+              )}
+
+              {/* Metadata grid */}
+              <div className="grid grid-cols-2 gap-x-8 gap-y-2 mt-1">
+                {[
+                  { label: "Status", value: formatStatus(anime.status) },
+                  { label: "Studio", value: studio },
+                  { label: "Episodes", value: anime.episodes?.toString() ?? null },
+                  { label: "Duration", value: anime.duration ? `${anime.duration} min` : null },
+                  { label: "Season", value: season },
+                  { label: "Format", value: anime.format ? anime.format.replace(/_/g, " ") : null },
+                ]
+                  .filter((r) => r.value)
+                  .map((r) => (
+                    <div key={r.label} className="flex flex-col gap-0.5">
+                      <span className="text-[10px] font-bold uppercase tracking-wider text-[#5d6169]">{r.label}</span>
+                      <span className="text-sm text-[#bfc1c6] font-medium">{r.value}</span>
+                    </div>
+                  ))}
+              </div>
             </div>
           </section>
         )}

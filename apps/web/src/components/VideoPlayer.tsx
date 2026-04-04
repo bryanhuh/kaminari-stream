@@ -85,7 +85,7 @@ export default function VideoPlayer({
       <MediaProvider>
         {streamData.subtitles?.map((sub, i) => (
           <Track
-            key={i}
+            key={`${i}-${sub.lang}`}
             src={sub.url}
             kind="subtitles"
             label={sub.lang}
