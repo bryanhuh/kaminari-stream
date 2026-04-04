@@ -90,12 +90,29 @@ export function usePopular(page = 1, perPage = 12) {
   });
 }
 
-export function useAnimeSearch(query: string, page = 1, perPage = 30) {
+export interface SearchFilters {
+  genre?: string;
+  format?: string;
+  year?: number;
+  status?: string;
+}
+
+export function useAnimeSearch(query: string, page = 1, perPage = 30, filters?: SearchFilters) {
+  const hasFilters = filters && (filters.genre || filters.format || filters.year || filters.status);
+  const hasQuery = query.length > 0;
+
   return useQuery<PageResult>({
-    queryKey: ["anime", "search", query, page, perPage],
-    queryFn: () =>
-      api.get<PageResult>(`/api/anime/search?q=${encodeURIComponent(query)}&page=${page}&perPage=${perPage}`),
-    enabled: query.length > 0,
+    queryKey: ["anime", "search", query, page, perPage, filters ?? {}],
+    queryFn: () => {
+      const params = new URLSearchParams({ page: String(page), perPage: String(perPage) });
+      if (query) params.set("q", query);
+      if (filters?.genre) params.set("genre", filters.genre);
+      if (filters?.format) params.set("format", filters.format);
+      if (filters?.year) params.set("year", String(filters.year));
+      if (filters?.status) params.set("status", filters.status);
+      return api.get<PageResult>(`/api/anime/search?${params}`);
+    },
+    enabled: hasQuery || !!hasFilters,
     staleTime: 1000 * 60 * 5,
   });
 }
