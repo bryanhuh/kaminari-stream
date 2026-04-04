@@ -2,8 +2,8 @@
 
 ## High Priority
 
-- [ ] **Watchlist / Favorites** — Let users bookmark anime to watch later. Needs a new SQLite table, API routes (add/remove/list), and UI (heart/bookmark button on AnimeCard, AnimeDetail, and a `/watchlist` page).
-- [ ] **Watch History page** — Dedicated `/history` page listing all watched episodes with progress, grouped by anime. Data already exists in SQLite — just needs a page + route.
+- [x] **Watchlist / Favorites** — Let users bookmark anime to watch later. Needs a new SQLite table, API routes (add/remove/list), and UI (heart/bookmark button on AnimeCard, AnimeDetail, and a `/watchlist` page).
+- [x] **Watch History page** — Dedicated `/history` page listing all watched episodes with progress, grouped by anime. Data already exists in SQLite — just needs a page + route.
 - [ ] **404 page** — Fallback route in the router for unmatched URLs.
 - [ ] **Search filters** — Genre, format (TV/Movie/OVA), year, and status filters on the `/search` page.
 
