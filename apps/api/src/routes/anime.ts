@@ -3,6 +3,7 @@ import {
   getTrending,
   getPopular,
   searchAnimeAnilist,
+  advancedSearch,
   getAnimeDetail,
   browseAZ,
   getSeasonAnime,
@@ -155,14 +156,30 @@ router.get("/az", async (req: Request, res: Response) => {
 
 router.get("/search", async (req: Request, res: Response) => {
   const q = String(req.query.q ?? "").trim();
-  if (!q) {
-    res.status(400).json({ error: "Missing query param: q" });
-    return;
-  }
+  const genre = req.query.genre ? String(req.query.genre) : undefined;
+  const format = req.query.format ? String(req.query.format) : undefined;
+  const year = req.query.year ? Number(req.query.year) : undefined;
+  const status = req.query.status ? String(req.query.status) : undefined;
   const page = Number(req.query.page) || 1;
   const perPage = Number(req.query.perPage) || 30;
+
+  const hasFilters = genre || format || year || status;
+
+  if (!q && !hasFilters) {
+    res.status(400).json({ error: "Missing query param: q or at least one filter" });
+    return;
+  }
+
   try {
-    const data = await searchAnimeAnilist(q, page, perPage);
+    const data = await advancedSearch({
+      search: q || undefined,
+      genre,
+      format,
+      year,
+      status,
+      page,
+      perPage,
+    });
     res.json({ data });
   } catch (err) {
     handleAnilistError(err, res);

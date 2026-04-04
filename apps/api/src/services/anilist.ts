@@ -376,6 +376,87 @@ export function getByGenre(genre: string, perPage = 6) {
   );
 }
 
+// ── Advanced search with filters ──────────────────────────────────────────────
+
+export interface SearchFilters {
+  search?: string;
+  genre?: string;
+  format?: string;
+  year?: number;
+  status?: string;
+  sort?: string;
+  page?: number;
+  perPage?: number;
+}
+
+const ADVANCED_SEARCH_QUERY = `
+  query AdvancedSearch(
+    $search: String,
+    $genre: String,
+    $format: MediaFormat,
+    $seasonYear: Int,
+    $status: MediaStatus,
+    $sort: [MediaSort],
+    $page: Int,
+    $perPage: Int
+  ) {
+    Page(page: $page, perPage: $perPage) {
+      pageInfo { total hasNextPage }
+      media(
+        search: $search,
+        genre: $genre,
+        format: $format,
+        seasonYear: $seasonYear,
+        status: $status,
+        sort: $sort,
+        type: ANIME,
+        isAdult: false
+      ) {
+        ${MEDIA_FIELDS}
+      }
+    }
+  }
+`;
+
+export function advancedSearch(filters: SearchFilters) {
+  const page = filters.page ?? 1;
+  const perPage = filters.perPage ?? 30;
+  const sort = filters.search ? "SEARCH_MATCH" : (filters.sort ?? "TRENDING_DESC");
+
+  const variables: Record<string, unknown> = {
+    page,
+    perPage,
+    sort: [sort],
+  };
+  if (filters.search) variables.search = filters.search;
+  if (filters.genre) variables.genre = filters.genre;
+  if (filters.format) variables.format = filters.format;
+  if (filters.year) variables.seasonYear = filters.year;
+  if (filters.status) variables.status = filters.status;
+
+  const keyParts = [
+    "advsearch",
+    filters.search ?? "",
+    filters.genre ?? "",
+    filters.format ?? "",
+    filters.year ?? "",
+    filters.status ?? "",
+    sort,
+    page,
+    perPage,
+  ];
+
+  return cached(keyParts.join(":"), TTL_SEARCH, () =>
+    withRetry(() =>
+      request<{ Page: { pageInfo: { total: number; hasNextPage: boolean }; media: unknown[] } }>(
+        ANILIST_URL,
+        ADVANCED_SEARCH_QUERY,
+        variables
+      )
+    )
+  );
+}
+
 export async function getRandomAnime() {
   const page = Math.ceil(Math.random() * 3);
   const data = await withRetry(() =>
