@@ -108,7 +108,7 @@ export default function Comments({ animeId, episodeId }: CommentsProps) {
           <button
             type="submit"
             disabled={!username.trim() || !body.trim()}
-            className="bg-primary-500 hover:bg-primary-400 disabled:opacity-40 disabled:cursor-not-allowed text-[#0a0a0f] font-bold text-sm px-4 py-2 rounded-lg transition-colors"
+            className="bg-primary-500 hover:bg-primary-400 disabled:opacity-40 disabled:cursor-not-allowed text-[#0a0a0f] font-bold text-sm px-4 py-2 rounded-full shadow-lg shadow-primary-500/20 transition-colors"
           >
             Post Comment
           </button>
