@@ -473,7 +473,7 @@ export default function Watch() {
         {recommendations.length > 0 && (
           <section>
             <h2 className="text-lg font-bold text-white mb-4">You Might Also Like</h2>
-            <div className="grid grid-cols-3 sm:grid-cols-6 gap-4">
+            <div className="grid grid-cols-4 sm:grid-cols-8 gap-3">
               {recommendations.map(({ mediaRecommendation: rec }) =>
                 rec ? (
                   <AnimeCard

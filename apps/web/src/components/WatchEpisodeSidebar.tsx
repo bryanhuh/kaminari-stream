@@ -36,7 +36,7 @@ export default function WatchEpisodeSidebar({
   }, [currentEpisodeId, episodes.length]);
 
   return (
-    <div className="hidden lg:flex flex-col bg-[#111118]/80 backdrop-blur-sm border border-[#1e1e28] rounded-xl overflow-hidden h-full">
+    <div className="hidden lg:flex flex-col bg-[#111118]/80 backdrop-blur-sm border border-[#1e1e28] rounded-xl overflow-hidden" style={{ maxHeight: "min(560px, calc((100vw - 300px - 4rem) * 9 / 16))" }}>
       <div className="px-4 py-3 border-b border-[#1e1e28] flex items-center justify-between shrink-0">
         <h3 className="text-sm font-semibold text-white">Episodes</h3>
         {episodes.length > 0 && (

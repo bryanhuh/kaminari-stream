@@ -2,20 +2,11 @@ import { Link } from "react-router-dom";
 
 export default function Footer() {
   return (
-    <div className="relative mt-auto">
-      {/* Mascot peeking over the footer top border */}
-      <div className="absolute -top-[128px] right-10 sm:right-20 pointer-events-none select-none hidden sm:block z-10">
-        <img
-          src="/mascot.png"
-          alt="raijin. mascot"
-          className="h-[148px] w-auto drop-shadow-[0_0_24px_rgba(255,213,97,0.25)]"
-        />
-      </div>
-
+    <div className="mt-auto">
       <footer className="w-full border-t border-[#1e1e28] bg-[#0a0a0f]">
         <div className="max-w-7xl mx-auto px-6 py-10 flex flex-col gap-6">
           {/* Top row */}
-          <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6 pr-0 sm:pr-40">
+          <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
             {/* Brand */}
             <div className="flex flex-col gap-1.5">
               <Link to="/" className="font-extrabold text-xl text-primary-500 tracking-tight">
@@ -35,8 +26,17 @@ export default function Footer() {
             </nav>
           </div>
 
-          {/* Divider */}
-          <div className="border-t border-[#1e1e28]" />
+          {/* Divider with mascot sitting on it */}
+          <div className="relative">
+            <div className="border-t border-[#1e1e28]" />
+            <div className="absolute -top-[100px] right-0 pointer-events-none select-none hidden sm:block">
+              <img
+                src="/mascot.png"
+                alt="raijin. mascot"
+                className="h-[148px] w-auto drop-shadow-[0_0_24px_rgba(255,213,97,0.25)]"
+              />
+            </div>
+          </div>
 
           {/* Disclaimer */}
           <div className="flex flex-col gap-2 pr-0 sm:pr-40">

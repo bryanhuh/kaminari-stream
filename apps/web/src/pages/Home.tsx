@@ -104,10 +104,7 @@ export default function Home() {
         <HeroSpotlight items={spotlightData.results} />
       )}
 
-      {/* 2 ── GITHUB STAR BANNER */}
-      <GitHubStarBanner />
-
-      {/* 3 ── FULL-WIDTH RECENT EPISODES STRIP */}
+      {/* 2 ── FULL-WIDTH RECENT EPISODES STRIP */}
       <section className="w-full py-6 border-b border-[#1e1e28]">
         <div className="flex items-center justify-between px-6 mb-4">
           <h2 className="text-xl font-bold text-white tracking-tight">Recent Episodes</h2>
@@ -216,7 +213,12 @@ export default function Home() {
         <ScheduleSection />
       </div>
 
-      {/* 9 ── CONTAINED: ALL-TIME POPULAR (horizontal row) */}
+      {/* 9 ── GITHUB STAR BANNER (after schedule) */}
+      <div className="max-w-7xl mx-auto px-6 w-full pt-10">
+        <GitHubStarBanner />
+      </div>
+
+      {/* 10 ── CONTAINED: ALL-TIME POPULAR (horizontal row) */}
       <div className="max-w-7xl mx-auto px-6 w-full py-14">
         <SectionHeader title="All-Time Popular" viewAllHref="/browse?category=popular" />
         <AnimeScrollRow

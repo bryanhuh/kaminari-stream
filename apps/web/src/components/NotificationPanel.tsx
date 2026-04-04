@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useContinueWatching } from "../hooks/useWatchHistory";
 import { useAnimeDetail, useGenreRecommendations, useNextSeason, useShows } from "../hooks/useAnime";
@@ -57,38 +57,132 @@ function ChevronRight() {
   );
 }
 
-export default function NotificationPanel({ open, onClose }: NotificationPanelProps) {
-  const panelRef = useRef<HTMLDivElement>(null);
-  const navigate = useNavigate();
-
-  // Continue watching
-  const { data: history } = useContinueWatching();
-  const historyItems = (history ?? []).slice(0, 3);
-  const mostRecentId = historyItems[0]?.animeId;
-
-  // Genre-based top picks — chain: most recent anime detail → genre → recommendations
+// Discover section — only mounts after the panel has been opened once,
+// preventing AniList requests until the user actually opens the panel.
+function DiscoverSection({
+  mostRecentId,
+  go,
+}: {
+  mostRecentId: number | undefined;
+  go: (path: string) => void;
+}) {
   const { data: recentDetail } = useAnimeDetail(mostRecentId ?? 0);
   const topGenre = recentDetail?.Media?.genres?.[0];
   const { data: recsData } = useGenreRecommendations(topGenre);
-  const { data: trendingData } = useShows(1, 6); // fallback when no history
+  const { data: trendingData } = useShows(1, 6);
   const topPickItems = recsData?.Page.media ?? trendingData?.Page.media ?? [];
   const topPickCovers = topPickItems.slice(0, 3).map((a) => a.coverImage?.large);
 
-  // Currently airing
   const { data: airingData } = useShows(1, 6);
   const airingItems = airingData?.Page.media ?? [];
   const airingCovers = airingItems.slice(0, 3).map((a) => a.coverImage?.large);
 
-  // Next season
   const { data: nextSeasonData } = useNextSeason(6);
   const nextSeasonItems = nextSeasonData?.Page.media ?? [];
   const nextSeasonCovers = nextSeasonItems.slice(0, 3).map((a) => a.coverImage?.large);
   const nextSeason = nextSeasonItems[0];
-  const nextSeasonLabel = nextSeason?.season && nextSeason?.seasonYear
-    ? `${nextSeason.season.charAt(0) + nextSeason.season.slice(1).toLowerCase()} ${nextSeason.seasonYear}`
-    : "Coming Soon";
+  const nextSeasonLabel =
+    nextSeason?.season && nextSeason?.seasonYear
+      ? `${nextSeason.season.charAt(0) + nextSeason.season.slice(1).toLowerCase()} ${nextSeason.seasonYear}`
+      : "Coming Soon";
 
-  // Close handlers
+  return (
+    <div>
+      <p className="px-4 pt-3 pb-1.5 text-[10px] font-bold uppercase tracking-wider text-[#5d6169]">
+        Discover
+      </p>
+
+      {/* Top Picks */}
+      <button
+        onClick={() => go("/shows")}
+        className="w-full flex items-center gap-3 px-4 py-3.5 hover:bg-white/[0.04] transition-colors border-b border-[#1e1e28] text-left"
+      >
+        <CoverStack covers={topPickCovers} fallbackColor="#00AEEF" />
+        <div className="flex-1 min-w-0">
+          <p className="text-sm font-semibold text-white leading-tight">Your Top Picks</p>
+          <p className="text-xs text-[#bfc1c6] mt-0.5 line-clamp-1">
+            {topGenre ? `Based on ${topGenre}` : "Trending recommendations"}
+          </p>
+          <p className="text-xs text-[#5d6169] mt-1">
+            {topPickItems.length > 0 ? `${topPickItems.length} anime` : "Explore now"}
+          </p>
+        </div>
+        <ChevronRight />
+      </button>
+
+      {/* Now Airing */}
+      <button
+        onClick={() => go("/shows")}
+        className="w-full flex items-center gap-3 px-4 py-3.5 hover:bg-white/[0.04] transition-colors border-b border-[#1e1e28] text-left"
+      >
+        <CoverStack covers={airingCovers} fallbackColor="#7c3aed" />
+        <div className="flex-1 min-w-0">
+          <p className="text-sm font-semibold text-white leading-tight">Now Airing</p>
+          <p className="text-xs text-[#bfc1c6] mt-0.5">Currently releasing this season</p>
+          <p className="text-xs text-[#5d6169] mt-1">
+            {airingItems.length > 0
+              ? `${airingData?.Page.pageInfo?.total ?? airingItems.length}+ anime airing`
+              : "View schedule"}
+          </p>
+        </div>
+        <ChevronRight />
+      </button>
+
+      {/* Anticipated Next Season */}
+      <button
+        onClick={() => go("/shows")}
+        className="w-full flex items-center gap-3 px-4 py-3.5 hover:bg-white/[0.04] transition-colors border-b border-[#1e1e28] text-left"
+      >
+        <CoverStack covers={nextSeasonCovers} fallbackColor="#d97706" />
+        <div className="flex-1 min-w-0">
+          <p className="text-sm font-semibold text-white leading-tight">Anticipated Next Season</p>
+          <p className="text-xs text-[#bfc1c6] mt-0.5">{nextSeasonLabel}</p>
+          <p className="text-xs text-[#5d6169] mt-1">
+            {nextSeasonItems.length > 0 ? `${nextSeasonItems.length} titles announced` : "Coming soon"}
+          </p>
+        </div>
+        <ChevronRight />
+      </button>
+
+      {/* Weekly Schedule */}
+      <button
+        onClick={() => go("/browse?category=schedule")}
+        className="w-full flex items-center gap-3 px-4 py-3.5 hover:bg-white/[0.04] transition-colors text-left"
+      >
+        <div className="shrink-0 w-[68px] h-[56px] rounded-lg flex items-center justify-center bg-[#05965622] border border-[#05965633]">
+          <svg className="w-6 h-6 text-[#059656]" fill="none" stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5" />
+          </svg>
+        </div>
+        <div className="flex-1 min-w-0">
+          <p className="text-sm font-semibold text-white leading-tight">Weekly Schedule</p>
+          <p className="text-xs text-[#bfc1c6] mt-0.5">This week's airing episodes</p>
+          <p className="text-xs text-[#5d6169] mt-1">Updated daily</p>
+        </div>
+        <ChevronRight />
+      </button>
+    </div>
+  );
+}
+
+export default function NotificationPanel({ open, onClose }: NotificationPanelProps) {
+  const panelRef = useRef<HTMLDivElement>(null);
+  const navigate = useNavigate();
+
+  // Track whether the panel has ever been opened.
+  // DiscoverSection only mounts after first open, so AniList queries
+  // are deferred until the user actually opens the panel.
+  const [hasOpened, setHasOpened] = useState(false);
+  useEffect(() => {
+    if (open) setHasOpened(true);
+  }, [open]);
+
+  // Continue watching — local SQLite, always safe to fetch
+  const { data: history } = useContinueWatching();
+  const historyItems = (history ?? []).slice(0, 3);
+  const mostRecentId = historyItems[0]?.animeId;
+
+  // Close on outside click
   useEffect(() => {
     if (!open) return;
     function handler(e: MouseEvent) {
@@ -98,6 +192,7 @@ export default function NotificationPanel({ open, onClose }: NotificationPanelPr
     return () => document.removeEventListener("mousedown", handler);
   }, [open, onClose]);
 
+  // Close on Escape
   useEffect(() => {
     if (!open) return;
     function handler(e: KeyboardEvent) {
@@ -130,7 +225,6 @@ export default function NotificationPanel({ open, onClose }: NotificationPanelPr
         </div>
 
         <div className="max-h-[520px] overflow-y-auto">
-
           {/* ── Continue Watching ───────────────────────────────── */}
           {historyItems.length > 0 && (
             <div>
@@ -139,9 +233,10 @@ export default function NotificationPanel({ open, onClose }: NotificationPanelPr
               </p>
               {historyItems.map((entry) => {
                 const to = `/watch?animeId=${entry.animeId}&episodeId=${encodeURIComponent(entry.episodeId)}&ep=${entry.episodeNumber}`;
-                const pct = entry.durationSeconds > 0
-                  ? Math.round((entry.progressSeconds / entry.durationSeconds) * 100)
-                  : 0;
+                const pct =
+                  entry.durationSeconds > 0
+                    ? Math.round((entry.progressSeconds / entry.durationSeconds) * 100)
+                    : 0;
                 return (
                   <button
                     key={entry.id}
@@ -149,12 +244,15 @@ export default function NotificationPanel({ open, onClose }: NotificationPanelPr
                     className="w-full flex items-start gap-3 px-4 py-3 hover:bg-white/[0.04] transition-colors border-b border-[#1e1e28] text-left"
                   >
                     <div className="shrink-0 w-[72px] h-[48px] rounded-lg overflow-hidden bg-[#0a0a0f] relative">
-                      {entry.animeCover
-                        ? <img src={entry.animeCover} alt={entry.animeTitle} className="w-full h-full object-cover" />
-                        : <div className="w-full h-full flex items-center justify-center">
-                            <svg className="w-5 h-5 text-[#2a2a38]" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z" /></svg>
-                          </div>
-                      }
+                      {entry.animeCover ? (
+                        <img src={entry.animeCover} alt={entry.animeTitle} className="w-full h-full object-cover" />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center">
+                          <svg className="w-5 h-5 text-[#2a2a38]" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M8 5v14l11-7z" />
+                          </svg>
+                        </div>
+                      )}
                       <div className="absolute bottom-0 left-0 right-0 h-[2px] bg-white/20">
                         <div className="h-full bg-primary-500" style={{ width: `${pct}%` }} />
                       </div>
@@ -171,80 +269,8 @@ export default function NotificationPanel({ open, onClose }: NotificationPanelPr
             </div>
           )}
 
-          {/* ── Editorial cards ─────────────────────────────────── */}
-          <div>
-            <p className="px-4 pt-3 pb-1.5 text-[10px] font-bold uppercase tracking-wider text-[#5d6169]">
-              Discover
-            </p>
-
-            {/* Top Picks */}
-            <button
-              onClick={() => go("/shows")}
-              className="w-full flex items-center gap-3 px-4 py-3.5 hover:bg-white/[0.04] transition-colors border-b border-[#1e1e28] text-left"
-            >
-              <CoverStack covers={topPickCovers} fallbackColor="#00AEEF" />
-              <div className="flex-1 min-w-0">
-                <p className="text-sm font-semibold text-white leading-tight">Your Top Picks</p>
-                <p className="text-xs text-[#bfc1c6] mt-0.5 line-clamp-1">
-                  {topGenre ? `Based on ${topGenre}` : "Trending recommendations"}
-                </p>
-                <p className="text-xs text-[#5d6169] mt-1">
-                  {topPickItems.length > 0 ? `${topPickItems.length} anime` : "Explore now"}
-                </p>
-              </div>
-              <ChevronRight />
-            </button>
-
-            {/* Now Airing */}
-            <button
-              onClick={() => go("/shows")}
-              className="w-full flex items-center gap-3 px-4 py-3.5 hover:bg-white/[0.04] transition-colors border-b border-[#1e1e28] text-left"
-            >
-              <CoverStack covers={airingCovers} fallbackColor="#7c3aed" />
-              <div className="flex-1 min-w-0">
-                <p className="text-sm font-semibold text-white leading-tight">Now Airing</p>
-                <p className="text-xs text-[#bfc1c6] mt-0.5">Currently releasing this season</p>
-                <p className="text-xs text-[#5d6169] mt-1">
-                  {airingItems.length > 0 ? `${airingData?.Page.pageInfo?.total ?? airingItems.length}+ anime airing` : "View schedule"}
-                </p>
-              </div>
-              <ChevronRight />
-            </button>
-
-            {/* Anticipated Next Season */}
-            <button
-              onClick={() => go("/shows")}
-              className="w-full flex items-center gap-3 px-4 py-3.5 hover:bg-white/[0.04] transition-colors border-b border-[#1e1e28] text-left"
-            >
-              <CoverStack covers={nextSeasonCovers} fallbackColor="#d97706" />
-              <div className="flex-1 min-w-0">
-                <p className="text-sm font-semibold text-white leading-tight">Anticipated Next Season</p>
-                <p className="text-xs text-[#bfc1c6] mt-0.5">{nextSeasonLabel}</p>
-                <p className="text-xs text-[#5d6169] mt-1">
-                  {nextSeasonItems.length > 0 ? `${nextSeasonItems.length} titles announced` : "Coming soon"}
-                </p>
-              </div>
-              <ChevronRight />
-            </button>
-
-            {/* Weekly Schedule */}
-            <button
-              onClick={() => go("/browse?category=schedule")}
-              className="w-full flex items-center gap-3 px-4 py-3.5 hover:bg-white/[0.04] transition-colors text-left"
-            >
-              <div className="shrink-0 w-[68px] h-[56px] rounded-lg flex items-center justify-center bg-[#05965622] border border-[#05965633]">
-                <svg className="w-6 h-6 text-[#059656]" fill="none" stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5" />
-                </svg>
-              </div>
-              <div className="flex-1 min-w-0">
-                <p className="text-sm font-semibold text-white leading-tight">Weekly Schedule</p>
-                <p className="text-xs text-[#bfc1c6] mt-0.5">This week's airing episodes</p>
-                <p className="text-xs text-[#5d6169] mt-1">Updated daily</p>
-              </div>
-              <ChevronRight />
-            </button>
-          </div>
+          {/* ── Discover — only rendered after first open ─────── */}
+          {hasOpened && <DiscoverSection mostRecentId={mostRecentId} go={go} />}
         </div>
       </div>
     </div>
