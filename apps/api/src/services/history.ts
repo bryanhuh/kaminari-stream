@@ -12,8 +12,9 @@ export interface UpsertProgressInput {
   animeCover?: string | null;
 }
 
-export function upsertProgress(input: UpsertProgressInput) {
-  db.insert(watchHistory)
+export async function upsertProgress(input: UpsertProgressInput) {
+  await db
+    .insert(watchHistory)
     .values({
       animeId: input.animeId,
       episodeId: input.episodeId,
@@ -33,30 +34,27 @@ export function upsertProgress(input: UpsertProgressInput) {
         animeCover: input.animeCover ?? null,
         watchedAt: new Date().toISOString(),
       },
-    })
-    .run();
+    });
 }
 
-export function getHistory(limit = 30) {
+export async function getHistory(limit = 30) {
   return db
     .select()
     .from(watchHistory)
     .orderBy(desc(watchHistory.watchedAt))
-    .limit(limit)
-    .all();
+    .limit(limit);
 }
 
-export function getAnimeHistory(animeId: number) {
+export async function getAnimeHistory(animeId: number) {
   return db
     .select()
     .from(watchHistory)
     .where(eq(watchHistory.animeId, animeId))
-    .orderBy(desc(watchHistory.watchedAt))
-    .all();
+    .orderBy(desc(watchHistory.watchedAt));
 }
 
-export function getEpisodeProgress(animeId: number, episodeId: string) {
-  return db
+export async function getEpisodeProgress(animeId: number, episodeId: string) {
+  const rows = await db
     .select()
     .from(watchHistory)
     .where(
@@ -65,16 +63,16 @@ export function getEpisodeProgress(animeId: number, episodeId: string) {
         eq(watchHistory.episodeId, episodeId)
       )
     )
-    .get();
+    .limit(1);
+  return rows[0] ?? null;
 }
 
-export function getContinueWatching(limit = 12) {
+export async function getContinueWatching(limit = 12) {
   // Return most-recent entry per anime where progress is < 95% of duration
-  const all = db
+  const all = await db
     .select()
     .from(watchHistory)
-    .orderBy(desc(watchHistory.watchedAt))
-    .all();
+    .orderBy(desc(watchHistory.watchedAt));
 
   const seen = new Set<number>();
   const result = [];

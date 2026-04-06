@@ -12,8 +12,9 @@ export interface AddToWatchlistInput {
   status?: string | null;
 }
 
-export function addToWatchlist(input: AddToWatchlistInput) {
-  db.insert(watchlist)
+export async function addToWatchlist(input: AddToWatchlistInput) {
+  await db
+    .insert(watchlist)
     .values({
       animeId: input.animeId,
       animeTitle: input.animeTitle,
@@ -23,22 +24,22 @@ export function addToWatchlist(input: AddToWatchlistInput) {
       score: input.score ?? null,
       status: input.status ?? null,
     })
-    .onConflictDoNothing()
-    .run();
+    .onConflictDoNothing();
 }
 
-export function removeFromWatchlist(animeId: number) {
-  db.delete(watchlist).where(eq(watchlist.animeId, animeId)).run();
+export async function removeFromWatchlist(animeId: number) {
+  await db.delete(watchlist).where(eq(watchlist.animeId, animeId));
 }
 
-export function getWatchlist() {
-  return db.select().from(watchlist).orderBy(desc(watchlist.addedAt)).all();
+export async function getWatchlist() {
+  return db.select().from(watchlist).orderBy(desc(watchlist.addedAt));
 }
 
-export function getWatchlistEntry(animeId: number) {
-  return db
+export async function getWatchlistEntry(animeId: number) {
+  const rows = await db
     .select()
     .from(watchlist)
     .where(eq(watchlist.animeId, animeId))
-    .get();
+    .limit(1);
+  return rows[0] ?? null;
 }

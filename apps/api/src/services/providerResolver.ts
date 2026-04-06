@@ -15,11 +15,12 @@ export async function resolveProviderAnimeId(
   if (OVERRIDES[anilistId]) return OVERRIDES[anilistId];
 
   // 2. Check cache
-  const cached = db
+  const rows = await db
     .select()
     .from(providerIdCache)
     .where(eq(providerIdCache.anilistId, anilistId))
-    .get();
+    .limit(1);
+  const cached = rows[0];
 
   if (cached) return cached.providerAnimeId;
 
@@ -31,13 +32,13 @@ export async function resolveProviderAnimeId(
   const providerAnimeId = results[0].id;
 
   // 4. Cache the result
-  db.insert(providerIdCache)
+  await db
+    .insert(providerIdCache)
     .values({ anilistId, providerAnimeId })
     .onConflictDoUpdate({
       target: providerIdCache.anilistId,
       set: { providerAnimeId, updatedAt: new Date().toISOString() },
-    })
-    .run();
+    });
 
   return providerAnimeId;
 }
