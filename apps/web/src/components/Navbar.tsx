@@ -15,7 +15,7 @@ export default function Navbar() {
   const notifRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
   const location = useLocation();
-  const { isLoggedIn } = useAuth();
+  useAuth();
 
   const isActive = (path: string) => location.pathname === path;
 

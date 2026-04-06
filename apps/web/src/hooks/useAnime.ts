@@ -13,6 +13,8 @@ export interface MediaItem {
   description?: string | null;
   bannerImage?: string | null;
   trailer?: { id: string; site: string } | null;
+  season?: string | null;
+  seasonYear?: number | null;
 }
 
 interface PageResult {
