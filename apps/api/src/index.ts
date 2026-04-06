@@ -11,7 +11,11 @@ async function main() {
 
   const app = express();
 
-  app.use(cors({ origin: "http://localhost:5173" }));
+  const allowedOrigins = [
+    "http://localhost:5173",
+    "https://raijin-anime.pages.dev",
+  ];
+  app.use(cors({ origin: allowedOrigins }));
   app.use(express.json());
   app.use(requestLogger);
 
