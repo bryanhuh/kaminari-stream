@@ -11,25 +11,24 @@
   },
   "dependencies": {
     "@anime-app/types": "workspace:*",
+    "@neondatabase/serverless": "^1.0.2",
     "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "drizzle-orm": "^0.45.2",
     "express": "^4.21.2",
+    "graphql": "^16.10.0",
+    "graphql-request": "^7.1.2",
     "morgan": "^1.10.0",
     "ofetch": "^1.4.1",
-    "better-sqlite3": "^11.8.1",
-    "drizzle-orm": "^0.39.3",
-    "zod": "^3.24.2",
-    "graphql-request": "^7.1.2",
-    "graphql": "^16.10.0",
-    "dotenv": "^16.4.7"
+    "zod": "^3.24.2"
   },
   "devDependencies": {
     "@types/cors": "^2.8.17",
     "@types/express": "^5.0.0",
     "@types/morgan": "^1.9.9",
-    "@types/better-sqlite3": "^7.6.12",
     "@types/node": "^22.10.7",
+    "drizzle-kit": "^0.30.4",
     "tsx": "^4.19.2",
-    "typescript": "^5.7.3",
-    "drizzle-kit": "^0.30.4"
+    "typescript": "^5.7.3"
   }
 }
