@@ -11,7 +11,7 @@ const router = Router();
 
 // GET /api/browse/genre/:genre?page=1
 router.get("/genre/:genre", async (req: Request, res: Response) => {
-  const genre = req.params.genre;
+  const genre = req.params.genre as string;
   const page = Number(req.query.page) || 1;
   try {
     const data = await browseByGenre(genre, page);
@@ -60,7 +60,7 @@ router.get("/updates", async (req: Request, res: Response) => {
 
 // GET /api/browse/schedule/:date  (date = YYYY-MM-DD)
 router.get("/schedule/:date", async (req: Request, res: Response) => {
-  const { date } = req.params;
+  const date = req.params.date as string;
   try {
     const data = await getSchedule(date);
     res.json({ data });
