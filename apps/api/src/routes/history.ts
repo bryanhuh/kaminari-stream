@@ -20,22 +20,30 @@ const upsertSchema = z.object({
 });
 
 // GET /api/history — all recent history
-router.get("/", (_req, res) => {
-  const entries = getHistory(30);
-  res.json({ data: entries });
+router.get("/", async (_req, res, next) => {
+  try {
+    const entries = await getHistory(30);
+    res.json({ data: entries });
+  } catch (err) {
+    next(err);
+  }
 });
 
 // GET /api/history/continue — entries suitable for "continue watching"
-router.get("/continue", (_req, res) => {
-  const entries = getContinueWatching(12);
-  res.json({ data: entries });
+router.get("/continue", async (_req, res, next) => {
+  try {
+    const entries = await getContinueWatching(12);
+    res.json({ data: entries });
+  } catch (err) {
+    next(err);
+  }
 });
 
 // GET /api/history/:animeId — all episodes watched for an anime
-router.get("/:animeId", (req, res, next) => {
+router.get("/:animeId", async (req, res, next) => {
   try {
     const animeId = z.coerce.number().int().positive().parse(req.params.animeId);
-    const entries = getAnimeHistory(animeId);
+    const entries = await getAnimeHistory(animeId);
     res.json({ data: entries });
   } catch (err) {
     next(err);
@@ -43,10 +51,10 @@ router.get("/:animeId", (req, res, next) => {
 });
 
 // POST /api/history — upsert progress
-router.post("/", (req, res, next) => {
+router.post("/", async (req, res, next) => {
   try {
     const input = upsertSchema.parse(req.body);
-    upsertProgress(input);
+    await upsertProgress(input);
     res.json({ data: { ok: true } });
   } catch (err) {
     next(err);

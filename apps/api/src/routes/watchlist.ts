@@ -20,16 +20,20 @@ const addSchema = z.object({
 });
 
 // GET /api/watchlist — all saved entries
-router.get("/", (_req, res) => {
-  const entries = getWatchlist();
-  res.json({ data: entries });
+router.get("/", async (_req, res, next) => {
+  try {
+    const entries = await getWatchlist();
+    res.json({ data: entries });
+  } catch (err) {
+    next(err);
+  }
 });
 
 // GET /api/watchlist/:animeId — check if anime is saved
-router.get("/:animeId", (req, res, next) => {
+router.get("/:animeId", async (req, res, next) => {
   try {
     const animeId = z.coerce.number().int().positive().parse(req.params.animeId);
-    const entry = getWatchlistEntry(animeId);
+    const entry = await getWatchlistEntry(animeId);
     res.json({ data: entry ?? null });
   } catch (err) {
     next(err);
@@ -37,10 +41,10 @@ router.get("/:animeId", (req, res, next) => {
 });
 
 // POST /api/watchlist — add anime
-router.post("/", (req, res, next) => {
+router.post("/", async (req, res, next) => {
   try {
     const input = addSchema.parse(req.body);
-    addToWatchlist(input);
+    await addToWatchlist(input);
     res.json({ data: { ok: true } });
   } catch (err) {
     next(err);
@@ -48,10 +52,10 @@ router.post("/", (req, res, next) => {
 });
 
 // DELETE /api/watchlist/:animeId — remove anime
-router.delete("/:animeId", (req, res, next) => {
+router.delete("/:animeId", async (req, res, next) => {
   try {
     const animeId = z.coerce.number().int().positive().parse(req.params.animeId);
-    removeFromWatchlist(animeId);
+    await removeFromWatchlist(animeId);
     res.json({ data: { ok: true } });
   } catch (err) {
     next(err);
