@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { useContinueWatching } from "../hooks/useWatchHistory";
+import { useContinueWatching, useRemoveFromHistory } from "../hooks/useWatchHistory";
 import type { WatchHistoryEntry } from "@anime-app/types";
 
 function formatProgress(entry: WatchHistoryEntry): string {
@@ -82,12 +82,14 @@ function HistoryCard({ entry }: { entry: WatchHistoryEntry }) {
   const pct = entry.durationSeconds
     ? Math.min(100, Math.round((entry.progressSeconds / entry.durationSeconds) * 100))
     : 0;
+  const remove = useRemoveFromHistory(entry.animeId);
 
   return (
-    <Link
-      to={`/watch?animeId=${entry.animeId}&episodeId=${encodeURIComponent(entry.episodeId)}&ep=${entry.episodeNumber}`}
-      className="group flex items-center gap-4 p-3 rounded-xl bg-[#111118] border border-[#1e1e28] hover:border-[#2a2a38] hover:bg-[#13131b] transition-colors"
-    >
+    <div className="group relative flex items-center gap-4 p-3 rounded-xl bg-[#111118] border border-[#1e1e28] hover:border-[#2a2a38] hover:bg-[#13131b] transition-colors">
+      <Link
+        to={`/watch?animeId=${entry.animeId}&episodeId=${encodeURIComponent(entry.episodeId)}&ep=${entry.episodeNumber}`}
+        className="contents"
+      >
       {/* Cover */}
       <div className="relative shrink-0 w-20 h-[60px] rounded-lg overflow-hidden bg-[#1e1e28]">
         {entry.animeCover ? (
@@ -138,6 +140,19 @@ function HistoryCard({ entry }: { entry: WatchHistoryEntry }) {
           <path strokeLinecap="round" strokeLinejoin="round" d="M5.25 5.653c0-.856.917-1.398 1.667-.986l11.54 6.347a1.125 1.125 0 0 1 0 1.972l-11.54 6.347a1.125 1.125 0 0 1-1.667-.986V5.653Z" />
         </svg>
       </div>
-    </Link>
+      </Link>
+
+      {/* Delete button — outside the Link so it doesn't navigate */}
+      <button
+        onClick={() => remove.mutate(entry.id)}
+        disabled={remove.isPending}
+        aria-label="Remove from history"
+        className="absolute right-2 top-2 opacity-0 group-hover:opacity-100 transition-opacity p-1 rounded-md text-[#5d6169] hover:text-red-400 hover:bg-white/5 disabled:opacity-30"
+      >
+        <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" d="M6 18 18 6M6 6l12 12" />
+        </svg>
+      </button>
+    </div>
   );
 }

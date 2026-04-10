@@ -35,7 +35,7 @@ export function useWatchlistEntry(animeId: number) {
  * many components render simultaneously.
  */
 export function useIsInWatchlist(animeId: number) {
-  return useQuery<WatchlistEntry[]>({
+  return useQuery<WatchlistEntry[], Error, boolean>({
     queryKey: ["watchlist"],
     queryFn: () => api.get<WatchlistEntry[]>("/api/watchlist"),
     staleTime: 30_000,
