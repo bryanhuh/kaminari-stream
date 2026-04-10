@@ -29,6 +29,20 @@ export function useWatchlistEntry(animeId: number) {
   });
 }
 
+/**
+ * Checks watchlist membership by looking up the already-cached full watchlist
+ * instead of making a per-anime network request. Use this in card contexts where
+ * many components render simultaneously.
+ */
+export function useIsInWatchlist(animeId: number) {
+  return useQuery<WatchlistEntry[]>({
+    queryKey: ["watchlist"],
+    queryFn: () => api.get<WatchlistEntry[]>("/api/watchlist"),
+    staleTime: 30_000,
+    select: (entries) => entries.some((e) => e.animeId === animeId),
+  });
+}
+
 export function useAddToWatchlist() {
   const queryClient = useQueryClient();
   return useMutation({
