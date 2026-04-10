@@ -4,6 +4,10 @@ import type { Episode, StreamData } from "@anime-app/types";
 
 const base = config.consumetBaseUrl;
 
+// Render free tier cold-starts take up to ~60 s; use a generous timeout so the
+// first request after spin-down actually waits long enough to succeed.
+const TIMEOUT = 70_000;
+
 // ── Search ─────────────────────────────────────────────────────────────────────
 
 interface ConsumetSearchResult {
@@ -61,7 +65,7 @@ interface ConsumetWatchResponse {
 export async function searchAnime(query: string): Promise<ConsumetSearchResult[]> {
   const res = await ofetch<ConsumetSearchResponse>(
     `${base}/anime/animekai/${encodeURIComponent(query)}`,
-    { timeout: 10000 }
+    { timeout: TIMEOUT }
   );
   return res.results ?? [];
 }
@@ -70,14 +74,14 @@ export async function getAnimeInfo(providerAnimeId: string): Promise<ConsumetAni
   // animekai uses ?id= query param (not a path segment)
   return ofetch<ConsumetAnimeInfo>(
     `${base}/anime/animekai/info`,
-    { query: { id: providerAnimeId }, timeout: 10000 }
+    { query: { id: providerAnimeId }, timeout: TIMEOUT }
   );
 }
 
 export async function getStreamSources(episodeId: string): Promise<StreamData> {
   const res = await ofetch<ConsumetWatchResponse>(
     `${base}/anime/animekai/watch/${episodeId}`,
-    { timeout: 15000 }
+    { timeout: TIMEOUT }
   );
 
   return {
@@ -122,7 +126,7 @@ export interface ScheduleItem {
 export async function getSchedule(date: string): Promise<ScheduleItem[]> {
   const res = await ofetch<{ results: ScheduleItem[] }>(
     `${base}/anime/animekai/schedule/${encodeURIComponent(date)}`,
-    { timeout: 10000 }
+    { timeout: TIMEOUT }
   );
   return res.results ?? [];
 }
@@ -150,28 +154,28 @@ interface BrowseResponse {
 export async function browseByGenre(genre: string, page = 1): Promise<BrowseResponse> {
   return ofetch<BrowseResponse>(
     `${base}/anime/animekai/genre/${encodeURIComponent(genre)}`,
-    { query: { page }, timeout: 10000 }
+    { query: { page }, timeout: TIMEOUT }
   );
 }
 
 export async function browseNewReleases(page = 1): Promise<BrowseResponse> {
   return ofetch<BrowseResponse>(
     `${base}/anime/animekai/new-releases`,
-    { query: { page }, timeout: 10000 }
+    { query: { page }, timeout: TIMEOUT }
   );
 }
 
 export async function browseTopAiring(page = 1): Promise<BrowseResponse> {
   return ofetch<BrowseResponse>(
     `${base}/anime/animekai/top-airing`,
-    { query: { page }, timeout: 10000 }
+    { query: { page }, timeout: TIMEOUT }
   );
 }
 
 export async function browseMostPopular(page = 1): Promise<BrowseResponse> {
   return ofetch<BrowseResponse>(
     `${base}/anime/animekai/most-popular`,
-    { query: { page }, timeout: 10000 }
+    { query: { page }, timeout: TIMEOUT }
   );
 }
 
@@ -199,7 +203,7 @@ interface ConsumetSpotlightResponse {
 export async function getSpotlight(): Promise<ConsumetSpotlightAnime[]> {
   const res = await ofetch<ConsumetSpotlightResponse>(
     `${base}/anime/animekai/spotlight`,
-    { timeout: 10000 }
+    { timeout: TIMEOUT }
   );
   return res.results ?? [];
 }
@@ -207,7 +211,7 @@ export async function getSpotlight(): Promise<ConsumetSpotlightAnime[]> {
 export async function getRecentEpisodes(page = 1): Promise<ConsumetRecentEpisodesResponse> {
   return ofetch<ConsumetRecentEpisodesResponse>(
     `${base}/anime/animekai/recent-episodes`,
-    { query: { page }, timeout: 10000 }
+    { query: { page }, timeout: TIMEOUT }
   );
 }
 
