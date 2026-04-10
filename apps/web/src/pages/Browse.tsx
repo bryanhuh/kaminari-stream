@@ -1,5 +1,6 @@
 import { useSearchParams, Link, useNavigate } from "react-router-dom";
 import { useBrowseGenre, useBrowseCategory } from "../hooks/useBrowse";
+import { usePageMeta } from "../hooks/usePageMeta";
 import { useRecentEpisodes, useAZBrowse } from "../hooks/useAnime";
 import type { BrowseAnime } from "@anime-app/types";
 import AnimeGrid from "../components/AnimeGrid";
@@ -131,6 +132,7 @@ const CATEGORY_LABELS: Record<BrowseCategory, string> = {
 };
 
 export default function Browse() {
+  usePageMeta("Browse Anime — raijin.");
   const [searchParams, setSearchParams] = useSearchParams();
   const category = (searchParams.get("category") ?? "genres") as BrowseCategory;
   const genre = searchParams.get("genre");

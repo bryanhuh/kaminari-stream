@@ -3,6 +3,7 @@ import { useSearchParams } from "react-router-dom";
 import { useTrending, useAnimeSearch, type SearchFilters } from "../hooks/useAnime";
 import AnimeGrid from "../components/AnimeGrid";
 import { ANIME_GENRES } from "../components/GenreSelect";
+import { usePageMeta } from "../hooks/usePageMeta";
 
 const FORMATS = [
   { value: "TV", label: "TV" },
@@ -107,6 +108,10 @@ export default function Search() {
   const initialQuery = searchParams.get("q") ?? "";
   const [inputValue, setInputValue] = useState(initialQuery);
   const [debouncedQuery, setDebouncedQuery] = useState(initialQuery);
+
+  usePageMeta(
+    debouncedQuery ? `"${debouncedQuery}" — raijin.` : "Search Anime — raijin."
+  );
 
   const [filters, setFilters] = useState<SearchFilters>({
     genre: searchParams.get("genre") ?? undefined,

@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import { useParams, Link } from "react-router-dom";
+import { usePageMeta } from "../hooks/usePageMeta";
 import { useAnimeDetail } from "../hooks/useAnime";
 import { useEpisodes } from "../hooks/useEpisodes";
 import { useAnimeHistory } from "../hooks/useWatchHistory";
@@ -52,6 +53,10 @@ export default function AnimeDetail() {
     useEpisodes(anime?.id ?? 0, resolvedTitle);
 
   const { data: animeHistory } = useAnimeHistory(anime?.id ?? 0);
+
+  const pageTitle = resolvedTitle ? `${resolvedTitle} — raijin.` : "raijin.";
+  const pageDesc = anime?.description ? stripHtml(anime.description).slice(0, 160) : undefined;
+  usePageMeta(pageTitle, pageDesc);
 
   if (isLoading) {
     return (

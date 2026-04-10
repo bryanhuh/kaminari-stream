@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
+import { usePageMeta } from "../hooks/usePageMeta";
 import { useShows } from "../hooks/useAnime";
 import AnimeGrid from "../components/AnimeGrid";
 import GenreSelect from "../components/GenreSelect";
@@ -7,6 +8,7 @@ import { TrailerHero, StaticHero, parseYouTubeId } from "../components/TrailerHe
 import type { TrailerEntry } from "../components/TrailerHero";
 
 export default function Shows() {
+  usePageMeta("TV Shows — raijin.");
   const [page, setPage] = useState(1);
   const [genre, setGenre] = useState("");
   const { data, isLoading } = useShows(page, 24, genre || undefined);

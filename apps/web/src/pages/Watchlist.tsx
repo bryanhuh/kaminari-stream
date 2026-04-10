@@ -1,8 +1,10 @@
 import { Link } from "react-router-dom";
 import { useWatchlist, useRemoveFromWatchlist } from "../hooks/useWatchlist";
+import { usePageMeta } from "../hooks/usePageMeta";
 import type { WatchlistEntry } from "@anime-app/types";
 
 export default function Watchlist() {
+  usePageMeta("My Watchlist — raijin.");
   const { data, isLoading } = useWatchlist();
 
   if (isLoading) {

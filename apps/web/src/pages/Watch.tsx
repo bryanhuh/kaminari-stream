@@ -1,5 +1,6 @@
 import { useState, useCallback, useRef, useEffect } from "react";
 import { useSearchParams, Link, useNavigate } from "react-router-dom";
+import { usePageMeta } from "../hooks/usePageMeta";
 import type { WatchHistoryEntry } from "@anime-app/types";
 import { useAnimeDetail } from "../hooks/useAnime";
 import { useStream } from "../hooks/useStream";
@@ -57,6 +58,10 @@ export default function Watch() {
   const { data: animeData } = useAnimeDetail(animeId);
   const anime = animeData?.Media ?? null;
   const title = anime?.title.english ?? anime?.title.romaji ?? "Unknown";
+
+  usePageMeta(
+    episodeNumber ? `Ep ${episodeNumber} · ${title} — raijin.` : `${title} — raijin.`
+  );
   const cover = anime?.coverImage?.medium ?? null;
 
   const { data: streamData, isLoading: streamLoading, error: streamError } = useStream(episodeId);

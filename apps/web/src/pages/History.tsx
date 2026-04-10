@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { useContinueWatching, useRemoveFromHistory } from "../hooks/useWatchHistory";
+import { usePageMeta } from "../hooks/usePageMeta";
 import type { WatchHistoryEntry } from "@anime-app/types";
 
 function formatProgress(entry: WatchHistoryEntry): string {
@@ -20,6 +21,7 @@ function timeAgo(dateStr: string): string {
 }
 
 export default function History() {
+  usePageMeta("Watch History — raijin.");
   const { data, isLoading } = useContinueWatching();
 
   if (isLoading) {

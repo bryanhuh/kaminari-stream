@@ -1,6 +1,8 @@
 import { Link } from "react-router-dom";
+import { usePageMeta } from "../hooks/usePageMeta";
 
 export default function NotFound() {
+  usePageMeta("Page Not Found — raijin.");
   return (
     <div className="flex flex-col items-center justify-center min-h-[60vh] px-4 text-center">
       <h1 className="text-7xl font-extrabold text-primary-500 mb-2">404</h1>

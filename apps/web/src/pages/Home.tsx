@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import { usePageMeta } from "../hooks/usePageMeta";
 import {
   useTrending,
   usePopular,
@@ -83,6 +84,7 @@ function getCurrentSeasonLabel() {
 }
 
 export default function Home() {
+  usePageMeta("raijin. — Watch Anime Free Online");
   const { data: trendingData, isLoading: trendingLoading, error: trendingError } = useTrending(1, 18);
   const { data: popularData, isLoading: popularLoading } = usePopular(1, 16);
   const { data: seasonData, isLoading: seasonLoading } = useSeasonAnime();
