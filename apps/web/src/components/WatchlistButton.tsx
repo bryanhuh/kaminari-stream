@@ -1,4 +1,4 @@
-import { useWatchlistEntry, useAddToWatchlist, useRemoveFromWatchlist } from "../hooks/useWatchlist";
+import { useWatchlistEntry, useIsInWatchlist, useAddToWatchlist, useRemoveFromWatchlist } from "../hooks/useWatchlist";
 
 interface WatchlistButtonProps {
   animeId: number;
@@ -22,13 +22,19 @@ export default function WatchlistButton({
   status,
   variant = "full",
 }: WatchlistButtonProps) {
-  const { data: entry, isLoading: entryLoading } = useWatchlistEntry(animeId);
+  // icon variant (AnimeCard): check the cached full watchlist — no per-anime request
+  // full variant (detail page): fetch the specific entry for accurate loading state
+  const { data: isInWatchlistFromCache, isLoading: cacheLoading } = useIsInWatchlist(animeId);
+  const { data: entry, isLoading: entryLoading } = useWatchlistEntry(
+    variant === "full" ? animeId : 0
+  );
   const addMutation = useAddToWatchlist();
   const removeMutation = useRemoveFromWatchlist();
 
-  const inWatchlist = !!entry;
+  const inWatchlist = variant === "full" ? !!entry : !!isInWatchlistFromCache;
+  const isLoadingEntry = variant === "full" ? entryLoading : cacheLoading;
   const isPending = addMutation.isPending || removeMutation.isPending;
-  const isDisabled = entryLoading || isPending;
+  const isDisabled = isLoadingEntry || isPending;
 
   function handleClick(e: React.MouseEvent) {
     e.preventDefault();
