@@ -5,6 +5,7 @@ import {
   getHistory,
   getAnimeHistory,
   getContinueWatching,
+  deleteHistoryEntry,
 } from "../services/history";
 
 const router = Router();
@@ -45,6 +46,17 @@ router.get("/:animeId", async (req, res, next) => {
     const animeId = z.coerce.number().int().positive().parse(req.params.animeId);
     const entries = await getAnimeHistory(animeId);
     res.json({ data: entries });
+  } catch (err) {
+    next(err);
+  }
+});
+
+// DELETE /api/history/:id — remove a single history entry
+router.delete("/:id", async (req, res, next) => {
+  try {
+    const id = z.coerce.number().int().positive().parse(req.params.id);
+    await deleteHistoryEntry(id);
+    res.json({ data: { ok: true } });
   } catch (err) {
     next(err);
   }

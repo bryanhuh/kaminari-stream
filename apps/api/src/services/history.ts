@@ -67,6 +67,10 @@ export async function getEpisodeProgress(animeId: number, episodeId: string) {
   return rows[0] ?? null;
 }
 
+export async function deleteHistoryEntry(id: number) {
+  await db.delete(watchHistory).where(eq(watchHistory.id, id));
+}
+
 export async function getContinueWatching(limit = 12) {
   // Return most-recent entry per anime where progress is < 95% of duration
   const all = await db
