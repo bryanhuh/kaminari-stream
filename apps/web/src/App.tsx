@@ -1,6 +1,7 @@
 import { Routes, Route } from "react-router-dom";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
+import BottomNav from "./components/BottomNav";
 import Home from "./pages/Home";
 import Search from "./pages/Search";
 import AnimeDetail from "./pages/AnimeDetail";
@@ -18,7 +19,7 @@ export default function App() {
   return (
     <div className="min-h-screen bg-[#0a0a0f] text-white flex flex-col">
       <Navbar />
-      <main className="flex-1">
+      <main className="flex-1 pb-16 md:pb-0">
         <ErrorBoundary>
           <Routes>
             <Route path="/" element={<ErrorBoundary><Home /></ErrorBoundary>} />
@@ -35,6 +36,7 @@ export default function App() {
         </ErrorBoundary>
       </main>
       <Footer />
+      <BottomNav />
       <RateLimitToast />
     </div>
   );
