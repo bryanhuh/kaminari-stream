@@ -36,6 +36,17 @@ export function useSaveProgress() {
   });
 }
 
+export function useRemoveFromHistory(animeId: number) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (id: number) => api.del<{ ok: boolean }>(`/api/history/${id}`),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["history", "continue"] });
+      queryClient.invalidateQueries({ queryKey: ["history", "anime", animeId] });
+    },
+  });
+}
+
 export function useEpisodeProgress(
   history: WatchHistoryEntry[] | undefined,
   episodeId: string
