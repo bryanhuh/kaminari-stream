@@ -107,6 +107,18 @@ export default function AnimeDetail() {
 
   const firstEpisode = episodesData?.episodes[0];
 
+  // Most recently watched episode that isn't finished (< 95%)
+  const resumeEntry = animeHistory?.find(
+    (e) => e.durationSeconds <= 0 || e.progressSeconds / e.durationSeconds < 0.95
+  ) ?? null;
+
+  // Unified play target for banner overlay and CTA
+  const playTarget = resumeEntry
+    ? { episodeId: resumeEntry.episodeId, episodeNumber: resumeEntry.episodeNumber }
+    : firstEpisode
+    ? { episodeId: firstEpisode.id, episodeNumber: firstEpisode.number }
+    : null;
+
   return (
     <div className="min-h-screen">
       {/* Banner */}
@@ -130,10 +142,10 @@ export default function AnimeDetail() {
         )}
 
         {/* Play button overlay — only shown when there's a banner and an episode to watch */}
-        {anime.bannerImage && firstEpisode && (
+        {anime.bannerImage && playTarget && (
           <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
             <Link
-              to={`/watch?animeId=${anime.id}&episodeId=${encodeURIComponent(firstEpisode.id)}&ep=${firstEpisode.number}`}
+              to={`/watch?animeId=${anime.id}&episodeId=${encodeURIComponent(playTarget.episodeId)}&ep=${playTarget.episodeNumber}`}
               onClick={(e) => e.stopPropagation()}
               className="flex items-center justify-center w-20 h-20 rounded-full bg-black/40 border-2 border-white/30 backdrop-blur-sm hover:bg-black/60 hover:border-white/50 hover:scale-110 transition-all duration-200"
               aria-label={`Watch ${title}`}
@@ -210,7 +222,17 @@ export default function AnimeDetail() {
 
             {/* CTA */}
             <div className="flex gap-3 mt-1">
-              {firstEpisode && (
+              {resumeEntry ? (
+                <Link
+                  to={`/watch?animeId=${anime.id}&episodeId=${encodeURIComponent(resumeEntry.episodeId)}&ep=${resumeEntry.episodeNumber}`}
+                  className="flex items-center gap-2 bg-primary-500 hover:bg-primary-400 text-[#0a0a0f] font-bold text-sm px-5 py-2.5 rounded-full transition-colors shadow-lg shadow-primary-500/20"
+                >
+                  <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M8 5v14l11-7z" />
+                  </svg>
+                  Resume Episode {resumeEntry.episodeNumber}
+                </Link>
+              ) : firstEpisode ? (
                 <Link
                   to={`/watch?animeId=${anime.id}&episodeId=${encodeURIComponent(firstEpisode.id)}&ep=${firstEpisode.number}`}
                   className="flex items-center gap-2 bg-primary-500 hover:bg-primary-400 text-[#0a0a0f] font-bold text-sm px-5 py-2.5 rounded-full transition-colors shadow-lg shadow-primary-500/20"
@@ -220,7 +242,7 @@ export default function AnimeDetail() {
                   </svg>
                   Watch Now
                 </Link>
-              )}
+              ) : null}
               <WatchlistButton
                 animeId={anime.id}
                 animeTitle={title}
