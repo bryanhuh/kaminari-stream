@@ -14,7 +14,7 @@ const queryClient = new QueryClient({
       // Never retry a 429 — retrying makes rate limiting worse.
       // For other errors, allow one retry.
       retry: (failureCount, error) => {
-        if (error instanceof ApiError && error.status === 429) return false;
+        if (error instanceof ApiError && (error.status === 429 || error.status === 401)) return false;
         return failureCount < 1;
       },
       // Don't refetch when the user switches back to the tab.
