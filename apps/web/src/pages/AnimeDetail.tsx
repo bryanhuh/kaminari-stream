@@ -56,7 +56,8 @@ export default function AnimeDetail() {
 
   const pageTitle = resolvedTitle ? `${resolvedTitle} — raijin.` : "raijin.";
   const pageDesc = anime?.description ? stripHtml(anime.description).slice(0, 160) : undefined;
-  usePageMeta(pageTitle, pageDesc);
+  const pageImage = anime?.bannerImage ?? anime?.coverImage?.large ?? anime?.coverImage?.medium ?? undefined;
+  usePageMeta(pageTitle, pageDesc, pageImage);
 
   if (isLoading) {
     return (

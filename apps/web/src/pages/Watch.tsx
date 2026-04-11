@@ -59,8 +59,12 @@ export default function Watch() {
   const anime = animeData?.Media ?? null;
   const title = anime?.title.english ?? anime?.title.romaji ?? "Unknown";
 
+  const watchDesc = anime?.description ? stripHtml(anime.description).slice(0, 160) : undefined;
+  const watchImage = anime?.bannerImage ?? anime?.coverImage?.large ?? undefined;
   usePageMeta(
-    episodeNumber ? `Ep ${episodeNumber} · ${title} — raijin.` : `${title} — raijin.`
+    episodeNumber ? `Ep ${episodeNumber} · ${title} — raijin.` : `${title} — raijin.`,
+    watchDesc,
+    watchImage,
   );
   const cover = anime?.coverImage?.medium ?? null;
 
