@@ -13,9 +13,9 @@
 - [x] **Remove from watch history** — Allow users to delete individual entries from their history (button on history page and/or continue watching banner).
 - [x] **Mobile bottom navigation bar** — Persistent bottom nav on mobile with Home, Browse, Search, History shortcuts.
 - [x] **Dynamic page titles & meta** — Set `<title>` and `<meta name="description">` per page (anime name on detail/watch pages, search query on search page, etc.).
-- [ ] **Loading states / Suspense boundaries** — Add top-level loading indicators and `Suspense` boundaries for route transitions and async data fetching.
-- [ ] **Accessibility improvements** — Add skip-to-content link, focus management on route changes, and ARIA labels across interactive elements.
-- [ ] **SEO / Open Graph tags** — Add `<meta description>`, Open Graph, and Twitter Card tags per page (use `react-helmet` or equivalent).
+- [x] **Loading states / Suspense boundaries** — Add top-level loading indicators and `Suspense` boundaries for route transitions and async data fetching.
+- [x] **Accessibility improvements** — Add skip-to-content link, focus management on route changes, and ARIA labels across interactive elements.
+- [x] **SEO / Open Graph tags** — Add `<meta description>`, Open Graph, and Twitter Card tags per page (use `react-helmet` or equivalent).
 
 ## Lower Priority / Nice to Have
 
