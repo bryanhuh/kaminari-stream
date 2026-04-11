@@ -21,7 +21,7 @@ function timeAgo(dateStr: string): string {
 }
 
 export default function History() {
-  usePageMeta("Watch History — raijin.");
+  usePageMeta("Watch History — raijin.", "Your anime watch history and episode progress on raijin.");
   const { data, isLoading } = useContinueWatching();
 
   if (isLoading) {

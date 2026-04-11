@@ -84,7 +84,7 @@ function getCurrentSeasonLabel() {
 }
 
 export default function Home() {
-  usePageMeta("raijin. — Watch Anime Free Online");
+  usePageMeta("raijin. — Watch Anime Free Online", "Stream anime online free. New episodes, seasonal picks, trending shows, and more — all in one place.");
   const { data: trendingData, isLoading: trendingLoading, error: trendingError } = useTrending(1, 18);
   const { data: popularData, isLoading: popularLoading } = usePopular(1, 16);
   const { data: seasonData, isLoading: seasonLoading } = useSeasonAnime();

@@ -132,7 +132,7 @@ const CATEGORY_LABELS: Record<BrowseCategory, string> = {
 };
 
 export default function Browse() {
-  usePageMeta("Browse Anime — raijin.");
+  usePageMeta("Browse Anime — raijin.", "Discover anime by genre, type, A–Z listing, and more on raijin.");
   const [searchParams, setSearchParams] = useSearchParams();
   const category = (searchParams.get("category") ?? "genres") as BrowseCategory;
   const genre = searchParams.get("genre");

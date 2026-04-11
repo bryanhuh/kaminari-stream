@@ -110,7 +110,8 @@ export default function Search() {
   const [debouncedQuery, setDebouncedQuery] = useState(initialQuery);
 
   usePageMeta(
-    debouncedQuery ? `"${debouncedQuery}" — raijin.` : "Search Anime — raijin."
+    debouncedQuery ? `"${debouncedQuery}" — raijin.` : "Search Anime — raijin.",
+    debouncedQuery ? `Search results for "${debouncedQuery}" on raijin.` : "Search for anime by title, genre, format, year, and more on raijin.",
   );
 
   const [filters, setFilters] = useState<SearchFilters>({

@@ -8,7 +8,7 @@ import { TrailerHero, StaticHero, parseYouTubeId } from "../components/TrailerHe
 import type { TrailerEntry } from "../components/TrailerHero";
 
 export default function Movies() {
-  usePageMeta("Movies — raijin.");
+  usePageMeta("Movies — raijin.", "Browse and stream anime movies online free on raijin.");
   const [page, setPage] = useState(1);
   const [genre, setGenre] = useState("");
   const { data, isLoading } = useMovies(page, 24, genre || undefined);

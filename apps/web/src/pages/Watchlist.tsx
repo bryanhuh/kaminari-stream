@@ -4,7 +4,7 @@ import { usePageMeta } from "../hooks/usePageMeta";
 import type { WatchlistEntry } from "@anime-app/types";
 
 export default function Watchlist() {
-  usePageMeta("My Watchlist — raijin.");
+  usePageMeta("My Watchlist — raijin.", "Your saved anime watchlist on raijin.");
   const { data, isLoading } = useWatchlist();
 
   if (isLoading) {
