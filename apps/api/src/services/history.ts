@@ -3,6 +3,7 @@ import { db } from "../db/client";
 import { watchHistory } from "../db/schema";
 
 export interface UpsertProgressInput {
+  userId: number;
   animeId: number;
   episodeId: string;
   episodeNumber: number;
@@ -16,6 +17,7 @@ export async function upsertProgress(input: UpsertProgressInput) {
   await db
     .insert(watchHistory)
     .values({
+      userId: input.userId,
       animeId: input.animeId,
       episodeId: input.episodeId,
       episodeNumber: input.episodeNumber,
@@ -26,7 +28,7 @@ export async function upsertProgress(input: UpsertProgressInput) {
       watchedAt: new Date().toISOString(),
     })
     .onConflictDoUpdate({
-      target: [watchHistory.animeId, watchHistory.episodeId],
+      target: [watchHistory.userId, watchHistory.animeId, watchHistory.episodeId],
       set: {
         progressSeconds: input.progressSeconds,
         durationSeconds: input.durationSeconds,
@@ -37,45 +39,34 @@ export async function upsertProgress(input: UpsertProgressInput) {
     });
 }
 
-export async function getHistory(limit = 30) {
+export async function getHistory(userId: number, limit = 30) {
   return db
     .select()
     .from(watchHistory)
+    .where(eq(watchHistory.userId, userId))
     .orderBy(desc(watchHistory.watchedAt))
     .limit(limit);
 }
 
-export async function getAnimeHistory(animeId: number) {
+export async function getAnimeHistory(userId: number, animeId: number) {
   return db
     .select()
     .from(watchHistory)
-    .where(eq(watchHistory.animeId, animeId))
+    .where(and(eq(watchHistory.userId, userId), eq(watchHistory.animeId, animeId)))
     .orderBy(desc(watchHistory.watchedAt));
 }
 
-export async function getEpisodeProgress(animeId: number, episodeId: string) {
-  const rows = await db
-    .select()
-    .from(watchHistory)
-    .where(
-      and(
-        eq(watchHistory.animeId, animeId),
-        eq(watchHistory.episodeId, episodeId)
-      )
-    )
-    .limit(1);
-  return rows[0] ?? null;
+export async function deleteHistoryEntry(userId: number, id: number) {
+  await db
+    .delete(watchHistory)
+    .where(and(eq(watchHistory.id, id), eq(watchHistory.userId, userId)));
 }
 
-export async function deleteHistoryEntry(id: number) {
-  await db.delete(watchHistory).where(eq(watchHistory.id, id));
-}
-
-export async function getContinueWatching(limit = 12) {
-  // Return most-recent entry per anime where progress is < 95% of duration
+export async function getContinueWatching(userId: number, limit = 12) {
   const all = await db
     .select()
     .from(watchHistory)
+    .where(eq(watchHistory.userId, userId))
     .orderBy(desc(watchHistory.watchedAt));
 
   const seen = new Set<number>();

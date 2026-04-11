@@ -1,4 +1,4 @@
-import { Router } from "express";
+import { Router, type Request, type Response, type NextFunction } from "express";
 import { z } from "zod";
 import {
   upsertProgress,
@@ -7,8 +7,11 @@ import {
   getContinueWatching,
   deleteHistoryEntry,
 } from "../services/history";
+import { requireAuth } from "../middleware/auth";
 
 const router = Router();
+
+router.use(requireAuth);
 
 const upsertSchema = z.object({
   animeId: z.number().int().positive(),
@@ -21,9 +24,9 @@ const upsertSchema = z.object({
 });
 
 // GET /api/history — all recent history
-router.get("/", async (_req, res, next) => {
+router.get("/", async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const entries = await getHistory(30);
+    const entries = await getHistory(req.userId, 30);
     res.json({ data: entries });
   } catch (err) {
     next(err);
@@ -31,9 +34,9 @@ router.get("/", async (_req, res, next) => {
 });
 
 // GET /api/history/continue — entries suitable for "continue watching"
-router.get("/continue", async (_req, res, next) => {
+router.get("/continue", async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const entries = await getContinueWatching(12);
+    const entries = await getContinueWatching(req.userId, 12);
     res.json({ data: entries });
   } catch (err) {
     next(err);
@@ -41,10 +44,10 @@ router.get("/continue", async (_req, res, next) => {
 });
 
 // GET /api/history/:animeId — all episodes watched for an anime
-router.get("/:animeId", async (req, res, next) => {
+router.get("/:animeId", async (req: Request, res: Response, next: NextFunction) => {
   try {
     const animeId = z.coerce.number().int().positive().parse(req.params.animeId);
-    const entries = await getAnimeHistory(animeId);
+    const entries = await getAnimeHistory(req.userId, animeId);
     res.json({ data: entries });
   } catch (err) {
     next(err);
@@ -52,10 +55,10 @@ router.get("/:animeId", async (req, res, next) => {
 });
 
 // DELETE /api/history/:id — remove a single history entry
-router.delete("/:id", async (req, res, next) => {
+router.delete("/:id", async (req: Request, res: Response, next: NextFunction) => {
   try {
     const id = z.coerce.number().int().positive().parse(req.params.id);
-    await deleteHistoryEntry(id);
+    await deleteHistoryEntry(req.userId, id);
     res.json({ data: { ok: true } });
   } catch (err) {
     next(err);
@@ -63,10 +66,10 @@ router.delete("/:id", async (req, res, next) => {
 });
 
 // POST /api/history — upsert progress
-router.post("/", async (req, res, next) => {
+router.post("/", async (req: Request, res: Response, next: NextFunction) => {
   try {
     const input = upsertSchema.parse(req.body);
-    await upsertProgress(input);
+    await upsertProgress({ ...input, userId: req.userId });
     res.json({ data: { ok: true } });
   } catch (err) {
     next(err);
