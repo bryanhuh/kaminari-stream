@@ -1,34 +1,76 @@
-import { createContext, useContext, useState, type ReactNode } from "react";
+import { createContext, useContext, useState, useCallback, type ReactNode } from "react";
+import type { User } from "@anime-app/types";
+
+const BASE = import.meta.env.VITE_API_BASE_URL ?? "http://localhost:4000";
+const STORAGE_KEY = "raijin_auth";
+
+interface StoredAuth {
+  token: string;
+  user: User;
+}
 
 interface AuthContextValue {
+  user: User | null;
   isLoggedIn: boolean;
-  login: () => void;
+  login: (email: string, password: string) => Promise<void>;
+  register: (username: string, email: string, password: string) => Promise<void>;
   logout: () => void;
 }
 
 const AuthContext = createContext<AuthContextValue>({
+  user: null,
   isLoggedIn: false,
-  login: () => {},
+  login: async () => {},
+  register: async () => {},
   logout: () => {},
 });
 
+function loadStoredAuth(): StoredAuth | null {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    return raw ? (JSON.parse(raw) as StoredAuth) : null;
+  } catch {
+    return null;
+  }
+}
+
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [isLoggedIn, setIsLoggedIn] = useState(() => {
-    return localStorage.getItem("raijin_logged_in") === "true";
-  });
+  const [auth, setAuth] = useState<StoredAuth | null>(loadStoredAuth);
 
-  function login() {
-    localStorage.setItem("raijin_logged_in", "true");
-    setIsLoggedIn(true);
+  function persist(data: StoredAuth) {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+    setAuth(data);
   }
 
-  function logout() {
-    localStorage.removeItem("raijin_logged_in");
-    setIsLoggedIn(false);
-  }
+  const logout = useCallback(() => {
+    localStorage.removeItem(STORAGE_KEY);
+    setAuth(null);
+  }, []);
+
+  const login = useCallback(async (email: string, password: string) => {
+    const res = await fetch(`${BASE}/api/auth/login`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, password }),
+    });
+    const json = await res.json();
+    if (!res.ok) throw new Error(json.error ?? "Login failed.");
+    persist(json.data as StoredAuth);
+  }, []);
+
+  const register = useCallback(async (username: string, email: string, password: string) => {
+    const res = await fetch(`${BASE}/api/auth/register`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ username, email, password }),
+    });
+    const json = await res.json();
+    if (!res.ok) throw new Error(json.error ?? "Registration failed.");
+    persist(json.data as StoredAuth);
+  }, []);
 
   return (
-    <AuthContext.Provider value={{ isLoggedIn, login, logout }}>
+    <AuthContext.Provider value={{ user: auth?.user ?? null, isLoggedIn: !!auth, login, register, logout }}>
       {children}
     </AuthContext.Provider>
   );
