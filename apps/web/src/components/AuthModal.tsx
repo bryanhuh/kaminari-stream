@@ -81,43 +81,74 @@ export default function AuthModal({ open, onClose }: AuthModalProps) {
 
 function SignInForm({ onSuccess }: { onSuccess: () => void }) {
   const { login } = useAuth();
-  function handleSubmit(e: React.FormEvent) {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    login();
-    onSuccess();
+    setError(null);
+    setLoading(true);
+    try {
+      await login(email, password);
+      onSuccess();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Sign in failed. Please try again.");
+    } finally {
+      setLoading(false);
+    }
   }
+
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+      {error && (
+        <p className="text-sm text-red-400 bg-red-400/10 border border-red-400/20 rounded-lg px-3 py-2">
+          {error}
+        </p>
+      )}
       <div>
-        <label className="block text-xs font-semibold text-[#bfc1c6] mb-1.5">Email</label>
-        <input
-          type="email"
-          placeholder="you@example.com"
-          className="w-full bg-[#0a0a0f] border border-[#2a2a38] rounded-lg px-3.5 py-2.5 text-sm text-white placeholder-[#5d6169] outline-none focus:border-primary-500 focus:ring-1 focus:ring-primary-500/40 transition-colors"
-        />
-      </div>
-      <div>
-        <label className="block text-xs font-semibold text-[#bfc1c6] mb-1.5">Password</label>
-        <input
-          type="password"
-          placeholder="••••••••"
-          className="w-full bg-[#0a0a0f] border border-[#2a2a38] rounded-lg px-3.5 py-2.5 text-sm text-white placeholder-[#5d6169] outline-none focus:border-primary-500 focus:ring-1 focus:ring-primary-500/40 transition-colors"
-        />
-      </div>
-      <div className="flex items-center justify-between text-xs">
-        <label className="flex items-center gap-2 text-[#bfc1c6] cursor-pointer">
-          <input type="checkbox" className="accent-primary-500" />
-          Remember me
+        <label className="block text-xs font-semibold text-[#bfc1c6] mb-1.5" htmlFor="signin-email">
+          Email
         </label>
-        <button type="button" className="text-primary-500 hover:text-primary-400 transition-colors">
-          Forgot password?
-        </button>
+        <input
+          id="signin-email"
+          type="email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          placeholder="you@example.com"
+          required
+          autoComplete="email"
+          className="w-full bg-[#0a0a0f] border border-[#2a2a38] rounded-lg px-3.5 py-2.5 text-sm text-white placeholder-[#5d6169] outline-none focus:border-primary-500 focus:ring-1 focus:ring-primary-500/40 transition-colors"
+        />
+      </div>
+      <div>
+        <label className="block text-xs font-semibold text-[#bfc1c6] mb-1.5" htmlFor="signin-password">
+          Password
+        </label>
+        <input
+          id="signin-password"
+          type="password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          placeholder="••••••••"
+          required
+          autoComplete="current-password"
+          className="w-full bg-[#0a0a0f] border border-[#2a2a38] rounded-lg px-3.5 py-2.5 text-sm text-white placeholder-[#5d6169] outline-none focus:border-primary-500 focus:ring-1 focus:ring-primary-500/40 transition-colors"
+        />
       </div>
       <button
         type="submit"
-        className="w-full py-2.5 bg-primary-500 hover:bg-primary-400 text-[#0a0a0f] font-semibold text-sm rounded-lg transition-colors mt-1"
+        disabled={loading}
+        className="w-full py-2.5 bg-primary-500 hover:bg-primary-400 text-[#0a0a0f] font-semibold text-sm rounded-lg transition-colors mt-1 disabled:opacity-60 flex items-center justify-center gap-2"
       >
-        Sign In
+        {loading && (
+          <svg className="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
+            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4l3-3-3-3v4a8 8 0 00-8 8h4z" />
+          </svg>
+        )}
+        {loading ? "Signing in…" : "Sign In"}
       </button>
       <p className="text-center text-xs text-[#5d6169]">
         By signing in you agree to our{" "}
@@ -128,43 +159,92 @@ function SignInForm({ onSuccess }: { onSuccess: () => void }) {
 }
 
 function SignUpForm({ onSuccess }: { onSuccess: () => void }) {
-  const { login } = useAuth();
-  function handleSubmit(e: React.FormEvent) {
+  const { register } = useAuth();
+  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    login();
-    onSuccess();
+    setError(null);
+    setLoading(true);
+    try {
+      await register(username, email, password);
+      onSuccess();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Sign up failed. Please try again.");
+    } finally {
+      setLoading(false);
+    }
   }
+
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+      {error && (
+        <p className="text-sm text-red-400 bg-red-400/10 border border-red-400/20 rounded-lg px-3 py-2">
+          {error}
+        </p>
+      )}
       <div>
-        <label className="block text-xs font-semibold text-[#bfc1c6] mb-1.5">Username</label>
+        <label className="block text-xs font-semibold text-[#bfc1c6] mb-1.5" htmlFor="signup-username">
+          Username
+        </label>
         <input
+          id="signup-username"
           type="text"
+          value={username}
+          onChange={(e) => setUsername(e.target.value)}
           placeholder="otaku_legend"
+          required
+          autoComplete="username"
           className="w-full bg-[#0a0a0f] border border-[#2a2a38] rounded-lg px-3.5 py-2.5 text-sm text-white placeholder-[#5d6169] outline-none focus:border-primary-500 focus:ring-1 focus:ring-primary-500/40 transition-colors"
         />
       </div>
       <div>
-        <label className="block text-xs font-semibold text-[#bfc1c6] mb-1.5">Email</label>
+        <label className="block text-xs font-semibold text-[#bfc1c6] mb-1.5" htmlFor="signup-email">
+          Email
+        </label>
         <input
+          id="signup-email"
           type="email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
           placeholder="you@example.com"
+          required
+          autoComplete="email"
           className="w-full bg-[#0a0a0f] border border-[#2a2a38] rounded-lg px-3.5 py-2.5 text-sm text-white placeholder-[#5d6169] outline-none focus:border-primary-500 focus:ring-1 focus:ring-primary-500/40 transition-colors"
         />
       </div>
       <div>
-        <label className="block text-xs font-semibold text-[#bfc1c6] mb-1.5">Password</label>
+        <label className="block text-xs font-semibold text-[#bfc1c6] mb-1.5" htmlFor="signup-password">
+          Password
+        </label>
         <input
+          id="signup-password"
           type="password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
           placeholder="••••••••"
+          required
+          minLength={8}
+          autoComplete="new-password"
           className="w-full bg-[#0a0a0f] border border-[#2a2a38] rounded-lg px-3.5 py-2.5 text-sm text-white placeholder-[#5d6169] outline-none focus:border-primary-500 focus:ring-1 focus:ring-primary-500/40 transition-colors"
         />
       </div>
       <button
         type="submit"
-        className="w-full py-2.5 bg-primary-500 hover:bg-primary-400 text-[#0a0a0f] font-semibold text-sm rounded-lg transition-colors mt-1"
+        disabled={loading}
+        className="w-full py-2.5 bg-primary-500 hover:bg-primary-400 text-[#0a0a0f] font-semibold text-sm rounded-lg transition-colors mt-1 disabled:opacity-60 flex items-center justify-center gap-2"
       >
-        Create Account
+        {loading && (
+          <svg className="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
+            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4l3-3-3-3v4a8 8 0 00-8 8h4z" />
+          </svg>
+        )}
+        {loading ? "Creating account…" : "Create Account"}
       </button>
       <p className="text-center text-xs text-[#5d6169]">
         By signing up you agree to our{" "}
