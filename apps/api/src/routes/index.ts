@@ -6,6 +6,7 @@ import animeRouter from "./anime";
 import proxyRouter from "./proxy";
 import browseRouter from "./browse";
 import watchlistRouter from "./watchlist";
+import authRouter from "./auth";
 
 const router = Router();
 
@@ -13,6 +14,7 @@ router.get("/health", (_req, res) => {
   res.json({ status: "ok", timestamp: new Date().toISOString() });
 });
 
+router.use("/auth", authRouter);
 router.use("/anime", animeRouter);
 router.use("/proxy", proxyRouter);
 router.use("/episodes", episodesRouter);
