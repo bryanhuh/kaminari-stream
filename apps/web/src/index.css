@@ -30,6 +30,12 @@
   --color-border-default: #2a2a38;
 }
 
+/* Navigation progress bar animation */
+@keyframes nav-progress {
+  0%   { transform: translateX(-100%); }
+  100% { transform: translateX(400%); }
+}
+
 /* Base dark background */
 body {
   background-color: #0a0a0f;
