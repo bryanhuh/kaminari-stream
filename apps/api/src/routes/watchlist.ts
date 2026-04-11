@@ -1,4 +1,4 @@
-import { Router } from "express";
+import { Router, type Request, type Response, type NextFunction } from "express";
 import { z } from "zod";
 import {
   addToWatchlist,
@@ -6,8 +6,11 @@ import {
   getWatchlist,
   getWatchlistEntry,
 } from "../services/watchlist";
+import { requireAuth } from "../middleware/auth";
 
 const router = Router();
+
+router.use(requireAuth);
 
 const addSchema = z.object({
   animeId: z.number().int().positive(),
@@ -20,9 +23,9 @@ const addSchema = z.object({
 });
 
 // GET /api/watchlist — all saved entries
-router.get("/", async (_req, res, next) => {
+router.get("/", async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const entries = await getWatchlist();
+    const entries = await getWatchlist(req.userId);
     res.json({ data: entries });
   } catch (err) {
     next(err);
@@ -30,10 +33,10 @@ router.get("/", async (_req, res, next) => {
 });
 
 // GET /api/watchlist/:animeId — check if anime is saved
-router.get("/:animeId", async (req, res, next) => {
+router.get("/:animeId", async (req: Request, res: Response, next: NextFunction) => {
   try {
     const animeId = z.coerce.number().int().positive().parse(req.params.animeId);
-    const entry = await getWatchlistEntry(animeId);
+    const entry = await getWatchlistEntry(req.userId, animeId);
     res.json({ data: entry ?? null });
   } catch (err) {
     next(err);
@@ -41,10 +44,10 @@ router.get("/:animeId", async (req, res, next) => {
 });
 
 // POST /api/watchlist — add anime
-router.post("/", async (req, res, next) => {
+router.post("/", async (req: Request, res: Response, next: NextFunction) => {
   try {
     const input = addSchema.parse(req.body);
-    await addToWatchlist(input);
+    await addToWatchlist({ ...input, userId: req.userId });
     res.json({ data: { ok: true } });
   } catch (err) {
     next(err);
@@ -52,10 +55,10 @@ router.post("/", async (req, res, next) => {
 });
 
 // DELETE /api/watchlist/:animeId — remove anime
-router.delete("/:animeId", async (req, res, next) => {
+router.delete("/:animeId", async (req: Request, res: Response, next: NextFunction) => {
   try {
     const animeId = z.coerce.number().int().positive().parse(req.params.animeId);
-    await removeFromWatchlist(animeId);
+    await removeFromWatchlist(req.userId, animeId);
     res.json({ data: { ok: true } });
   } catch (err) {
     next(err);
