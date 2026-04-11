@@ -1,11 +1,33 @@
 import { Link } from "react-router-dom";
 import { useWatchlist, useRemoveFromWatchlist } from "../hooks/useWatchlist";
 import { usePageMeta } from "../hooks/usePageMeta";
+import { useAuth } from "../context/AuthContext";
+import LoginPrompt from "../components/LoginPrompt";
 import type { WatchlistEntry } from "@anime-app/types";
+
+const watchlistIcon = (
+  <svg className="w-8 h-8" fill="none" stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24">
+    <path strokeLinecap="round" strokeLinejoin="round" d="M5 3a2 2 0 0 0-2 2v16l9-4 9 4V5a2 2 0 0 0-2-2H5z" />
+  </svg>
+);
 
 export default function Watchlist() {
   usePageMeta("My Watchlist — raijin.", "Your saved anime watchlist on raijin.");
+  const { isLoggedIn } = useAuth();
   const { data, isLoading } = useWatchlist();
+
+  if (!isLoggedIn) {
+    return (
+      <div className="max-w-7xl mx-auto px-4 py-10">
+        <h1 className="text-2xl font-bold text-white mb-8">My Watchlist</h1>
+        <LoginPrompt
+          icon={watchlistIcon}
+          heading="Sign in to access your watchlist"
+          body="Save anime you want to watch and pick up right where you left off."
+        />
+      </div>
+    );
+  }
 
   if (isLoading) {
     return (

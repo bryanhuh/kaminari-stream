@@ -1,7 +1,15 @@
 import { Link } from "react-router-dom";
 import { useContinueWatching, useRemoveFromHistory } from "../hooks/useWatchHistory";
 import { usePageMeta } from "../hooks/usePageMeta";
+import { useAuth } from "../context/AuthContext";
+import LoginPrompt from "../components/LoginPrompt";
 import type { WatchHistoryEntry } from "@anime-app/types";
+
+const historyIcon = (
+  <svg className="w-8 h-8" fill="none" stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24">
+    <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+  </svg>
+);
 
 function formatProgress(entry: WatchHistoryEntry): string {
   if (!entry.durationSeconds) return `Ep ${entry.episodeNumber}`;
@@ -22,7 +30,21 @@ function timeAgo(dateStr: string): string {
 
 export default function History() {
   usePageMeta("Watch History — raijin.", "Your anime watch history and episode progress on raijin.");
+  const { isLoggedIn } = useAuth();
   const { data, isLoading } = useContinueWatching();
+
+  if (!isLoggedIn) {
+    return (
+      <div className="max-w-7xl mx-auto px-4 py-10">
+        <h1 className="text-2xl font-bold text-white mb-8">Watch History</h1>
+        <LoginPrompt
+          icon={historyIcon}
+          heading="Sign in to see your watch history"
+          body="Your episode progress and watch history will be saved and synced when you're signed in."
+        />
+      </div>
+    );
+  }
 
   if (isLoading) {
     return (
