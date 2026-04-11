@@ -1,5 +1,5 @@
 import { Link, useNavigate, useLocation } from "react-router-dom";
-import { FormEvent, useState, useCallback, useRef } from "react";
+import { FormEvent, useState, useCallback, useRef, useEffect } from "react";
 import AuthModal from "./AuthModal";
 import NotificationPanel from "./NotificationPanel";
 import { useAuth } from "../context/AuthContext";
@@ -12,10 +12,24 @@ export default function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
 
+  const [userMenuOpen, setUserMenuOpen] = useState(false);
+  const userMenuRef = useRef<HTMLDivElement>(null);
   const notifRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
   const location = useLocation();
-  useAuth();
+  const { user, isLoggedIn, logout } = useAuth();
+
+  // Close user menu on outside click
+  useEffect(() => {
+    if (!userMenuOpen) return;
+    function handler(e: MouseEvent) {
+      if (userMenuRef.current && !userMenuRef.current.contains(e.target as Node)) {
+        setUserMenuOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, [userMenuOpen]);
 
   const isActive = (path: string) => location.pathname === path;
 
@@ -172,15 +186,44 @@ export default function Navbar() {
             </div>
 
             {/* Account */}
-            <button
-              onClick={() => setAuthOpen(true)}
-              aria-label="Account"
-              className="flex items-center justify-center w-9 h-9 rounded-lg text-[#bfc1c6] hover:text-white hover:bg-white/5 transition-colors"
-            >
-              <svg className="w-[18px] h-[18px]" fill="none" stroke="currentColor" strokeWidth={1.8} viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" />
-              </svg>
-            </button>
+            {isLoggedIn && user ? (
+              <div ref={userMenuRef} className="relative">
+                <button
+                  onClick={() => setUserMenuOpen((v) => !v)}
+                  aria-label="Account menu"
+                  title={user.username}
+                  className={`flex items-center justify-center w-9 h-9 rounded-lg font-bold text-sm transition-colors ${
+                    userMenuOpen ? "bg-primary-500 text-[#0a0a0f]" : "bg-primary-500/15 text-primary-400 hover:bg-primary-500/25"
+                  }`}
+                >
+                  {user.username[0].toUpperCase()}
+                </button>
+                {userMenuOpen && (
+                  <div className="absolute right-0 top-full mt-2 min-w-[160px] bg-[#111118] border border-[#1e1e28] rounded-xl shadow-2xl py-1 z-50">
+                    <div className="px-3 py-2 border-b border-[#1e1e28]">
+                      <p className="text-xs font-semibold text-white truncate">{user.username}</p>
+                      <p className="text-xs text-[#5d6169] truncate">{user.email}</p>
+                    </div>
+                    <button
+                      onClick={() => { logout(); setUserMenuOpen(false); }}
+                      className="w-full text-left px-3 py-2 text-sm text-[#bfc1c6] hover:text-white hover:bg-white/5 transition-colors"
+                    >
+                      Sign Out
+                    </button>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <button
+                onClick={() => setAuthOpen(true)}
+                aria-label="Sign in"
+                className="flex items-center justify-center w-9 h-9 rounded-lg text-[#bfc1c6] hover:text-white hover:bg-white/5 transition-colors"
+              >
+                <svg className="w-[18px] h-[18px]" fill="none" stroke="currentColor" strokeWidth={1.8} viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" />
+                </svg>
+              </button>
+            )}
           </div>
         </div>
 
