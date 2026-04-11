@@ -7,10 +7,25 @@ export class ApiError extends Error {
   }
 }
 
+function getAuthHeader(): Record<string, string> {
+  try {
+    const raw = localStorage.getItem("raijin_auth");
+    if (!raw) return {};
+    const parsed = JSON.parse(raw) as { token?: string };
+    return parsed.token ? { Authorization: `Bearer ${parsed.token}` } : {};
+  } catch {
+    return {};
+  }
+}
+
 async function apiFetch<T>(path: string, init?: RequestInit): Promise<T> {
   const res = await fetch(`${BASE}${path}`, {
-    headers: { "Content-Type": "application/json" },
     ...init,
+    headers: {
+      "Content-Type": "application/json",
+      ...getAuthHeader(),
+      ...(init?.headers as Record<string, string> | undefined),
+    },
   });
   if (!res.ok) {
     const body = await res.json().catch(() => ({ error: res.statusText }));
