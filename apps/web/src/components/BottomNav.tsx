@@ -50,7 +50,7 @@ export default function BottomNav() {
     exact ? pathname === to : pathname.startsWith(to);
 
   return (
-    <nav className="md:hidden fixed bottom-0 inset-x-0 z-50 bg-[#0a0a0f]/95 backdrop-blur-md border-t border-[#1e1e28] flex items-stretch h-16 safe-area-inset-bottom">
+    <nav aria-label="Mobile navigation" className="md:hidden fixed bottom-0 inset-x-0 z-50 bg-[#0a0a0f]/95 backdrop-blur-md border-t border-[#1e1e28] flex items-stretch h-16 safe-area-inset-bottom">
       {NAV_ITEMS.map(({ label, to, exact, icon }) => {
         const active = isActive(to, exact);
         return (

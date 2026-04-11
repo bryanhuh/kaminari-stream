@@ -77,7 +77,7 @@ export default function Navbar() {
           </Link>
 
           {/* Desktop nav links */}
-          <nav className="hidden md:flex items-center gap-1 text-sm font-medium ml-2">
+          <nav aria-label="Main navigation" className="hidden md:flex items-center gap-1 text-sm font-medium ml-2">
             {navLinks.map((link) => (
               <Link
                 key={link.to}
@@ -97,10 +97,11 @@ export default function Navbar() {
           <div className="flex-1" />
 
           {/* Search — desktop */}
-          <form onSubmit={handleSearch} className="hidden md:block w-52 lg:w-64">
+          <form onSubmit={handleSearch} className="hidden md:block w-52 lg:w-64" role="search">
             <div className="relative">
               <svg
                 className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#5d6169] pointer-events-none"
+                aria-hidden="true"
                 fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"
               >
                 <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-4.35-4.35M17 11A6 6 0 1 1 5 11a6 6 0 0 1 12 0z" />
@@ -110,6 +111,7 @@ export default function Navbar() {
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 placeholder="Search anime..."
+                aria-label="Search anime"
                 className="w-full bg-[#111118] text-sm text-white placeholder-[#5d6169] rounded-full pl-9 pr-4 py-2 outline-none border border-[#1e1e28] focus:border-primary-500 focus:ring-1 focus:ring-primary-500/50 transition-colors"
               />
             </div>
@@ -185,10 +187,11 @@ export default function Navbar() {
         {/* Mobile search bar */}
         {mobileSearchOpen && (
           <div className="md:hidden border-t border-[#1e1e28] px-4 py-3">
-            <form onSubmit={handleSearch}>
+            <form onSubmit={handleSearch} role="search">
               <div className="relative">
                 <svg
                   className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#5d6169] pointer-events-none"
+                  aria-hidden="true"
                   fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"
                 >
                   <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-4.35-4.35M17 11A6 6 0 1 1 5 11a6 6 0 0 1 12 0z" />
@@ -198,6 +201,7 @@ export default function Navbar() {
                   value={query}
                   onChange={(e) => setQuery(e.target.value)}
                   placeholder="Search anime..."
+                  aria-label="Search anime"
                   autoFocus
                   className="w-full bg-[#111118] text-sm text-white placeholder-[#5d6169] rounded-full pl-9 pr-4 py-2.5 outline-none border border-[#1e1e28] focus:border-primary-500 focus:ring-1 focus:ring-primary-500/50 transition-colors"
                 />
@@ -208,7 +212,7 @@ export default function Navbar() {
 
         {/* Mobile nav menu */}
         {mobileMenuOpen && (
-          <div className="md:hidden border-t border-[#1e1e28] py-2">
+          <nav aria-label="Mobile navigation" className="md:hidden border-t border-[#1e1e28] py-2">
             {navLinks.map((link) => (
               <Link
                 key={link.to}
@@ -221,7 +225,7 @@ export default function Navbar() {
                 {link.label}
               </Link>
             ))}
-          </div>
+          </nav>
         )}
       </header>
 
