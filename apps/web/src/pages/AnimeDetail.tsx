@@ -7,6 +7,7 @@ import { useAnimeHistory } from "../hooks/useWatchHistory";
 import AnimeCard from "../components/AnimeCard";
 import EpisodeList from "../components/EpisodeList";
 import WatchlistButton from "../components/WatchlistButton";
+import ReviewSection from "../components/ReviewSection";
 
 function formatStatus(s: string | null) {
   if (!s) return null;
@@ -387,6 +388,11 @@ export default function AnimeDetail() {
                 </div>
               </section>
             )}
+
+            {/* Ratings & Reviews */}
+            <section>
+              <ReviewSection animeId={anime.id} />
+            </section>
 
             {/* Recommendations */}
             {recommendations.length > 0 && (
