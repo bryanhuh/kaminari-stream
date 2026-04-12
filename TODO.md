@@ -23,7 +23,7 @@
 - [x] **Comments persistence** — Move comments from localStorage to the SQLite backend so they persist across browsers/devices.
 - [x] **PWA manifest** — Add `manifest.json` and service worker so the app is installable to home screen on mobile.
 - [x] **Ratings / reviews** — Allow logged-in users to rate anime (1–10 stars) and leave a short review on the anime detail page.
-- [ ] **Episode progress bars on EpisodeList** — Show a thin progress bar on partially-watched episode cards (data already available from watch history).
+- [x] **Episode progress bars on EpisodeList** — Show a thin progress bar on partially-watched episode cards (data already available from watch history).
 - [ ] **Error tracking / monitoring** — Integrate Sentry or similar service so runtime errors are captured beyond `console.error` in ErrorBoundary.
 - [ ] **Analytics** — Basic page-view / event tracking to understand usage patterns.
 
