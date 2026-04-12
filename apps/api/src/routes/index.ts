@@ -7,6 +7,7 @@ import proxyRouter from "./proxy";
 import browseRouter from "./browse";
 import watchlistRouter from "./watchlist";
 import authRouter from "./auth";
+import commentsRouter from "./comments";
 
 const router = Router();
 
@@ -22,5 +23,6 @@ router.use("/stream", streamRouter);
 router.use("/history", historyRouter);
 router.use("/browse", browseRouter);
 router.use("/watchlist", watchlistRouter);
+router.use("/comments", commentsRouter);
 
 export default router;
