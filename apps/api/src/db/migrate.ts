@@ -102,4 +102,15 @@ export async function runMigrations() {
       END IF;
     END $$
   `;
+
+  await sql`
+    CREATE TABLE IF NOT EXISTS comments (
+      id SERIAL PRIMARY KEY,
+      user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+      anime_id INTEGER NOT NULL,
+      episode_id TEXT NOT NULL,
+      body TEXT NOT NULL,
+      created_at TEXT NOT NULL DEFAULT now()
+    )
+  `;
 }
