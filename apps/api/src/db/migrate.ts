@@ -104,6 +104,18 @@ export async function runMigrations() {
   `;
 
   await sql`
+    CREATE TABLE IF NOT EXISTS reviews (
+      id SERIAL PRIMARY KEY,
+      user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+      anime_id INTEGER NOT NULL,
+      rating INTEGER NOT NULL CHECK (rating >= 1 AND rating <= 10),
+      review TEXT,
+      created_at TEXT NOT NULL DEFAULT now(),
+      UNIQUE (user_id, anime_id)
+    )
+  `;
+
+  await sql`
     CREATE TABLE IF NOT EXISTS comments (
       id SERIAL PRIMARY KEY,
       user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
