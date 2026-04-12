@@ -20,8 +20,8 @@
 ## Lower Priority / Nice to Have
 
 - [x] **Auth backend** — Wire up the sign in / sign up modal to a real user system (JWT, sessions, or similar). Currently the AuthModal is UI-only.
-- [ ] **Comments persistence** — Move comments from localStorage to the SQLite backend so they persist across browsers/devices.
-- [ ] **PWA manifest** — Add `manifest.json` and service worker so the app is installable to home screen on mobile.
+- [x] **Comments persistence** — Move comments from localStorage to the SQLite backend so they persist across browsers/devices.
+- [x] **PWA manifest** — Add `manifest.json` and service worker so the app is installable to home screen on mobile.
 - [ ] **Ratings / reviews** — Allow logged-in users to rate anime (1–10 stars) and leave a short review on the anime detail page.
 - [ ] **Episode progress bars on EpisodeList** — Show a thin progress bar on partially-watched episode cards (data already available from watch history).
 - [ ] **Error tracking / monitoring** — Integrate Sentry or similar service so runtime errors are captured beyond `console.error` in ErrorBoundary.
