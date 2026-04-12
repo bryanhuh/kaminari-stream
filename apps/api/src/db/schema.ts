@@ -34,6 +34,19 @@ export const watchlist = pgTable(
   (t) => [unique().on(t.userId, t.animeId)]
 );
 
+export const reviews = pgTable(
+  "reviews",
+  {
+    id: serial("id").primaryKey(),
+    userId: integer("user_id").references(() => users.id, { onDelete: "cascade" }).notNull(),
+    animeId: integer("anime_id").notNull(),
+    rating: integer("rating").notNull(), // 1–10
+    review: text("review"), // optional short text
+    createdAt: text("created_at").notNull().default(sql`now()`),
+  },
+  (t) => [unique().on(t.userId, t.animeId)]
+);
+
 export const comments = pgTable("comments", {
   id: serial("id").primaryKey(),
   userId: integer("user_id").references(() => users.id, { onDelete: "cascade" }).notNull(),
