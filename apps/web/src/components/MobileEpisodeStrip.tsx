@@ -32,17 +32,19 @@ export default function MobileEpisodeStrip({
       {episodes.map((ep) => {
         const isCurrent = ep.id === currentEpisodeId;
         const entry = watchHistory.find((w) => w.episodeId === ep.id);
-        const isDone =
+        const pct =
           entry && entry.durationSeconds > 0
-            ? entry.progressSeconds / entry.durationSeconds >= 0.95
-            : false;
+            ? entry.progressSeconds / entry.durationSeconds
+            : 0;
+        const isDone = pct >= 0.95;
+        const isPartial = pct > 0 && !isDone;
 
         return (
           <Link
             key={ep.id}
             ref={isCurrent ? currentRef : undefined}
             to={`/watch?animeId=${animeId}&episodeId=${encodeURIComponent(ep.id)}&ep=${ep.number}`}
-            className={`shrink-0 w-10 h-10 rounded-lg flex items-center justify-center text-sm font-bold transition-colors ${
+            className={`relative shrink-0 w-10 h-10 rounded-lg flex items-center justify-center text-sm font-bold transition-colors overflow-hidden ${
               isCurrent
                 ? "bg-primary-500 text-[#0a0a0f] shadow-md shadow-primary-500/30"
                 : isDone
@@ -51,6 +53,12 @@ export default function MobileEpisodeStrip({
             }`}
           >
             {ep.number}
+            {isPartial && !isCurrent && (
+              <span
+                className="absolute bottom-0 left-0 h-0.5 bg-primary-500"
+                style={{ width: `${Math.round(pct * 100)}%` }}
+              />
+            )}
           </Link>
         );
       })}
