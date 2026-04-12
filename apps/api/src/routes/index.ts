@@ -8,6 +8,7 @@ import browseRouter from "./browse";
 import watchlistRouter from "./watchlist";
 import authRouter from "./auth";
 import commentsRouter from "./comments";
+import reviewsRouter from "./reviews";
 
 const router = Router();
 
@@ -24,5 +25,6 @@ router.use("/history", historyRouter);
 router.use("/browse", browseRouter);
 router.use("/watchlist", watchlistRouter);
 router.use("/comments", commentsRouter);
+router.use("/reviews", reviewsRouter);
 
 export default router;
