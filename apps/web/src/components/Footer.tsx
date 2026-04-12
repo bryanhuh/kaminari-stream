@@ -31,7 +31,7 @@ export default function Footer() {
             <div className="border-t border-[#1e1e28]" />
             <div className="absolute -top-[36px] right-0 pointer-events-none select-none hidden sm:block">
               <img
-                src="/mascot.png"
+                src="/mascot-logo.png"
                 alt="raijin. mascot"
                 className="h-[120px] w-auto drop-shadow-[0_0_24px_rgba(255,213,97,0.25)]"
               />
