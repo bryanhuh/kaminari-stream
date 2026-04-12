@@ -1,19 +1,10 @@
-import { useState, useEffect } from "react";
-
-interface Comment {
-  id: string;
-  username: string;
-  body: string;
-  createdAt: string;
-}
+import { useState } from "react";
+import { useAuth } from "../context/AuthContext";
+import { useComments, useAddComment, useDeleteComment } from "../hooks/useComments";
 
 interface CommentsProps {
   animeId: number;
   episodeId: string;
-}
-
-function storageKey(animeId: number, episodeId: string) {
-  return `comments:${animeId}:${episodeId}`;
 }
 
 function timeAgo(iso: string): string {
@@ -28,95 +19,70 @@ function timeAgo(iso: string): string {
   return `${diffDays} days ago`;
 }
 
-function loadComments(animeId: number, episodeId: string): Comment[] {
-  try {
-    const raw = localStorage.getItem(storageKey(animeId, episodeId));
-    return raw ? (JSON.parse(raw) as Comment[]) : [];
-  } catch {
-    return [];
-  }
-}
-
-function saveComments(animeId: number, episodeId: string, comments: Comment[]) {
-  localStorage.setItem(storageKey(animeId, episodeId), JSON.stringify(comments));
-}
-
 export default function Comments({ animeId, episodeId }: CommentsProps) {
-  const [comments, setComments] = useState<Comment[]>(() =>
-    loadComments(animeId, episodeId)
-  );
-  const [username, setUsername] = useState<string>(
-    () => localStorage.getItem("commentUsername") ?? ""
-  );
+  const { user, isLoggedIn } = useAuth();
+  const { data: comments = [], isLoading } = useComments(animeId, episodeId);
+  const addComment = useAddComment(animeId, episodeId);
+  const deleteComment = useDeleteComment(animeId, episodeId);
   const [body, setBody] = useState("");
-
-  // Reload comments when episode changes
-  useEffect(() => {
-    setComments(loadComments(animeId, episodeId));
-  }, [animeId, episodeId]);
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    const trimmedUser = username.trim();
-    const trimmedBody = body.trim();
-    if (!trimmedUser || !trimmedBody) return;
-
-    localStorage.setItem("commentUsername", trimmedUser);
-
-    const newComment: Comment = {
-      id: `${Date.now()}-${Math.random().toString(36).slice(2)}`,
-      username: trimmedUser,
-      body: trimmedBody,
-      createdAt: new Date().toISOString(),
-    };
-
-    const updated = [newComment, ...comments];
-    setComments(updated);
-    saveComments(animeId, episodeId, updated);
-    setBody("");
+    const trimmed = body.trim();
+    if (!trimmed || addComment.isPending) return;
+    addComment.mutate(trimmed, { onSuccess: () => setBody("") });
   }
 
   return (
     <div className="flex flex-col gap-6">
       {/* Header */}
       <h2 className="text-base font-bold text-white">
-        Comments ({comments.length})
+        Comments ({isLoading ? "…" : comments.length})
       </h2>
 
-      {/* Comment form */}
-      <form
-        onSubmit={handleSubmit}
-        className="flex flex-col gap-3 bg-[#111118] border border-[#1e1e28] rounded-xl p-4"
-      >
-        <input
-          type="text"
-          placeholder="Your name"
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
-          maxLength={50}
-          className="w-full bg-[#0a0a0f] border border-[#2a2a38] rounded-lg px-3 py-2 text-sm text-white placeholder-[#5d6169] focus:outline-none focus:border-primary-500/60 transition-colors"
-        />
-        <textarea
-          placeholder="Share your thoughts about this episode..."
-          value={body}
-          onChange={(e) => setBody(e.target.value)}
-          rows={3}
-          maxLength={1000}
-          className="w-full bg-[#0a0a0f] border border-[#2a2a38] rounded-lg px-3 py-2 text-sm text-white placeholder-[#5d6169] focus:outline-none focus:border-primary-500/60 transition-colors resize-none"
-        />
-        <div className="flex justify-end">
-          <button
-            type="submit"
-            disabled={!username.trim() || !body.trim()}
-            className="bg-primary-500 hover:bg-primary-400 disabled:opacity-40 disabled:cursor-not-allowed text-[#0a0a0f] font-bold text-sm px-4 py-2 rounded-full shadow-lg shadow-primary-500/20 transition-colors"
-          >
-            Post Comment
-          </button>
+      {/* Comment form — only shown when logged in */}
+      {isLoggedIn ? (
+        <form
+          onSubmit={handleSubmit}
+          className="flex flex-col gap-3 bg-[#111118] border border-[#1e1e28] rounded-xl p-4"
+        >
+          <p className="text-xs text-[#5d6169]">
+            Posting as{" "}
+            <span className="text-primary-400 font-semibold">{user?.username}</span>
+          </p>
+          <textarea
+            placeholder="Share your thoughts about this episode..."
+            value={body}
+            onChange={(e) => setBody(e.target.value)}
+            rows={3}
+            maxLength={1000}
+            className="w-full bg-[#0a0a0f] border border-[#2a2a38] rounded-lg px-3 py-2 text-sm text-white placeholder-[#5d6169] focus:outline-none focus:border-primary-500/60 transition-colors resize-none"
+          />
+          <div className="flex justify-end">
+            <button
+              type="submit"
+              disabled={!body.trim() || addComment.isPending}
+              className="bg-primary-500 hover:bg-primary-400 disabled:opacity-40 disabled:cursor-not-allowed text-[#0a0a0f] font-bold text-sm px-4 py-2 rounded-full shadow-lg shadow-primary-500/20 transition-colors"
+            >
+              {addComment.isPending ? "Posting…" : "Post Comment"}
+            </button>
+          </div>
+          {addComment.isError && (
+            <p className="text-xs text-red-400">Failed to post comment. Try again.</p>
+          )}
+        </form>
+      ) : (
+        <div className="bg-[#111118] border border-[#1e1e28] rounded-xl p-4 text-center text-sm text-[#5d6169]">
+          Sign in to join the discussion.
         </div>
-      </form>
+      )}
 
       {/* Comment list */}
-      {comments.length === 0 ? (
+      {isLoading ? (
+        <div className="flex justify-center py-8">
+          <div className="w-5 h-5 rounded-full border-2 border-primary-500/30 border-t-primary-500 animate-spin" />
+        </div>
+      ) : comments.length === 0 ? (
         <div className="flex flex-col items-center justify-center gap-2 py-12 text-center">
           <svg
             className="w-10 h-10 text-[#2a2a38]"
@@ -163,6 +129,25 @@ export default function Comments({ animeId, episodeId }: CommentsProps) {
                   {comment.body}
                 </p>
               </div>
+
+              {/* Delete — only own comments */}
+              {user?.username === comment.username && (
+                <button
+                  onClick={() => deleteComment.mutate(comment.id)}
+                  disabled={deleteComment.isPending}
+                  aria-label="Delete comment"
+                  className="shrink-0 text-[#3a3a48] hover:text-red-400 transition-colors disabled:opacity-40"
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={1.5}
+                      d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                    />
+                  </svg>
+                </button>
+              )}
             </div>
           ))}
         </div>
