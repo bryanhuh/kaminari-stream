@@ -34,6 +34,15 @@ export const watchlist = pgTable(
   (t) => [unique().on(t.userId, t.animeId)]
 );
 
+export const comments = pgTable("comments", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").references(() => users.id, { onDelete: "cascade" }).notNull(),
+  animeId: integer("anime_id").notNull(),
+  episodeId: text("episode_id").notNull(),
+  body: text("body").notNull(),
+  createdAt: text("created_at").notNull().default(sql`now()`),
+});
+
 export const watchHistory = pgTable(
   "watch_history",
   {
