@@ -116,6 +116,19 @@ export async function runMigrations() {
   `;
 
   await sql`
+    CREATE TABLE IF NOT EXISTS anime_status (
+      id SERIAL PRIMARY KEY,
+      user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+      anime_id INTEGER NOT NULL,
+      anime_title TEXT NOT NULL,
+      anime_cover TEXT,
+      status TEXT NOT NULL,
+      updated_at TEXT NOT NULL DEFAULT now(),
+      UNIQUE (user_id, anime_id)
+    )
+  `;
+
+  await sql`
     CREATE TABLE IF NOT EXISTS anilist_cache (
       key TEXT PRIMARY KEY,
       value TEXT NOT NULL,

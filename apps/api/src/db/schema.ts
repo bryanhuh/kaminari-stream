@@ -56,6 +56,20 @@ export const comments = pgTable("comments", {
   createdAt: text("created_at").notNull().default(sql`now()`),
 });
 
+export const animeStatus = pgTable(
+  "anime_status",
+  {
+    id: serial("id").primaryKey(),
+    userId: integer("user_id").references(() => users.id, { onDelete: "cascade" }).notNull(),
+    animeId: integer("anime_id").notNull(),
+    animeTitle: text("anime_title").notNull(),
+    animeCover: text("anime_cover"),
+    status: text("status").notNull(), // WATCHING | COMPLETED | DROPPED | PLAN_TO_WATCH
+    updatedAt: text("updated_at").notNull().default(sql`now()`),
+  },
+  (t) => [unique().on(t.userId, t.animeId)]
+);
+
 export const anilistCache = pgTable("anilist_cache", {
   key: text("key").primaryKey(),
   value: text("value").notNull(),       // JSON-serialised response
