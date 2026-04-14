@@ -10,7 +10,7 @@ Items are roughly ordered by impact vs. effort. Each section is independent — 
 
 - [x] **Hover prefetch on AnimeCards** — On `mouseenter` (after ~150ms debounce), call `queryClient.prefetchQuery` for `GET /api/anime/:id`. By the time the user clicks through, the detail data is already in cache and the page renders instantly.
 
-- [ ] **Anime status tracking** — Add MAL-style per-anime status: Watching / Completed / Dropped / Plan to Watch. Needs a new SQLite table, API routes, and a status selector UI on AnimeDetail. More useful than a plain watchlist for people who actually track what they watch.
+- [x] **Anime status tracking** — Add MAL-style per-anime status: Watching / Completed / Dropped / Plan to Watch. Needs a new SQLite table, API routes, and a status selector UI on AnimeDetail. More useful than a plain watchlist for people who actually track what they watch.
 
 ---
 
