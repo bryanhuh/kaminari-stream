@@ -7,6 +7,7 @@ import { useAnimeHistory } from "../hooks/useWatchHistory";
 import AnimeCard from "../components/AnimeCard";
 import EpisodeList from "../components/EpisodeList";
 import WatchlistButton from "../components/WatchlistButton";
+import AnimeStatusButton from "../components/AnimeStatusButton";
 import ReviewSection from "../components/ReviewSection";
 
 function formatStatus(s: string | null) {
@@ -258,6 +259,11 @@ export default function AnimeDetail() {
                 episodes={anime.episodes}
                 score={anime.averageScore}
                 status={anime.status}
+              />
+              <AnimeStatusButton
+                animeId={anime.id}
+                animeTitle={title}
+                animeCover={anime.coverImage?.large ?? anime.coverImage?.medium}
               />
             </div>
           </div>
