@@ -229,7 +229,7 @@ export default function AnimeDetail() {
             </div>
 
             {/* CTA */}
-            <div className="flex gap-3 mt-1">
+            <div className="flex flex-wrap gap-3 mt-1">
               {resumeEntry ? (
                 <Link
                   to={`/watch?animeId=${anime.id}&episodeId=${encodeURIComponent(resumeEntry.episodeId)}&ep=${resumeEntry.episodeNumber}`}
