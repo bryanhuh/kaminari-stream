@@ -8,6 +8,7 @@ import RateLimitToast from "./components/RateLimitToast";
 import SkipToContent from "./components/SkipToContent";
 import NavigationProgress from "./components/NavigationProgress";
 import PageSkeleton from "./components/PageSkeleton";
+import { trackPageView } from "./lib/analytics";
 
 const Home = lazy(() => import("./pages/Home"));
 const Search = lazy(() => import("./pages/Search"));
@@ -25,6 +26,7 @@ function useFocusOnRouteChange() {
   useEffect(() => {
     const main = document.getElementById("main-content");
     if (main) main.focus({ preventScroll: true });
+    trackPageView();
   }, [location.pathname, location.search]);
 }
 
