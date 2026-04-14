@@ -1,4 +1,7 @@
 import { request } from "graphql-request";
+import { eq } from "drizzle-orm";
+import { db } from "../db/client";
+import { anilistCache } from "../db/schema";
 import { config } from "../config";
 
 const ANILIST_URL = config.anilistUrl ?? "https://graphql.anilist.co";
@@ -8,15 +11,47 @@ const ANILIST_URL = config.anilistUrl ?? "https://graphql.anilist.co";
 // (e.g. during dev HMR re-renders or duplicate client requests).
 
 interface CacheEntry<T> { value: T; expiresAt: number }
-const cache = new Map<string, CacheEntry<unknown>>();
+// L1: in-process memory — survives within a single process lifetime
+const memCache = new Map<string, CacheEntry<unknown>>();
 
-function cached<T>(key: string, ttlMs: number, fn: () => Promise<T>): Promise<T> {
-  const hit = cache.get(key) as CacheEntry<T> | undefined;
-  if (hit && hit.expiresAt > Date.now()) return Promise.resolve(hit.value);
-  return fn().then((value) => {
-    cache.set(key, { value, expiresAt: Date.now() + ttlMs });
-    return value;
-  });
+async function cached<T>(key: string, ttlMs: number, fn: () => Promise<T>): Promise<T> {
+  const now = Date.now();
+
+  // L1: memory hit
+  const memHit = memCache.get(key) as CacheEntry<T> | undefined;
+  if (memHit && memHit.expiresAt > now) return memHit.value;
+
+  // L2: DB hit (survives restarts — prevents 429s on cold start)
+  try {
+    const rows = await db.select().from(anilistCache).where(eq(anilistCache.key, key)).limit(1);
+    const dbHit = rows[0];
+    if (dbHit && parseInt(dbHit.expiresAt) > now) {
+      const value = JSON.parse(dbHit.value) as T;
+      memCache.set(key, { value, expiresAt: parseInt(dbHit.expiresAt) });
+      return value;
+    }
+  } catch {
+    // DB unavailable — fall through to AniList
+  }
+
+  // Fetch from AniList
+  const value = await fn();
+  const expiresAt = now + ttlMs;
+  const serialized = JSON.stringify(value);
+
+  // Write L1
+  memCache.set(key, { value, expiresAt });
+
+  // Write L2 — fire-and-forget so it never delays the response
+  db.insert(anilistCache)
+    .values({ key, value: serialized, expiresAt: String(expiresAt) })
+    .onConflictDoUpdate({
+      target: anilistCache.key,
+      set: { value: serialized, expiresAt: String(expiresAt) },
+    })
+    .catch(() => {});
+
+  return value;
 }
 
 // TTLs: longer caches reduce upstream AniList calls and rate-limit exposure.
