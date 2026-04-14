@@ -56,6 +56,12 @@ export const comments = pgTable("comments", {
   createdAt: text("created_at").notNull().default(sql`now()`),
 });
 
+export const anilistCache = pgTable("anilist_cache", {
+  key: text("key").primaryKey(),
+  value: text("value").notNull(),       // JSON-serialised response
+  expiresAt: text("expires_at").notNull(), // epoch ms as string
+});
+
 export const watchHistory = pgTable(
   "watch_history",
   {

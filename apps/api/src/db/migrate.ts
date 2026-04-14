@@ -116,6 +116,14 @@ export async function runMigrations() {
   `;
 
   await sql`
+    CREATE TABLE IF NOT EXISTS anilist_cache (
+      key TEXT PRIMARY KEY,
+      value TEXT NOT NULL,
+      expires_at TEXT NOT NULL
+    )
+  `;
+
+  await sql`
     CREATE TABLE IF NOT EXISTS comments (
       id SERIAL PRIMARY KEY,
       user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
