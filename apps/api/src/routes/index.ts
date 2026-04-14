@@ -9,6 +9,7 @@ import watchlistRouter from "./watchlist";
 import authRouter from "./auth";
 import commentsRouter from "./comments";
 import reviewsRouter from "./reviews";
+import animeStatusRouter from "./animeStatus";
 
 const router = Router();
 
@@ -26,5 +27,6 @@ router.use("/browse", browseRouter);
 router.use("/watchlist", watchlistRouter);
 router.use("/comments", commentsRouter);
 router.use("/reviews", reviewsRouter);
+router.use("/status", animeStatusRouter);
 
 export default router;
