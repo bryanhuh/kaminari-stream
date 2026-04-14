@@ -1,4 +1,8 @@
+import { useRef } from "react";
 import { Link } from "react-router-dom";
+import { useQueryClient } from "@tanstack/react-query";
+import { api } from "../lib/api";
+import type { AnimeDetail } from "../hooks/useAnime";
 import WatchlistButton from "./WatchlistButton";
 
 interface AnimeCardProps {
@@ -21,8 +25,33 @@ export default function AnimeCard({
   status,
   episodes,
 }: AnimeCardProps) {
+  const queryClient = useQueryClient();
+  const prefetchTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const handleMouseEnter = () => {
+    prefetchTimer.current = setTimeout(() => {
+      queryClient.prefetchQuery({
+        queryKey: ["anime", "detail", id],
+        queryFn: () => api.get<{ Media: AnimeDetail }>(`/api/anime/${id}`),
+        staleTime: 1000 * 60 * 15,
+      });
+    }, 150);
+  };
+
+  const handleMouseLeave = () => {
+    if (prefetchTimer.current) {
+      clearTimeout(prefetchTimer.current);
+      prefetchTimer.current = null;
+    }
+  };
+
   return (
-    <Link to={`/anime/${id}`} className="group flex flex-col gap-2.5">
+    <Link
+      to={`/anime/${id}`}
+      className="group flex flex-col gap-2.5"
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
+    >
       {/* Cover image */}
       <div className="relative overflow-hidden rounded-xl aspect-[3/4] bg-[#111118]">
         {coverImage ? (
