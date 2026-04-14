@@ -6,7 +6,7 @@ Items are roughly ordered by impact vs. effort. Each section is independent — 
 
 ## High Impact
 
-- [ ] **Persist AniList cache to SQLite** — The server-side AniList cache is an in-memory `Map` that dies on every restart (including dev HMR). Swap it for a SQLite-backed cache with a TTL column so responses survive restarts and 429s stop happening in normal usage.
+- [x] **Persist AniList cache to DB** — The server-side AniList cache is an in-memory `Map` that dies on every restart (including dev HMR). Swap it for a DB-backed cache with a TTL column so responses survive restarts and 429s stop happening in normal usage.
 
 - [ ] **Hover prefetch on AnimeCards** — On `mouseenter` (after ~150ms debounce), call `queryClient.prefetchQuery` for `GET /api/anime/:id`. By the time the user clicks through, the detail data is already in cache and the page renders instantly.
 
