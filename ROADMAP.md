@@ -8,7 +8,7 @@ Items are roughly ordered by impact vs. effort. Each section is independent — 
 
 - [x] **Persist AniList cache to DB** — The server-side AniList cache is an in-memory `Map` that dies on every restart (including dev HMR). Swap it for a DB-backed cache with a TTL column so responses survive restarts and 429s stop happening in normal usage.
 
-- [ ] **Hover prefetch on AnimeCards** — On `mouseenter` (after ~150ms debounce), call `queryClient.prefetchQuery` for `GET /api/anime/:id`. By the time the user clicks through, the detail data is already in cache and the page renders instantly.
+- [x] **Hover prefetch on AnimeCards** — On `mouseenter` (after ~150ms debounce), call `queryClient.prefetchQuery` for `GET /api/anime/:id`. By the time the user clicks through, the detail data is already in cache and the page renders instantly.
 
 - [ ] **Anime status tracking** — Add MAL-style per-anime status: Watching / Completed / Dropped / Plan to Watch. Needs a new SQLite table, API routes, and a status selector UI on AnimeDetail. More useful than a plain watchlist for people who actually track what they watch.
 
