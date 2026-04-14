@@ -13,10 +13,12 @@
   },
   "dependencies": {
     "@anime-app/types": "workspace:*",
+    "@sentry/react": "^10.48.0",
     "@tanstack/react-query": "^5.66.0",
     "@urql/core": "^6.0.0",
     "@vidstack/react": "^1.12.13",
     "graphql": "^16.10.0",
+    "posthog-js": "^1.368.1",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-router-dom": "^7.2.0",
