@@ -33,6 +33,36 @@ router.get("/", async (req: Request, res: Response, next: NextFunction) => {
   }
 });
 
+// GET /api/history/export?format=csv|json — download full watch history
+router.get("/export", async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const format = req.query.format === "csv" ? "csv" : "json";
+    const entries = await getHistory(req.userId, 100_000);
+
+    if (format === "csv") {
+      const headers = [
+        "id", "animeId", "animeTitle", "episodeId", "episodeNumber",
+        "progressSeconds", "durationSeconds", "watchedAt",
+      ];
+      const escape = (v: unknown) => `"${String(v ?? "").replace(/"/g, '""')}"`;
+      const csv = [
+        headers.join(","),
+        ...entries.map((e) =>
+          headers.map((h) => escape(e[h as keyof typeof e])).join(",")
+        ),
+      ].join("\n");
+      res.setHeader("Content-Type", "text/csv");
+      res.setHeader("Content-Disposition", 'attachment; filename="watch-history.csv"');
+      res.send(csv);
+    } else {
+      res.setHeader("Content-Disposition", 'attachment; filename="watch-history.json"');
+      res.json(entries);
+    }
+  } catch (err) {
+    next(err);
+  }
+});
+
 // GET /api/history/continue — entries suitable for "continue watching"
 router.get("/continue", async (req: Request, res: Response, next: NextFunction) => {
   try {
