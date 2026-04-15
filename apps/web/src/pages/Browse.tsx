@@ -1,7 +1,8 @@
+import { useEffect, useRef } from "react";
 import { useSearchParams, Link, useNavigate } from "react-router-dom";
-import { useBrowseGenre, useBrowseCategory } from "../hooks/useBrowse";
+import { useInfiniteBrowseGenre, useInfiniteBrowseCategory } from "../hooks/useBrowse";
 import { usePageMeta } from "../hooks/usePageMeta";
-import { useRecentEpisodes, useAZBrowse } from "../hooks/useAnime";
+import { useInfiniteAZBrowse, useInfiniteRecentEpisodes } from "../hooks/useAnime";
 import type { BrowseAnime } from "@anime-app/types";
 import AnimeGrid from "../components/AnimeGrid";
 
@@ -97,25 +98,79 @@ function TypeGrid() {
   );
 }
 
-function BrowseGrid({ items, loading }: { items: BrowseAnime[]; loading: boolean }) {
-  if (loading) {
-    return (
-      <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-4">
-        {Array.from({ length: 18 }).map((_, i) => (
-          <div key={i}>
-            <div className="rounded-xl aspect-[3/4] bg-[#111118] animate-pulse" />
-            <div className="h-3 bg-[#111118] animate-pulse rounded mt-2 w-4/5" />
-          </div>
-        ))}
-      </div>
-    );
-  }
+function BrowseGridSkeleton() {
   return (
     <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-4">
-      {items.map((anime) => (
-        <BrowseAnimeCard key={anime.id} anime={anime} />
+      {Array.from({ length: 18 }).map((_, i) => (
+        <div key={i}>
+          <div className="rounded-xl aspect-[3/4] bg-[#111118] animate-pulse" />
+          <div className="h-3 bg-[#111118] animate-pulse rounded mt-2 w-4/5" />
+        </div>
       ))}
     </div>
+  );
+}
+
+function LoadMoreSpinner() {
+  return (
+    <div className="flex justify-center py-6">
+      <div className="w-6 h-6 border-2 border-primary-500 border-t-transparent rounded-full animate-spin" />
+    </div>
+  );
+}
+
+// Shared hook for sentinel-driven load-more
+function useSentinel(
+  sentinelRef: React.RefObject<HTMLDivElement | null>,
+  hasNextPage: boolean,
+  isFetchingNextPage: boolean,
+  fetchNextPage: () => void
+) {
+  useEffect(() => {
+    const el = sentinelRef.current;
+    if (!el) return;
+    const io = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting && hasNextPage && !isFetchingNextPage) {
+          fetchNextPage();
+        }
+      },
+      { threshold: 0.1 }
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, [sentinelRef, hasNextPage, isFetchingNextPage, fetchNextPage]);
+}
+
+function InfiniteBrowseGrid({
+  items,
+  loading,
+  hasNextPage,
+  isFetchingNextPage,
+  fetchNextPage,
+}: {
+  items: BrowseAnime[];
+  loading: boolean;
+  hasNextPage: boolean;
+  isFetchingNextPage: boolean;
+  fetchNextPage: () => void;
+}) {
+  const sentinelRef = useRef<HTMLDivElement>(null);
+  useSentinel(sentinelRef, hasNextPage, isFetchingNextPage, fetchNextPage);
+
+  if (loading) return <BrowseGridSkeleton />;
+
+  return (
+    <>
+      <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-4">
+        {items.map((anime) => (
+          <BrowseAnimeCard key={anime.id} anime={anime} />
+        ))}
+      </div>
+      <div ref={sentinelRef} className="mt-4">
+        {isFetchingNextPage && <LoadMoreSpinner />}
+      </div>
+    </>
   );
 }
 
@@ -141,19 +196,12 @@ export default function Browse() {
   const isGenreDrill = category === "genres" && !!genre;
   const azLetter = searchParams.get("letter") ?? "A";
 
-  const { data: categoryData, isLoading: categoryLoading } = useBrowseCategory(
+  const genreQuery = useInfiniteBrowseGenre(isGenreDrill ? genre : null);
+  const categoryQuery = useInfiniteBrowseCategory(
     isListCategory ? (category as "new-releases" | "ongoing" | "updates") : null
   );
-
-  const { data: genreData, isLoading: genreLoading } = useBrowseGenre(
-    isGenreDrill ? genre : null
-  );
-
-  const { data: recentData, isLoading: recentLoading } = useRecentEpisodes();
-
-  const { data: azData, isLoading: azLoading } = useAZBrowse(
-    category === "az" ? azLetter : ""
-  );
+  const azQuery = useInfiniteAZBrowse(category === "az" ? azLetter : "");
+  const recentQuery = useInfiniteRecentEpisodes();
 
   function selectGenre(g: string) {
     setSearchParams({ category: "genres", genre: g });
@@ -164,6 +212,27 @@ export default function Browse() {
     : category === "az"
     ? `A–Z List — ${azLetter}`
     : CATEGORY_LABELS[category];
+
+  // Sentinel for A-Z (AnimeGrid items)
+  const azSentinelRef = useRef<HTMLDivElement>(null);
+  useSentinel(
+    azSentinelRef,
+    azQuery.hasNextPage,
+    azQuery.isFetchingNextPage,
+    azQuery.fetchNextPage
+  );
+
+  // Sentinel for Recent
+  const recentSentinelRef = useRef<HTMLDivElement>(null);
+  useSentinel(
+    recentSentinelRef,
+    recentQuery.hasNextPage,
+    recentQuery.isFetchingNextPage,
+    recentQuery.fetchNextPage
+  );
+
+  const azItems = azQuery.data?.pages.flatMap((p) => p.media) ?? [];
+  const recentItems = recentQuery.data?.pages.flatMap((p) => p.results) ?? [];
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-8">
@@ -200,7 +269,13 @@ export default function Browse() {
 
       {/* Genre drill-down */}
       {isGenreDrill && (
-        <BrowseGrid items={genreData?.results ?? []} loading={genreLoading} />
+        <InfiniteBrowseGrid
+          items={genreQuery.data?.pages.flatMap((p) => p.results) ?? []}
+          loading={genreQuery.isLoading}
+          hasNextPage={genreQuery.hasNextPage}
+          isFetchingNextPage={genreQuery.isFetchingNextPage}
+          fetchNextPage={genreQuery.fetchNextPage}
+        />
       )}
 
       {/* Types */}
@@ -208,7 +283,13 @@ export default function Browse() {
 
       {/* List categories */}
       {isListCategory && (
-        <BrowseGrid items={categoryData?.results ?? []} loading={categoryLoading} />
+        <InfiniteBrowseGrid
+          items={categoryQuery.data?.pages.flatMap((p) => p.results) ?? []}
+          loading={categoryQuery.isLoading}
+          hasNextPage={categoryQuery.hasNextPage}
+          isFetchingNextPage={categoryQuery.isFetchingNextPage}
+          fetchNextPage={categoryQuery.fetchNextPage}
+        />
       )}
 
       {/* A-Z */}
@@ -231,52 +312,60 @@ export default function Browse() {
             ))}
           </div>
           <AnimeGrid
-            items={azData?.media ?? []}
-            loading={azLoading}
+            items={azItems}
+            loading={azQuery.isLoading}
             skeletonCount={18}
           />
+          <div ref={azSentinelRef} className="mt-4">
+            {azQuery.isFetchingNextPage && <LoadMoreSpinner />}
+          </div>
         </>
       )}
 
       {/* Recent */}
       {category === "recent" && (
-        <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-4">
-          {recentLoading
-            ? Array.from({ length: 18 }).map((_, i) => (
-                <div key={i}>
-                  <div className="rounded-xl aspect-[3/4] bg-[#111118] animate-pulse" />
-                  <div className="h-3 bg-[#111118] animate-pulse rounded mt-2 w-4/5" />
-                </div>
-              ))
-            : recentData?.results.map((ep) => {
-                const to = ep.anilistId
-                  ? `/watch?animeId=${ep.anilistId}&episodeId=${encodeURIComponent(ep.id)}&ep=${ep.episodeNumber}`
-                  : "#";
-                return (
-                  <Link key={`${ep.id}-${ep.episodeNumber}`} to={to} className="group flex flex-col gap-2.5">
-                    <div className="relative overflow-hidden rounded-xl aspect-[3/4] bg-[#111118]">
-                      {ep.image && (
-                        <img src={ep.image} alt={ep.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
-                      )}
-                      <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200 bg-black/50">
-                        <div className="w-11 h-11 rounded-full bg-primary-500/90 flex items-center justify-center shadow-lg">
-                          <svg className="w-5 h-5 text-white ml-0.5" fill="currentColor" viewBox="0 0 24 24">
-                            <path d="M8 5v14l11-7z" />
-                          </svg>
+        <>
+          <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-4">
+            {recentQuery.isLoading
+              ? Array.from({ length: 18 }).map((_, i) => (
+                  <div key={i}>
+                    <div className="rounded-xl aspect-[3/4] bg-[#111118] animate-pulse" />
+                    <div className="h-3 bg-[#111118] animate-pulse rounded mt-2 w-4/5" />
+                  </div>
+                ))
+              : recentItems.map((ep) => {
+                  const to = ep.anilistId
+                    ? `/watch?animeId=${ep.anilistId}&episodeId=${encodeURIComponent(ep.id)}&ep=${ep.episodeNumber}`
+                    : "#";
+                  return (
+                    <Link key={`${ep.id}-${ep.episodeNumber}`} to={to} className="group flex flex-col gap-2.5">
+                      <div className="relative overflow-hidden rounded-xl aspect-[3/4] bg-[#111118]">
+                        {ep.image && (
+                          <img src={ep.image} alt={ep.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
+                        )}
+                        <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200 bg-black/50">
+                          <div className="w-11 h-11 rounded-full bg-primary-500/90 flex items-center justify-center shadow-lg">
+                            <svg className="w-5 h-5 text-white ml-0.5" fill="currentColor" viewBox="0 0 24 24">
+                              <path d="M8 5v14l11-7z" />
+                            </svg>
+                          </div>
+                        </div>
+                        <div className="absolute top-2 right-2">
+                          <span className="text-xs bg-black/70 text-[#bfc1c6] px-1.5 py-0.5 rounded uppercase backdrop-blur-sm">{ep.subOrDub}</span>
                         </div>
                       </div>
-                      <div className="absolute top-2 right-2">
-                        <span className="text-xs bg-black/70 text-[#bfc1c6] px-1.5 py-0.5 rounded uppercase backdrop-blur-sm">{ep.subOrDub}</span>
+                      <div className="px-0.5">
+                        <p className="text-sm font-semibold text-white line-clamp-2 group-hover:text-primary-400 transition-colors">{ep.title}</p>
+                        <p className="text-xs text-[#5d6169] mt-0.5">Episode {ep.episodeNumber}</p>
                       </div>
-                    </div>
-                    <div className="px-0.5">
-                      <p className="text-sm font-semibold text-white line-clamp-2 group-hover:text-primary-400 transition-colors">{ep.title}</p>
-                      <p className="text-xs text-[#5d6169] mt-0.5">Episode {ep.episodeNumber}</p>
-                    </div>
-                  </Link>
-                );
-              })}
-        </div>
+                    </Link>
+                  );
+                })}
+          </div>
+          <div ref={recentSentinelRef} className="mt-4">
+            {recentQuery.isFetchingNextPage && <LoadMoreSpinner />}
+          </div>
+        </>
       )}
     </div>
   );
