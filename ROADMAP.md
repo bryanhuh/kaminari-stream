@@ -16,11 +16,11 @@ Items are roughly ordered by impact vs. effort. Each section is independent — 
 
 ## Medium Impact
 
-- [ ] **Virtual scrolling on EpisodeList** — Long series (One Piece, Naruto, Bleach) render 500–1000+ episode cards into the DOM at once. Swap for TanStack Virtual so only ~20 are mounted at any time.
+- [x] **Virtual scrolling on EpisodeList** — Long series (One Piece, Naruto, Bleach) render 500–1000+ episode cards into the DOM at once. Swap for TanStack Virtual so only ~20 are mounted at any time.
 
-- [ ] **Infinite scroll on Search / Browse** — Replace pagination buttons with an `IntersectionObserver`-driven load-more. The hooks already support a `page` param — it's mostly a UI change.
+- [x] **Infinite scroll on Search / Browse** — Replace pagination buttons with an `IntersectionObserver`-driven load-more. The hooks already support a `page` param — it's mostly a UI change.
 
-- [ ] **Export watch history / watchlist** — A single API endpoint (`GET /api/history/export`, `GET /api/watchlist/export`) returning CSV or JSON. Lets users back up data or migrate to MAL/AniList.
+- [x] **Export watch history / watchlist** — A single API endpoint (`GET /api/history/export`, `GET /api/watchlist/export`) returning CSV or JSON. Lets users back up data or migrate to MAL/AniList.
 
 ---
 
