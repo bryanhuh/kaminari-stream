@@ -1,4 +1,4 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useInfiniteQuery } from "@tanstack/react-query";
 import { api } from "../lib/api";
 import type { RecentEpisodesResponse, SpotlightAnime } from "@anime-app/types";
 
@@ -214,5 +214,67 @@ export function useMovies(page = 1, perPage = 24, genre?: string) {
       return api.get<FormatPageResult>(`/api/anime/movies?${params}`);
     },
     staleTime: 1000 * 60 * 10,
+  });
+}
+
+export function useInfiniteTrending(perPage = 30) {
+  return useInfiniteQuery<PageResult>({
+    queryKey: ["anime", "trending", "infinite", perPage],
+    queryFn: ({ pageParam }) =>
+      api.get<PageResult>(`/api/anime/trending?page=${pageParam}&perPage=${perPage}`),
+    initialPageParam: 1,
+    getNextPageParam: (lastPage, allPages) =>
+      lastPage.Page.pageInfo?.hasNextPage ? allPages.length + 1 : undefined,
+    staleTime: 1000 * 60 * 10,
+  });
+}
+
+export function useInfiniteAnimeSearch(query: string, perPage = 30, filters?: SearchFilters) {
+  const hasFilters = filters && (filters.genre || filters.format || filters.year || filters.status);
+  const hasQuery = query.length > 0;
+
+  return useInfiniteQuery<PageResult>({
+    queryKey: ["anime", "search", "infinite", query, perPage, filters ?? {}],
+    queryFn: ({ pageParam }) => {
+      const params = new URLSearchParams({ page: String(pageParam), perPage: String(perPage) });
+      if (query) params.set("q", query);
+      if (filters?.genre) params.set("genre", filters.genre);
+      if (filters?.format) params.set("format", filters.format);
+      if (filters?.year) params.set("year", String(filters.year));
+      if (filters?.status) params.set("status", filters.status);
+      return api.get<PageResult>(`/api/anime/search?${params}`);
+    },
+    initialPageParam: 1,
+    getNextPageParam: (lastPage, allPages) =>
+      lastPage.Page.pageInfo?.hasNextPage ? allPages.length + 1 : undefined,
+    enabled: hasQuery || !!hasFilters,
+    staleTime: 1000 * 60 * 5,
+  });
+}
+
+export function useInfiniteAZBrowse(letter: string) {
+  return useInfiniteQuery<AZResult>({
+    queryKey: ["anime", "az", "infinite", letter],
+    queryFn: ({ pageParam }) =>
+      api.get<AZResult>(`/api/anime/az?letter=${encodeURIComponent(letter)}&page=${pageParam}`),
+    initialPageParam: 1,
+    getNextPageParam: (lastPage, allPages) =>
+      lastPage.hasNextPage ? allPages.length + 1 : undefined,
+    enabled: !!letter,
+    staleTime: 1000 * 60 * 10,
+  });
+}
+
+export function useInfiniteRecentEpisodes() {
+  return useInfiniteQuery<import("@anime-app/types").RecentEpisodesResponse>({
+    queryKey: ["anime", "recent-episodes", "infinite"],
+    queryFn: ({ pageParam }) =>
+      api.get<import("@anime-app/types").RecentEpisodesResponse>(
+        `/api/anime/recent-episodes?page=${pageParam}`
+      ),
+    initialPageParam: 1,
+    getNextPageParam: (lastPage, allPages) =>
+      lastPage.hasNextPage ? allPages.length + 1 : undefined,
+    staleTime: 1000 * 60 * 5,
   });
 }

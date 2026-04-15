@@ -1,6 +1,6 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useSearchParams } from "react-router-dom";
-import { useTrending, useAnimeSearch, type SearchFilters } from "../hooks/useAnime";
+import { useInfiniteTrending, useInfiniteAnimeSearch, type SearchFilters } from "../hooks/useAnime";
 import AnimeGrid from "../components/AnimeGrid";
 import { ANIME_GENRES } from "../components/GenreSelect";
 import { usePageMeta } from "../hooks/usePageMeta";
@@ -141,18 +141,38 @@ export default function Search() {
   const hasFilters = !!(filters.genre || filters.format || filters.year || filters.status);
   const isSearching = debouncedQuery.length > 0 || hasFilters;
 
-  const { data: searchData, isLoading: searchLoading, error: searchError } =
-    useAnimeSearch(debouncedQuery, 1, 30, filters);
+  const searchQuery = useInfiniteAnimeSearch(debouncedQuery, 30, filters);
+  const trendingQuery = useInfiniteTrending(30);
 
-  const { data: browseData, isLoading: browseLoading, error: browseError } =
-    useTrending(1, 30);
+  const activeQuery = isSearching ? searchQuery : trendingQuery;
+  const {
+    data,
+    isLoading: loading,
+    error,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+  } = activeQuery;
 
-  const items = isSearching
-    ? (searchData?.Page.media ?? [])
-    : (browseData?.Page.media ?? []);
-  const loading = isSearching ? searchLoading : browseLoading;
-  const error = isSearching ? searchError : browseError;
-  const total = isSearching ? searchData?.Page.pageInfo?.total : undefined;
+  const items = data?.pages.flatMap((p) => p.Page.media) ?? [];
+  const total = isSearching ? data?.pages[0]?.Page.pageInfo?.total : undefined;
+
+  // Intersection observer sentinel for load-more
+  const sentinelRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const el = sentinelRef.current;
+    if (!el) return;
+    const io = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting && hasNextPage && !isFetchingNextPage) {
+          fetchNextPage();
+        }
+      },
+      { threshold: 0.1 }
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
 
   const activeFilterCount = [filters.genre, filters.format, filters.year, filters.status].filter(Boolean).length;
 
@@ -260,6 +280,13 @@ export default function Search() {
       )}
 
       <AnimeGrid items={items} loading={loading} skeletonCount={24} />
+
+      {/* Load-more sentinel */}
+      <div ref={sentinelRef} className="mt-8 flex justify-center">
+        {isFetchingNextPage && (
+          <div className="w-6 h-6 border-2 border-primary-500 border-t-transparent rounded-full animate-spin" />
+        )}
+      </div>
     </div>
   );
 }
