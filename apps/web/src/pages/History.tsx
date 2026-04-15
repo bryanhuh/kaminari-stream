@@ -5,6 +5,23 @@ import { useAuth } from "../context/AuthContext";
 import LoginPrompt from "../components/LoginPrompt";
 import type { WatchHistoryEntry } from "@anime-app/types";
 
+const BASE = import.meta.env.VITE_API_BASE_URL ?? "http://localhost:4000";
+
+async function downloadExport(format: "csv" | "json") {
+  const raw = localStorage.getItem("raijin_auth");
+  const token = raw ? (JSON.parse(raw) as { token?: string }).token : null;
+  const res = await fetch(`${BASE}/api/history/export?format=${format}`, {
+    headers: token ? { Authorization: `Bearer ${token}` } : {},
+  });
+  const blob = await res.blob();
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `watch-history.${format}`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
 const historyIcon = (
   <svg className="w-8 h-8" fill="none" stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24">
     <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
@@ -72,9 +89,27 @@ export default function History() {
     <div className="max-w-7xl mx-auto px-4 py-10">
       <div className="flex items-center justify-between mb-8">
         <h1 className="text-2xl font-bold text-white">Watch History</h1>
-        {entries.length > 0 && (
-          <span className="text-sm text-[#5d6169]">{entries.length} {entries.length === 1 ? "entry" : "entries"}</span>
-        )}
+        <div className="flex items-center gap-3">
+          {entries.length > 0 && (
+            <span className="text-sm text-[#5d6169]">{entries.length} {entries.length === 1 ? "entry" : "entries"}</span>
+          )}
+          {entries.length > 0 && (
+            <div className="flex items-center gap-1.5">
+              <button
+                onClick={() => downloadExport("json")}
+                className="text-xs px-2.5 py-1.5 rounded-lg border border-[#2a2a38] text-[#bfc1c6] hover:border-primary-500 hover:text-primary-400 transition-colors"
+              >
+                Export JSON
+              </button>
+              <button
+                onClick={() => downloadExport("csv")}
+                className="text-xs px-2.5 py-1.5 rounded-lg border border-[#2a2a38] text-[#bfc1c6] hover:border-primary-500 hover:text-primary-400 transition-colors"
+              >
+                Export CSV
+              </button>
+            </div>
+          )}
+        </div>
       </div>
 
       {entries.length === 0 ? (
