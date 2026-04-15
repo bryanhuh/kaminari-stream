@@ -32,6 +32,33 @@ router.get("/", async (req: Request, res: Response, next: NextFunction) => {
   }
 });
 
+// GET /api/watchlist/export?format=csv|json — download full watchlist
+router.get("/export", async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const format = req.query.format === "csv" ? "csv" : "json";
+    const entries = await getWatchlist(req.userId);
+
+    if (format === "csv") {
+      const headers = ["id", "animeId", "animeTitle", "format", "episodes", "score", "status", "addedAt"];
+      const escape = (v: unknown) => `"${String(v ?? "").replace(/"/g, '""')}"`;
+      const csv = [
+        headers.join(","),
+        ...entries.map((e) =>
+          headers.map((h) => escape(e[h as keyof typeof e])).join(",")
+        ),
+      ].join("\n");
+      res.setHeader("Content-Type", "text/csv");
+      res.setHeader("Content-Disposition", 'attachment; filename="watchlist.csv"');
+      res.send(csv);
+    } else {
+      res.setHeader("Content-Disposition", 'attachment; filename="watchlist.json"');
+      res.json(entries);
+    }
+  } catch (err) {
+    next(err);
+  }
+});
+
 // GET /api/watchlist/:animeId — check if anime is saved
 router.get("/:animeId", async (req: Request, res: Response, next: NextFunction) => {
   try {
