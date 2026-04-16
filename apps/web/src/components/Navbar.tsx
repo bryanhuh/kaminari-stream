@@ -1,4 +1,4 @@
-import { Link, useNavigate, useLocation } from "react-router-dom";
+import { Link, useNavigate, useLocation, NavLink } from "react-router-dom";
 import { FormEvent, useState, useCallback, useRef, useEffect } from "react";
 import AuthModal from "./AuthModal";
 import NotificationPanel from "./NotificationPanel";
@@ -205,6 +205,13 @@ export default function Navbar() {
                       <p className="text-xs font-semibold text-white truncate">{user.username}</p>
                       <p className="text-xs text-[#5d6169] truncate">{user.email}</p>
                     </div>
+                    <NavLink
+                      to="/profile"
+                      onClick={() => setUserMenuOpen(false)}
+                      className="block px-3 py-2 text-sm text-[#bfc1c6] hover:text-white hover:bg-white/5 transition-colors"
+                    >
+                      My Profile
+                    </NavLink>
                     <AniListOAuthButton />
                     <button
                       onClick={() => { logout(); setUserMenuOpen(false); }}
