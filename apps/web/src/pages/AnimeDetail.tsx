@@ -2,6 +2,8 @@ import type { ReactNode } from "react";
 import { useParams, Link } from "react-router-dom";
 import { usePageMeta } from "../hooks/usePageMeta";
 import { useAnimeDetail } from "../hooks/useAnime";
+import { useTitlePreference } from "../context/TitlePreferenceContext";
+import { resolveTitle } from "../utils/title";
 import { useEpisodes } from "../hooks/useEpisodes";
 import { useAnimeHistory } from "../hooks/useWatchHistory";
 import AnimeCard from "../components/AnimeCard";
@@ -48,8 +50,9 @@ export default function AnimeDetail() {
 
   const { data, isLoading, error } = useAnimeDetail(Number(id));
 
+  const { pref } = useTitlePreference();
   const anime = data?.Media ?? null;
-  const resolvedTitle = anime?.title.english ?? anime?.title.romaji ?? null;
+  const resolvedTitle = anime ? resolveTitle(anime.title, pref) : null;
 
   const { data: episodesData, isLoading: episodesLoading, error: episodesError } =
     useEpisodes(anime?.id ?? 0, resolvedTitle);

@@ -1,5 +1,7 @@
 import { useState, useCallback, useRef, useEffect } from "react";
 import { useSearchParams, Link, useNavigate } from "react-router-dom";
+import { useTitlePreference } from "../context/TitlePreferenceContext";
+import { resolveTitle } from "../utils/title";
 import { usePageMeta } from "../hooks/usePageMeta";
 import type { WatchHistoryEntry } from "@anime-app/types";
 import { useAnimeDetail } from "../hooks/useAnime";
@@ -55,9 +57,10 @@ export default function Watch() {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, [episodeId]);
 
+  const { pref } = useTitlePreference();
   const { data: animeData } = useAnimeDetail(animeId);
   const anime = animeData?.Media ?? null;
-  const title = anime?.title.english ?? anime?.title.romaji ?? "Unknown";
+  const title = anime ? resolveTitle(anime.title, pref) : "Unknown";
 
   const watchDesc = anime?.description ? stripHtml(anime.description).slice(0, 160) : undefined;
   const watchImage = anime?.bannerImage ?? anime?.coverImage?.large ?? undefined;

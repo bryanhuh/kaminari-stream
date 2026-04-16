@@ -3,6 +3,8 @@ import { useAuth } from "../context/AuthContext";
 import { useUserStats } from "../hooks/useUser";
 import { usePageMeta } from "../hooks/usePageMeta";
 import LoginPrompt from "../components/LoginPrompt";
+import { useTitlePreference } from "../context/TitlePreferenceContext";
+import type { TitleLanguage } from "../utils/title";
 
 const profileIcon = (
   <svg className="w-8 h-8" fill="none" stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24">
@@ -55,9 +57,16 @@ export default function Profile() {
   return <ProfileContent />;
 }
 
+const LANG_OPTIONS: { value: TitleLanguage; label: string; sub: string }[] = [
+  { value: "english", label: "English", sub: "Attack on Titan" },
+  { value: "romaji", label: "Romaji", sub: "Shingeki no Kyojin" },
+  { value: "native", label: "Japanese", sub: "進撃の巨人" },
+];
+
 function ProfileContent() {
   const { user } = useAuth();
   const { data: stats, isLoading } = useUserStats();
+  const { pref, setPreference } = useTitlePreference();
 
   const totalAnimeTracked = stats
     ? Object.values(stats.statusBreakdown).reduce((a, b) => a + b, 0)
@@ -149,6 +158,30 @@ function ProfileContent() {
           ) : null}
         </div>
       )}
+
+      {/* Preferences */}
+      <div className="flex flex-col gap-3 p-5 rounded-xl bg-[#111118] border border-[#1e1e28]">
+        <h2 className="text-sm font-bold text-white">Preferences</h2>
+        <div>
+          <p className="text-xs text-[#5d6169] mb-2">Anime title language</p>
+          <div className="flex gap-2">
+            {LANG_OPTIONS.map(({ value, label, sub }) => (
+              <button
+                key={value}
+                onClick={() => setPreference(value)}
+                className={`flex flex-col items-start px-3 py-2 rounded-lg border text-left transition-colors flex-1 ${
+                  pref === value
+                    ? "border-primary-500 bg-primary-500/10 text-primary-400"
+                    : "border-[#1e1e28] bg-[#0a0a0f] text-[#bfc1c6] hover:border-[#2a2a38] hover:text-white"
+                }`}
+              >
+                <span className="text-xs font-semibold">{label}</span>
+                <span className="text-[10px] text-[#5d6169] truncate w-full">{sub}</span>
+              </button>
+            ))}
+          </div>
+        </div>
+      </div>
 
       {/* Quick links */}
       <div className="grid grid-cols-2 gap-3">

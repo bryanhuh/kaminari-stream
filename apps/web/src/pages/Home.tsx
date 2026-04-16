@@ -11,6 +11,8 @@ import {
 import { useContinueWatching } from "../hooks/useWatchHistory";
 import { useTopGenres } from "../hooks/useUser";
 import { useAuth } from "../context/AuthContext";
+import { useTitlePreference } from "../context/TitlePreferenceContext";
+import { resolveTitle } from "../utils/title";
 import AnimeGrid from "../components/AnimeGrid";
 import AnimeCard from "../components/AnimeCard";
 import RecentEpisodeCard from "../components/RecentEpisodeCard";
@@ -46,6 +48,8 @@ function AnimeScrollRow({ items, loading, skeletonCount = 8, cardWidth = "w-44" 
   skeletonCount?: number;
   cardWidth?: string;
 }) {
+  const { pref } = useTitlePreference();
+
   if (loading) {
     return (
       <div className="flex gap-4 overflow-x-auto pb-2">
@@ -64,7 +68,7 @@ function AnimeScrollRow({ items, loading, skeletonCount = 8, cardWidth = "w-44" 
         <div key={anime.id} className={`shrink-0 ${cardWidth}`}>
           <AnimeCard
             id={anime.id}
-            title={anime.title.english ?? anime.title.romaji ?? ""}
+            title={resolveTitle(anime.title, pref)}
             coverImage={anime.coverImage?.large ?? anime.coverImage?.medium ?? null}
             score={anime.averageScore}
             format={anime.format}
@@ -89,6 +93,7 @@ function getCurrentSeasonLabel() {
 export default function Home() {
   usePageMeta("raijin. — Watch Anime Free Online", "Stream anime online free. New episodes, seasonal picks, trending shows, and more — all in one place.");
   const { isLoggedIn } = useAuth();
+  const { pref } = useTitlePreference();
   const { data: trendingData, isLoading: trendingLoading, error: trendingError } = useTrending(1, 18);
   const { data: popularData, isLoading: popularLoading } = usePopular(1, 16);
   const { data: seasonData, isLoading: seasonLoading } = useSeasonAnime();
@@ -180,7 +185,7 @@ export default function Home() {
               <div key={(anime as MediaItem).id} className="shrink-0 w-52">
                 <AnimeCard
                   id={(anime as MediaItem).id}
-                  title={(anime as MediaItem).title.english ?? (anime as MediaItem).title.romaji ?? ""}
+                  title={resolveTitle((anime as MediaItem).title, pref)}
                   coverImage={(anime as MediaItem).coverImage?.large ?? (anime as MediaItem).coverImage?.medium ?? null}
                   score={(anime as MediaItem).averageScore}
                   format={(anime as MediaItem).format}
