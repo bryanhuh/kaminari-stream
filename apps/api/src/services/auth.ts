@@ -19,7 +19,7 @@ export async function registerUser(username: string, email: string, password: st
   const inserted = await db
     .insert(users)
     .values({ username, email, passwordHash })
-    .returning({ id: users.id, username: users.username, email: users.email });
+    .returning({ id: users.id, username: users.username, email: users.email, anilistId: users.anilistId });
 
   const user = inserted[0];
   const token = signToken({ userId: user.id, email: user.email, username: user.username });
@@ -41,14 +41,14 @@ export async function loginUser(email: string, password: string) {
 
   const token = signToken({ userId: user.id, email: user.email, username: user.username });
   return {
-    user: { id: user.id, username: user.username, email: user.email },
+    user: { id: user.id, username: user.username, email: user.email, anilistId: user.anilistId },
     token,
   };
 }
 
 export async function getUserById(id: number) {
   const rows = await db
-    .select({ id: users.id, username: users.username, email: users.email })
+    .select({ id: users.id, username: users.username, email: users.email, anilistId: users.anilistId })
     .from(users)
     .where(eq(users.id, id))
     .limit(1);
