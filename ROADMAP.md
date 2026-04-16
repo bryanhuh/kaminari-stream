@@ -22,6 +22,14 @@ Items are roughly ordered by impact vs. effort. Each section is independent — 
 
 - [x] **Export watch history / watchlist** — A single API endpoint (`GET /api/history/export`, `GET /api/watchlist/export`) returning CSV or JSON. Lets users back up data or migrate to MAL/AniList.
 
+- [x] **Multi-language title support** — English / Romaji / Japanese title preference stored in localStorage. Picker lives on the Profile page under Preferences; all anime cards and detail pages respect it.
+
+- [x] **Watch party / share links** — "Share" button in the watch page controls copies a URL with the current timestamp (`?t=seconds`). Opening the link seeks directly to that position.
+
+- [x] **User stats activity chart** — Weekly episode count bar chart (past 8 weeks) on the Profile page using Recharts. Backed by `GET /api/auth/history-chart`.
+
+- [x] **Anime comparison** — `/compare` page with searchable pickers for two anime and a side-by-side stats view (score, format, episodes, genres, synopsis, etc.). Linked from the Navbar.
+
 ---
 
 ## Lower Priority / Polish
