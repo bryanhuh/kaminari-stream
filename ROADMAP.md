@@ -26,7 +26,7 @@ Items are roughly ordered by impact vs. effort. Each section is independent — 
 
 ## Lower Priority / Polish
 
-- [ ] **Keyboard shortcuts help modal** — `?` key opens a modal listing all player and global shortcuts. The shortcuts exist but there's no way to discover them.
+- [x] **Keyboard shortcuts help modal** — `?` key opens a modal listing all player and global shortcuts. The shortcuts exist but there's no way to discover them.
 
 - [x] **Random anime button** — Surface the existing `GET /api/anime/random` endpoint in the Navbar or Browse page. One button, zero backend work.
 
