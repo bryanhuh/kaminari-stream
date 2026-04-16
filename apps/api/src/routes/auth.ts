@@ -2,6 +2,15 @@ import { Router, type Request, type Response } from "express";
 import { z } from "zod";
 import { registerUser, loginUser, getUserById } from "../services/auth";
 import { requireAuth } from "../middleware/auth";
+import {
+  getAniListAuthUrl,
+  exchangeCodeForToken,
+  getAniListUser,
+  saveOAuthCredentials,
+  getOAuthStatus,
+  disconnectAniList,
+} from "../services/anilistOauth";
+import crypto from "crypto";
 
 const router = Router();
 
@@ -64,6 +73,63 @@ router.get("/me", requireAuth, async (req: Request, res: Response) => {
     return;
   }
   res.json({ data: { user } });
+});
+
+// GET /api/auth/anilist — initiate AniList OAuth flow
+router.get("/anilist", requireAuth, async (req: Request, res: Response) => {
+  // Generate a state token to prevent CSRF
+  const state = crypto.randomBytes(32).toString("hex");
+
+  const authUrl = getAniListAuthUrl(state);
+  res.json({ data: { authUrl, state } });
+});
+
+// GET /api/auth/anilist/callback — handle AniList OAuth callback
+router.get("/anilist/callback", requireAuth, async (req: Request, res: Response) => {
+  const { code } = req.query;
+
+  if (!code || typeof code !== "string") {
+    res.status(400).json({ error: "Missing authorization code." });
+    return;
+  }
+
+  try {
+    const tokenData = await exchangeCodeForToken(code);
+    const anilistUser = await getAniListUser(tokenData.access_token);
+
+    await saveOAuthCredentials(
+      req.userId,
+      anilistUser.id,
+      tokenData.access_token,
+      tokenData.refresh_token,
+      tokenData.expires_in
+    );
+
+    res.json({ data: { connected: true, anilistUser: anilistUser.name } });
+  } catch (err: unknown) {
+    const msg = err instanceof Error ? err.message : "Unknown error";
+    res.status(500).json({ error: `Failed to connect AniList: ${msg}` });
+  }
+});
+
+// GET /api/auth/anilist/status — check if user has AniList connected
+router.get("/anilist/status", requireAuth, async (req: Request, res: Response) => {
+  try {
+    const status = await getOAuthStatus(req.userId);
+    res.json({ data: { connected: !!status, ...status } });
+  } catch (err: unknown) {
+    res.status(500).json({ error: "Failed to check AniList status." });
+  }
+});
+
+// DELETE /api/auth/anilist — disconnect AniList account
+router.delete("/anilist", requireAuth, async (req: Request, res: Response) => {
+  try {
+    await disconnectAniList(req.userId);
+    res.json({ data: { disconnected: true } });
+  } catch (err: unknown) {
+    res.status(500).json({ error: "Failed to disconnect AniList." });
+  }
 });
 
 export default router;
