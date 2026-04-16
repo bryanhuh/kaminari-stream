@@ -1,6 +1,6 @@
 import { eq, desc, and } from "drizzle-orm";
 import { db } from "../db/client";
-import { watchHistory } from "../db/schema";
+import { watchHistory, animeStatus } from "../db/schema";
 
 export interface UpsertProgressInput {
   userId: number;
@@ -63,6 +63,13 @@ export async function deleteHistoryEntry(userId: number, id: number) {
 }
 
 export async function getContinueWatching(userId: number, limit = 12) {
+  // Get anime IDs the user has explicitly marked as COMPLETED
+  const completedRows = await db
+    .select({ animeId: animeStatus.animeId })
+    .from(animeStatus)
+    .where(and(eq(animeStatus.userId, userId), eq(animeStatus.status, "COMPLETED")));
+  const completedIds = new Set(completedRows.map((r) => r.animeId));
+
   const all = await db
     .select()
     .from(watchHistory)
@@ -75,6 +82,9 @@ export async function getContinueWatching(userId: number, limit = 12) {
   for (const entry of all) {
     if (seen.has(entry.animeId)) continue;
     seen.add(entry.animeId);
+
+    // Skip anime marked as COMPLETED
+    if (completedIds.has(entry.animeId)) continue;
 
     // Skip if effectively finished (>= 95%)
     if (
