@@ -137,3 +137,62 @@ export async function disconnectAniList(userId: number) {
   await db.delete(anilistOauth).where(eq(anilistOauth.userId, userId));
   await db.update(users).set({ anilistId: null }).where(eq(users.id, userId));
 }
+
+export async function syncAnimeStatusToAniList(
+  userId: number,
+  anilistAnimeId: number,
+  status: "WATCHING" | "COMPLETED" | "DROPPED" | "PLAN_TO_WATCH"
+): Promise<boolean> {
+  const oauth = await db
+    .select()
+    .from(anilistOauth)
+    .where(eq(anilistOauth.userId, userId))
+    .limit(1);
+
+  if (!oauth.length) {
+    return false; // AniList not connected
+  }
+
+  const accessToken = oauth[0].accessToken;
+
+  const statusMap: Record<string, string> = {
+    WATCHING: "CURRENT",
+    COMPLETED: "COMPLETED",
+    DROPPED: "DROPPED",
+    PLAN_TO_WATCH: "PLANNING",
+  };
+
+  const mutation = `mutation ($mediaId: Int!, $status: MediaListStatus) {
+    SaveMediaListEntry(mediaId: $mediaId, status: $status) {
+      id
+      status
+    }
+  }`;
+
+  try {
+    const res = await fetch("https://graphql.anilist.co/", {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${accessToken}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        query: mutation,
+        variables: {
+          mediaId: anilistAnimeId,
+          status: statusMap[status],
+        },
+      }),
+    });
+
+    const data = await res.json();
+    if (data.errors) {
+      console.error("AniList sync error:", data.errors);
+      return false;
+    }
+    return !!data.data?.SaveMediaListEntry;
+  } catch (err) {
+    console.error("Failed to sync status to AniList:", err);
+    return false;
+  }
+}

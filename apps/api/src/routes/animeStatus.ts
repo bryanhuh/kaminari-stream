@@ -7,6 +7,7 @@ import {
   getAnimeStatus,
   getAllAnimeStatuses,
 } from "../services/animeStatus";
+import { syncAnimeStatusToAniList } from "../services/anilistOauth";
 
 const router = Router();
 router.use(requireAuth);
@@ -46,6 +47,12 @@ router.post("/:animeId", async (req: Request, res: Response, next: NextFunction)
     const animeId = z.coerce.number().int().positive().parse(req.params.animeId);
     const body = setSchema.parse(req.body);
     await setAnimeStatus({ ...body, animeId, userId: req.userId });
+
+    // Sync to AniList if connected (fire and forget)
+    syncAnimeStatusToAniList(req.userId, animeId, body.status).catch((err) =>
+      console.error("Failed to sync anime status to AniList:", err)
+    );
+
     res.json({ data: { ok: true } });
   } catch (err) {
     next(err);
@@ -57,6 +64,12 @@ router.delete("/:animeId", async (req: Request, res: Response, next: NextFunctio
   try {
     const animeId = z.coerce.number().int().positive().parse(req.params.animeId);
     await removeAnimeStatus(req.userId, animeId);
+
+    // Sync to AniList if connected (fire and forget)
+    // Note: We don't have a direct "remove" mutation, so we just log it
+    // Users can remove the entry from AniList directly if needed
+    console.log(`User ${req.userId} removed anime ${animeId} locally`);
+
     res.json({ data: { ok: true } });
   } catch (err) {
     next(err);
