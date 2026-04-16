@@ -1,4 +1,4 @@
-import { lazy, Suspense, useEffect } from "react";
+import { lazy, Suspense, useEffect, useState, useCallback } from "react";
 import { Routes, Route, useLocation } from "react-router-dom";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
@@ -8,6 +8,7 @@ import RateLimitToast from "./components/RateLimitToast";
 import SkipToContent from "./components/SkipToContent";
 import NavigationProgress from "./components/NavigationProgress";
 import PageSkeleton from "./components/PageSkeleton";
+import KeyboardShortcutsModal from "./components/KeyboardShortcutsModal";
 import { trackPageView } from "./lib/analytics";
 
 const Home = lazy(() => import("./pages/Home"));
@@ -20,6 +21,7 @@ const Movies = lazy(() => import("./pages/Movies"));
 const Watchlist = lazy(() => import("./pages/Watchlist"));
 const History = lazy(() => import("./pages/History"));
 const AniListOAuthCallback = lazy(() => import("./pages/AniListOAuthCallback"));
+const Profile = lazy(() => import("./pages/Profile"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
 function useFocusOnRouteChange() {
@@ -33,11 +35,24 @@ function useFocusOnRouteChange() {
 
 export default function App() {
   useFocusOnRouteChange();
+  const [shortcutsOpen, setShortcutsOpen] = useState(false);
+  const closeShortcuts = useCallback(() => setShortcutsOpen(false), []);
+
+  // Global ? key listener to toggle shortcuts modal
+  useEffect(() => {
+    function handler(e: KeyboardEvent) {
+      if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return;
+      if (e.key === "?") setShortcutsOpen((v) => !v);
+    }
+    window.addEventListener("keydown", handler);
+    return () => window.removeEventListener("keydown", handler);
+  }, []);
 
   return (
     <div className="min-h-screen bg-[#0a0a0f] text-white flex flex-col">
       <SkipToContent />
       <NavigationProgress />
+      <KeyboardShortcutsModal open={shortcutsOpen} onClose={closeShortcuts} />
       <Navbar />
       <main id="main-content" tabIndex={-1} className="flex-1 pb-16 md:pb-0 outline-none">
         <ErrorBoundary>
@@ -53,6 +68,7 @@ export default function App() {
               <Route path="/watchlist" element={<ErrorBoundary><Watchlist /></ErrorBoundary>} />
               <Route path="/history" element={<ErrorBoundary><History /></ErrorBoundary>} />
               <Route path="/auth/anilist/callback" element={<ErrorBoundary><AniListOAuthCallback /></ErrorBoundary>} />
+              <Route path="/profile" element={<ErrorBoundary><Profile /></ErrorBoundary>} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </Suspense>
