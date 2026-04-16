@@ -1,6 +1,15 @@
 import { Link } from "react-router-dom";
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  Tooltip,
+  ResponsiveContainer,
+  Cell,
+} from "recharts";
 import { useAuth } from "../context/AuthContext";
-import { useUserStats } from "../hooks/useUser";
+import { useUserStats, useHistoryChart } from "../hooks/useUser";
 import { usePageMeta } from "../hooks/usePageMeta";
 import LoginPrompt from "../components/LoginPrompt";
 import { useTitlePreference } from "../context/TitlePreferenceContext";
@@ -66,7 +75,10 @@ const LANG_OPTIONS: { value: TitleLanguage; label: string; sub: string }[] = [
 function ProfileContent() {
   const { user } = useAuth();
   const { data: stats, isLoading } = useUserStats();
+  const { data: chartData, isLoading: chartLoading } = useHistoryChart();
   const { pref, setPreference } = useTitlePreference();
+
+  const maxEpisodes = chartData ? Math.max(...chartData.map((d) => d.episodes), 1) : 1;
 
   const totalAnimeTracked = stats
     ? Object.values(stats.statusBreakdown).reduce((a, b) => a + b, 0)
@@ -156,6 +168,48 @@ function ProfileContent() {
               })}
             </div>
           ) : null}
+        </div>
+      )}
+
+      {/* Activity chart */}
+      {(chartLoading || (chartData && chartData.some((d) => d.episodes > 0))) && (
+        <div className="flex flex-col gap-4 p-5 rounded-xl bg-[#111118] border border-[#1e1e28]">
+          <h2 className="text-sm font-bold text-white">Activity (last 8 weeks)</h2>
+          {chartLoading ? (
+            <div className="h-28 rounded bg-[#1e1e28] animate-pulse" />
+          ) : (
+            <ResponsiveContainer width="100%" height={112}>
+              <BarChart data={chartData} margin={{ top: 0, right: 0, bottom: 0, left: -28 }}>
+                <XAxis
+                  dataKey="week"
+                  tick={{ fill: "#5d6169", fontSize: 10 }}
+                  axisLine={false}
+                  tickLine={false}
+                />
+                <YAxis
+                  allowDecimals={false}
+                  tick={{ fill: "#5d6169", fontSize: 10 }}
+                  axisLine={false}
+                  tickLine={false}
+                />
+                <Tooltip
+                  cursor={{ fill: "#ffffff08" }}
+                  contentStyle={{ background: "#111118", border: "1px solid #1e1e28", borderRadius: 8, fontSize: 12 }}
+                  labelStyle={{ color: "#bfc1c6" }}
+                  itemStyle={{ color: "#a78bfa" }}
+                  formatter={(v) => { const n = Number(v); return [`${n} ep${n === 1 ? "" : "s"}`, ""]; }}
+                />
+                <Bar dataKey="episodes" radius={[4, 4, 0, 0]}>
+                  {chartData?.map((entry, i) => (
+                    <Cell
+                      key={i}
+                      fill={entry.episodes === maxEpisodes ? "#a78bfa" : "#3d3d5c"}
+                    />
+                  ))}
+                </Bar>
+              </BarChart>
+            </ResponsiveContainer>
+          )}
         </div>
       )}
 

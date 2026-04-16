@@ -1,4 +1,4 @@
-import { eq, desc, and } from "drizzle-orm";
+import { eq, desc, and, gte } from "drizzle-orm";
 import { db } from "../db/client";
 import { watchHistory, animeStatus, reviews, users, anilistCache } from "../db/schema";
 
@@ -44,6 +44,50 @@ export async function getUserStats(userId: number) {
     totalReviews: reviewRows.length,
     joinedAt: userRows[0]?.createdAt ?? null,
   };
+}
+
+export interface WeekBucket {
+  week: string; // "Mon DD" label
+  episodes: number;
+}
+
+export async function getUserHistoryChart(userId: number): Promise<WeekBucket[]> {
+  const WEEKS = 8;
+  const now = new Date();
+
+  // Build bucket boundaries (Sunday-aligned weeks, going back WEEKS weeks)
+  const buckets: { start: Date; end: Date; label: string }[] = [];
+  for (let i = WEEKS - 1; i >= 0; i--) {
+    const end = new Date(now);
+    end.setDate(now.getDate() - i * 7);
+    end.setHours(23, 59, 59, 999);
+
+    const start = new Date(end);
+    start.setDate(end.getDate() - 6);
+    start.setHours(0, 0, 0, 0);
+
+    const label = start.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+    buckets.push({ start, end, label });
+  }
+
+  const earliest = buckets[0].start;
+  const rows = await db
+    .select({ watchedAt: watchHistory.watchedAt })
+    .from(watchHistory)
+    .where(and(eq(watchHistory.userId, userId), gte(watchHistory.watchedAt, earliest.toISOString())));
+
+  const counts = new Map<string, number>(buckets.map((b) => [b.label, 0]));
+  for (const row of rows) {
+    const d = new Date(row.watchedAt);
+    for (const bucket of buckets) {
+      if (d >= bucket.start && d <= bucket.end) {
+        counts.set(bucket.label, (counts.get(bucket.label) ?? 0) + 1);
+        break;
+      }
+    }
+  }
+
+  return buckets.map((b) => ({ week: b.label, episodes: counts.get(b.label) ?? 0 }));
 }
 
 export async function getUserTopGenres(userId: number): Promise<string[]> {

@@ -36,3 +36,18 @@ export function useTopGenres() {
     staleTime: 1000 * 60 * 15,
   });
 }
+
+export interface WeekBucket {
+  week: string;
+  episodes: number;
+}
+
+export function useHistoryChart() {
+  const { isLoggedIn, user } = useAuth();
+  return useQuery<WeekBucket[]>({
+    queryKey: ["user", "history-chart", user?.id],
+    queryFn: () => api.get<WeekBucket[]>("/api/auth/history-chart"),
+    enabled: isLoggedIn,
+    staleTime: 1000 * 60 * 10,
+  });
+}

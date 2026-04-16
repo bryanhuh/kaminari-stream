@@ -1,7 +1,7 @@
 import { Router, type Request, type Response } from "express";
 import { z } from "zod";
 import { registerUser, loginUser, getUserById } from "../services/auth";
-import { getUserStats, getUserTopGenres } from "../services/users";
+import { getUserStats, getUserTopGenres, getUserHistoryChart } from "../services/users";
 import { requireAuth } from "../middleware/auth";
 import {
   getAniListAuthUrl,
@@ -140,6 +140,16 @@ router.get("/top-genres", requireAuth, async (req: Request, res: Response) => {
     res.json({ data: genres });
   } catch {
     res.status(500).json({ error: "Failed to load genres." });
+  }
+});
+
+// GET /api/auth/history-chart — weekly episode counts for the past 8 weeks
+router.get("/history-chart", requireAuth, async (req: Request, res: Response) => {
+  try {
+    const chart = await getUserHistoryChart(req.userId);
+    res.json({ data: chart });
+  } catch {
+    res.status(500).json({ error: "Failed to load chart data." });
   }
 });
 
