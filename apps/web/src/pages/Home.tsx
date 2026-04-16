@@ -6,8 +6,11 @@ import {
   useRecentEpisodes,
   useSpotlight,
   useSeasonAnime,
+  useGenreRecommendations,
 } from "../hooks/useAnime";
 import { useContinueWatching } from "../hooks/useWatchHistory";
+import { useTopGenres } from "../hooks/useUser";
+import { useAuth } from "../context/AuthContext";
 import AnimeGrid from "../components/AnimeGrid";
 import AnimeCard from "../components/AnimeCard";
 import RecentEpisodeCard from "../components/RecentEpisodeCard";
@@ -85,6 +88,7 @@ function getCurrentSeasonLabel() {
 
 export default function Home() {
   usePageMeta("raijin. — Watch Anime Free Online", "Stream anime online free. New episodes, seasonal picks, trending shows, and more — all in one place.");
+  const { isLoggedIn } = useAuth();
   const { data: trendingData, isLoading: trendingLoading, error: trendingError } = useTrending(1, 18);
   const { data: popularData, isLoading: popularLoading } = usePopular(1, 16);
   const { data: seasonData, isLoading: seasonLoading } = useSeasonAnime();
@@ -92,6 +96,9 @@ export default function Home() {
   const hasContinue = continueWatching && continueWatching.length > 0;
   const { data: recentData, isLoading: recentLoading } = useRecentEpisodes();
   const { data: spotlightData, isLoading: spotlightLoading } = useSpotlight();
+  const { data: topGenres } = useTopGenres();
+  const topGenre = topGenres?.[0];
+  const { data: recommendedData, isLoading: recommendedLoading } = useGenreRecommendations(topGenre);
 
   const seasonLabel = getCurrentSeasonLabel();
 
@@ -230,6 +237,22 @@ export default function Home() {
           cardWidth="w-44"
         />
       </div>
+
+      {/* 11 ── PERSONALIZED RECOMMENDATIONS (logged-in users with history) */}
+      {isLoggedIn && topGenre && (
+        <div className="max-w-7xl mx-auto px-6 w-full pb-14">
+          <SectionHeader
+            title={`More ${topGenre}`}
+            viewAllHref={`/browse?genre=${encodeURIComponent(topGenre)}`}
+          />
+          <AnimeScrollRow
+            items={(recommendedData?.Page.media ?? []) as MediaItem[]}
+            loading={recommendedLoading}
+            skeletonCount={8}
+            cardWidth="w-44"
+          />
+        </div>
+      )}
 
     </div>
   );
