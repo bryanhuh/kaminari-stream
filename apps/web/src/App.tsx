@@ -19,6 +19,7 @@ const Shows = lazy(() => import("./pages/Shows"));
 const Movies = lazy(() => import("./pages/Movies"));
 const Watchlist = lazy(() => import("./pages/Watchlist"));
 const History = lazy(() => import("./pages/History"));
+const AniListOAuthCallback = lazy(() => import("./pages/AniListOAuthCallback"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
 function useFocusOnRouteChange() {
@@ -51,6 +52,7 @@ export default function App() {
               <Route path="/movies" element={<ErrorBoundary><Movies /></ErrorBoundary>} />
               <Route path="/watchlist" element={<ErrorBoundary><Watchlist /></ErrorBoundary>} />
               <Route path="/history" element={<ErrorBoundary><History /></ErrorBoundary>} />
+              <Route path="/auth/anilist/callback" element={<ErrorBoundary><AniListOAuthCallback /></ErrorBoundary>} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </Suspense>
