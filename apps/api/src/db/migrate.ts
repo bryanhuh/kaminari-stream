@@ -10,7 +10,26 @@ export async function runMigrations() {
       username TEXT NOT NULL UNIQUE,
       email TEXT NOT NULL UNIQUE,
       password_hash TEXT NOT NULL,
+      anilist_id INTEGER,
       created_at TEXT NOT NULL DEFAULT now()
+    )
+  `;
+
+  await sql`
+    ALTER TABLE users ADD COLUMN IF NOT EXISTS
+      anilist_id INTEGER
+  `;
+
+  await sql`
+    CREATE TABLE IF NOT EXISTS anilist_oauth (
+      id SERIAL PRIMARY KEY,
+      user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE UNIQUE,
+      anilist_user_id INTEGER NOT NULL,
+      access_token TEXT NOT NULL,
+      refresh_token TEXT,
+      expires_at TEXT,
+      created_at TEXT NOT NULL DEFAULT now(),
+      updated_at TEXT NOT NULL DEFAULT now()
     )
   `;
 

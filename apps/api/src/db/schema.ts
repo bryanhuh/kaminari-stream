@@ -6,7 +6,19 @@ export const users = pgTable("users", {
   username: text("username").notNull().unique(),
   email: text("email").notNull().unique(),
   passwordHash: text("password_hash").notNull(),
+  anilistId: integer("anilist_id"),
   createdAt: text("created_at").notNull().default(sql`now()`),
+});
+
+export const anilistOauth = pgTable("anilist_oauth", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").references(() => users.id, { onDelete: "cascade" }).notNull().unique(),
+  anilistUserId: integer("anilist_user_id").notNull(),
+  accessToken: text("access_token").notNull(),
+  refreshToken: text("refresh_token"),
+  expiresAt: text("expires_at"),
+  createdAt: text("created_at").notNull().default(sql`now()`),
+  updatedAt: text("updated_at").notNull().default(sql`now()`),
 });
 
 export const providerIdCache = pgTable("provider_id_cache", {
