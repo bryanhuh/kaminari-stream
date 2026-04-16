@@ -372,6 +372,15 @@ export default function Watch() {
                 <span>P prev</span>
                 <span>·</span>
                 <span>N next</span>
+                <span>·</span>
+                <button
+                  onClick={() => window.dispatchEvent(new KeyboardEvent("keydown", { key: "?" }))}
+                  title="Keyboard shortcuts (?)"
+                  className="flex items-center gap-1 hover:text-[#bfc1c6] transition-colors"
+                >
+                  <kbd className="px-1.5 py-0.5 rounded bg-[#1a1a24] border border-[#2a2a38] font-mono text-[10px] text-[#5d6169]">?</kbd>
+                  shortcuts
+                </button>
               </span>
             </div>
 
