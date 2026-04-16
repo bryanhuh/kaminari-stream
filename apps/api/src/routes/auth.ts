@@ -1,6 +1,7 @@
 import { Router, type Request, type Response } from "express";
 import { z } from "zod";
 import { registerUser, loginUser, getUserById } from "../services/auth";
+import { getUserStats, getUserTopGenres } from "../services/users";
 import { requireAuth } from "../middleware/auth";
 import {
   getAniListAuthUrl,
@@ -119,6 +120,26 @@ router.get("/anilist/status", requireAuth, async (req: Request, res: Response) =
     res.json({ data: { connected: !!status, ...status } });
   } catch (err: unknown) {
     res.status(500).json({ error: "Failed to check AniList status." });
+  }
+});
+
+// GET /api/auth/stats — user activity stats
+router.get("/stats", requireAuth, async (req: Request, res: Response) => {
+  try {
+    const stats = await getUserStats(req.userId);
+    res.json({ data: stats });
+  } catch {
+    res.status(500).json({ error: "Failed to load stats." });
+  }
+});
+
+// GET /api/auth/top-genres — user's top genres based on watch history
+router.get("/top-genres", requireAuth, async (req: Request, res: Response) => {
+  try {
+    const genres = await getUserTopGenres(req.userId);
+    res.json({ data: genres });
+  } catch {
+    res.status(500).json({ error: "Failed to load genres." });
   }
 });
 
