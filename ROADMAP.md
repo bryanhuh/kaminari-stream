@@ -28,6 +28,6 @@ Items are roughly ordered by impact vs. effort. Each section is independent — 
 
 - [ ] **Keyboard shortcuts help modal** — `?` key opens a modal listing all player and global shortcuts. The shortcuts exist but there's no way to discover them.
 
-- [ ] **Random anime button** — Surface the existing `GET /api/anime/random` endpoint in the Navbar or Browse page. One button, zero backend work.
+- [x] **Random anime button** — Surface the existing `GET /api/anime/random` endpoint in the Navbar or Browse page. One button, zero backend work.
 
-- [ ] **AniList OAuth login** — Let users connect their AniList account to sync watch status bidirectionally. More involved but makes the app a real AniList companion.
+- [x] **AniList OAuth login** — Let users connect their AniList account to sync watch status bidirectionally. More involved but makes the app a real AniList companion.
