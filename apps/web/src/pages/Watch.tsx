@@ -76,7 +76,11 @@ export default function Watch() {
   );
   const cover = anime?.coverImage?.medium ?? null;
 
-  const { data: streamData, isLoading: streamLoading, error: streamError } = useStream(episodeId);
+  const { data: streamData, isLoading: streamLoading, error: streamError } = useStream(
+    episodeId,
+    animeId,
+    episodeNumber ? Number(episodeNumber) : null
+  );
   const { data: episodesData, isLoading: episodesLoading } = useEpisodes(
     animeId,
     title !== "Unknown" ? title : null
@@ -371,6 +375,13 @@ export default function Watch() {
                   <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
                   </svg>
+                </span>
+              )}
+
+              {/* Provider badge */}
+              {streamData?.provider && streamData.provider !== "animekai" && (
+                <span className="text-[10px] px-2 py-0.5 rounded-full bg-amber-500/15 border border-amber-500/30 text-amber-400 font-semibold uppercase tracking-wide">
+                  via {streamData.provider}
                 </span>
               )}
 
