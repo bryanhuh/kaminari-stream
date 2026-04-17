@@ -225,3 +225,120 @@ export function toEpisodes(info: ConsumetAnimeInfo): Episode[] {
     airDate: null,
   }));
 }
+
+// ── Hianime fallback ───────────────────────────────────────────────────────────
+
+interface HianimeSearchResult {
+  id: string;
+  title: string;
+}
+
+interface HianimeEpisode {
+  id: string;
+  number: number;
+  title?: string;
+}
+
+interface HianimeInfo {
+  id: string;
+  title: string;
+  episodes: { sub: HianimeEpisode[]; dub: HianimeEpisode[] } | HianimeEpisode[];
+}
+
+export async function getHianimeStreamSources(title: string, epNumber: number): Promise<StreamData | null> {
+  try {
+    const searchRes = await ofetch<{ results: HianimeSearchResult[] }>(
+      `${base}/anime/hianime/${encodeURIComponent(title)}`,
+      { timeout: TIMEOUT }
+    );
+    const match = searchRes.results?.[0];
+    if (!match) return null;
+
+    const info = await ofetch<HianimeInfo>(
+      `${base}/anime/hianime/info`,
+      { query: { id: match.id }, timeout: TIMEOUT }
+    );
+
+    const episodes: HianimeEpisode[] = Array.isArray(info.episodes)
+      ? info.episodes
+      : (info.episodes as { sub: HianimeEpisode[] }).sub ?? [];
+
+    const episode = episodes.find((e) => e.number === epNumber);
+    if (!episode) return null;
+
+    const watchRes = await ofetch<ConsumetWatchResponse>(
+      `${base}/anime/hianime/watch/${encodeURIComponent(episode.id)}`,
+      { timeout: TIMEOUT }
+    );
+
+    if (!watchRes.sources?.length) return null;
+
+    return {
+      sources: watchRes.sources.map((s) => ({
+        url: s.url,
+        quality: s.quality ?? "default",
+        isM3U8: s.isM3U8,
+      })),
+      subtitles: (watchRes.subtitles ?? []).map((s) => ({ url: s.url, lang: s.lang ?? s.kind ?? "unknown" })),
+      headers: watchRes.headers,
+    };
+  } catch {
+    return null;
+  }
+}
+
+// ── Animepahe fallback ─────────────────────────────────────────────────────────
+
+interface AnimePaheSearchResult {
+  id: string;
+  title: string;
+}
+
+interface AnimePaheEpisode {
+  id: string;
+  number: number;
+}
+
+interface AnimePaheInfo {
+  id: string;
+  title: string;
+  episodes: AnimePaheEpisode[];
+}
+
+export async function getAnimePaheStreamSources(title: string, epNumber: number): Promise<StreamData | null> {
+  try {
+    const searchRes = await ofetch<{ results: AnimePaheSearchResult[] }>(
+      `${base}/anime/animepahe/${encodeURIComponent(title)}`,
+      { timeout: TIMEOUT }
+    );
+    const match = searchRes.results?.[0];
+    if (!match) return null;
+
+    const info = await ofetch<AnimePaheInfo>(
+      `${base}/anime/animepahe/info`,
+      { query: { id: match.id }, timeout: TIMEOUT }
+    );
+
+    const episode = info.episodes?.find((e) => e.number === epNumber);
+    if (!episode) return null;
+
+    const watchRes = await ofetch<ConsumetWatchResponse>(
+      `${base}/anime/animepahe/watch/${encodeURIComponent(episode.id)}`,
+      { timeout: TIMEOUT }
+    );
+
+    if (!watchRes.sources?.length) return null;
+
+    return {
+      sources: watchRes.sources.map((s) => ({
+        url: s.url,
+        quality: s.quality ?? "default",
+        isM3U8: s.isM3U8,
+      })),
+      subtitles: (watchRes.subtitles ?? []).map((s) => ({ url: s.url, lang: s.lang ?? s.kind ?? "unknown" })),
+      headers: watchRes.headers,
+    };
+  } catch {
+    return null;
+  }
+}
