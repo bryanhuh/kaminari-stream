@@ -1,4 +1,5 @@
 import { useState, useCallback, useRef, useEffect } from "react";
+import { useSwipe } from "../hooks/useSwipe";
 import { useSearchParams, Link, useNavigate } from "react-router-dom";
 import { useTitlePreference } from "../context/TitlePreferenceContext";
 import { resolveTitle } from "../utils/title";
@@ -41,6 +42,7 @@ export default function Watch() {
   const lastSavedAt = useRef<number>(0);
   const currentTimeRef = useRef<number>(0);
   const [shareCopied, setShareCopied] = useState(false);
+  const swipeRef = useRef<HTMLDivElement>(null);
 
   const [autoNext, setAutoNext] = useState<boolean>(() => {
     const stored = localStorage.getItem(AUTO_NEXT_KEY);
@@ -155,6 +157,16 @@ export default function Watch() {
     return () => window.removeEventListener("keydown", handleKey);
   }, [prevEp, nextEp, animeId, navigate]);
 
+  const handleSwipeLeft = useCallback(() => {
+    if (nextEp) navigate(`/watch?animeId=${animeId}&episodeId=${encodeURIComponent(nextEp.id)}&ep=${nextEp.number}`);
+  }, [nextEp, animeId, navigate]);
+
+  const handleSwipeRight = useCallback(() => {
+    if (prevEp) navigate(`/watch?animeId=${animeId}&episodeId=${encodeURIComponent(prevEp.id)}&ep=${prevEp.number}`);
+  }, [prevEp, animeId, navigate]);
+
+  useSwipe(swipeRef, { onSwipeLeft: handleSwipeLeft, onSwipeRight: handleSwipeRight });
+
   function toggleAutoNext() {
     const next = !autoNext;
     setAutoNext(next);
@@ -248,7 +260,7 @@ export default function Watch() {
           </div>
 
           {/* ZONE C: Player grid + sidebar */}
-          <div className="grid grid-cols-1 lg:grid-cols-[1fr_300px] gap-3 lg:items-stretch">
+          <div ref={swipeRef} className="grid grid-cols-1 lg:grid-cols-[1fr_300px] gap-3 lg:items-stretch">
             {/* Player */}
             <div className="min-w-0">
               {streamLoading && (
