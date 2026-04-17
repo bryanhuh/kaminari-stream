@@ -1,4 +1,4 @@
-import { pgTable, serial, integer, text, real, unique } from "drizzle-orm/pg-core";
+import { pgTable, serial, integer, text, real, unique, primaryKey } from "drizzle-orm/pg-core";
 import { sql } from "drizzle-orm";
 
 export const users = pgTable("users", {
@@ -87,6 +87,29 @@ export const anilistCache = pgTable("anilist_cache", {
   value: text("value").notNull(),       // JSON-serialised response
   expiresAt: text("expires_at").notNull(), // epoch ms as string
 });
+
+export const customLists = pgTable(
+  "custom_lists",
+  {
+    id: serial("id").primaryKey(),
+    userId: integer("user_id").references(() => users.id, { onDelete: "cascade" }).notNull(),
+    name: text("name").notNull(),
+    createdAt: text("created_at").notNull().default(sql`now()`),
+  },
+  (t) => [unique().on(t.userId, t.name)]
+);
+
+export const customListEntries = pgTable(
+  "custom_list_entries",
+  {
+    listId: integer("list_id").references(() => customLists.id, { onDelete: "cascade" }).notNull(),
+    animeId: integer("anime_id").notNull(),
+    animeTitle: text("anime_title").notNull(),
+    animeCover: text("anime_cover"),
+    addedAt: text("added_at").notNull().default(sql`now()`),
+  },
+  (t) => [primaryKey({ columns: [t.listId, t.animeId] })]
+);
 
 export const watchHistory = pgTable(
   "watch_history",
