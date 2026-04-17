@@ -23,6 +23,7 @@ const History = lazy(() => import("./pages/History"));
 const AniListOAuthCallback = lazy(() => import("./pages/AniListOAuthCallback"));
 const Profile = lazy(() => import("./pages/Profile"));
 const Compare = lazy(() => import("./pages/Compare"));
+const CustomLists = lazy(() => import("./pages/CustomLists"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
 function useFocusOnRouteChange() {
@@ -71,6 +72,7 @@ export default function App() {
               <Route path="/auth/anilist/callback" element={<ErrorBoundary><AniListOAuthCallback /></ErrorBoundary>} />
               <Route path="/profile" element={<ErrorBoundary><Profile /></ErrorBoundary>} />
               <Route path="/compare" element={<ErrorBoundary><Compare /></ErrorBoundary>} />
+              <Route path="/lists" element={<ErrorBoundary><CustomLists /></ErrorBoundary>} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </Suspense>

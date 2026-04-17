@@ -11,6 +11,7 @@ import EpisodeList from "../components/EpisodeList";
 import WatchlistButton from "../components/WatchlistButton";
 import AnimeStatusButton from "../components/AnimeStatusButton";
 import ReviewSection from "../components/ReviewSection";
+import AddToListButton from "../components/AddToListButton";
 
 function formatStatus(s: string | null) {
   if (!s) return null;
@@ -264,6 +265,11 @@ export default function AnimeDetail() {
                 status={anime.status}
               />
               <AnimeStatusButton
+                animeId={anime.id}
+                animeTitle={title}
+                animeCover={anime.coverImage?.large ?? anime.coverImage?.medium}
+              />
+              <AddToListButton
                 animeId={anime.id}
                 animeTitle={title}
                 animeCover={anime.coverImage?.large ?? anime.coverImage?.medium}
