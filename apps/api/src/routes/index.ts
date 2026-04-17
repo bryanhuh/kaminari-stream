@@ -10,6 +10,7 @@ import authRouter from "./auth";
 import commentsRouter from "./comments";
 import reviewsRouter from "./reviews";
 import animeStatusRouter from "./animeStatus";
+import customListsRouter from "./customLists";
 
 const router = Router();
 
@@ -28,5 +29,6 @@ router.use("/watchlist", watchlistRouter);
 router.use("/comments", commentsRouter);
 router.use("/reviews", reviewsRouter);
 router.use("/status", animeStatusRouter);
+router.use("/lists", customListsRouter);
 
 export default router;
