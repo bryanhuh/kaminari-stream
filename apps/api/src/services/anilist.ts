@@ -60,18 +60,75 @@ const TTL_LIST   = 15 * 60 * 1000;  // 15 min (was 5)
 const TTL_DETAIL = 30 * 60 * 1000;  // 30 min (was 10)
 const TTL_SEARCH =  5 * 60 * 1000;  //  5 min (was 1)
 
+// ── Request queue (token bucket) ───────────────────────────────────────────────
+// AniList allows 90 req/min. We proactively throttle to 60 req/min (1/sec)
+// to stay safely under the limit and avoid reactive 429 handling in most cases.
+
+const BUCKET_CAPACITY = 60;
+const REFILL_INTERVAL_MS = 1000;
+
+let tokens = BUCKET_CAPACITY;
+let lastRefill = Date.now();
+const queue: Array<() => void> = [];
+let draining = false;
+
+function refillTokens() {
+  const now = Date.now();
+  const elapsed = now - lastRefill;
+  const refillAmount = Math.floor(elapsed / REFILL_INTERVAL_MS);
+  if (refillAmount > 0) {
+    tokens = Math.min(BUCKET_CAPACITY, tokens + refillAmount);
+    lastRefill = now;
+  }
+}
+
+function drainQueue() {
+  if (draining) return;
+  draining = true;
+  const tick = () => {
+    refillTokens();
+    while (queue.length > 0 && tokens > 0) {
+      tokens--;
+      const resolve = queue.shift()!;
+      resolve();
+    }
+    if (queue.length > 0) {
+      setTimeout(tick, REFILL_INTERVAL_MS);
+    } else {
+      draining = false;
+    }
+  };
+  tick();
+}
+
+function acquireToken(): Promise<void> {
+  refillTokens();
+  if (tokens > 0) {
+    tokens--;
+    return Promise.resolve();
+  }
+  return new Promise((resolve) => {
+    queue.push(resolve);
+    drainQueue();
+  });
+}
+
 // ── Retry wrapper ───────────────────────────────────────────────────────────────
 // On 429, waits with exponential backoff before retrying (up to maxRetries).
+// The token bucket handles normal load; this handles bursts that slip through.
 
 async function withRetry<T>(fn: () => Promise<T>, maxRetries = 3): Promise<T> {
-  let delay = 1000;
+  let delay = 2000;
   for (let attempt = 0; attempt <= maxRetries; attempt++) {
+    await acquireToken();
     try {
       return await fn();
     } catch (err: unknown) {
       const status =
         (err as { response?: { status?: number } })?.response?.status;
       if (status === 429 && attempt < maxRetries) {
+        // On 429, pause the whole bucket for 60s to let AniList recover
+        tokens = 0;
         await new Promise((r) => setTimeout(r, delay));
         delay *= 2;
         continue;
