@@ -231,6 +231,8 @@ export default function Watch() {
               <img
                 src={cover}
                 alt={title}
+                loading="lazy"
+                decoding="async"
                 className="w-8 h-11 rounded-md object-cover border border-white/10 shrink-0"
               />
             )}
@@ -463,6 +465,8 @@ export default function Watch() {
               <img
                 src={anime.coverImage?.large ?? anime.coverImage?.medium ?? ""}
                 alt={title}
+                loading="lazy"
+                decoding="async"
                 className="w-40 sm:w-48 rounded-xl object-cover border border-[#1e1e28] shadow-lg"
                 style={{ aspectRatio: "3/4" }}
               />
@@ -560,6 +564,8 @@ export default function Watch() {
                       <img
                         src={rel.coverImage.medium}
                         alt={rel.title.english ?? rel.title.romaji ?? ""}
+                        loading="lazy"
+                        decoding="async"
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                       />
                     )}

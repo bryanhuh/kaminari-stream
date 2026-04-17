@@ -3,6 +3,7 @@ import { useWatchlist, useRemoveFromWatchlist } from "../hooks/useWatchlist";
 import { usePageMeta } from "../hooks/usePageMeta";
 import { useAuth } from "../context/AuthContext";
 import LoginPrompt from "../components/LoginPrompt";
+import LazyImage from "../components/LazyImage";
 import type { WatchlistEntry } from "@anime-app/types";
 
 const BASE = import.meta.env.VITE_API_BASE_URL ?? "http://localhost:4000";
@@ -130,10 +131,10 @@ function WatchlistCard({ entry }: { entry: WatchlistEntry }) {
     <Link to={`/anime/${entry.animeId}`} className="group flex flex-col gap-2.5">
       <div className="relative overflow-hidden rounded-xl aspect-[3/4] bg-[#111118]">
         {entry.animeCover ? (
-          <img
+          <LazyImage
             src={entry.animeCover}
             alt={entry.animeTitle}
-            className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+            className="w-full h-full object-cover group-hover:scale-105"
           />
         ) : (
           <div className="w-full h-full flex items-center justify-center text-[#5d6169] text-sm">
