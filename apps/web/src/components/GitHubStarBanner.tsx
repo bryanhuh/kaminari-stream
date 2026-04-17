@@ -51,7 +51,7 @@ export default function GitHubStarBanner() {
         {/* Star button */}
         <div className="shrink-0 py-5 pr-2">
           <a
-            href="https://github.com/bryandiolataa/anime-app"
+            href="https://github.com/bryanhuh/kaminari-stream"
             target="_blank"
             rel="noopener noreferrer"
             className="flex items-center gap-2 bg-primary-500 hover:bg-primary-400 text-[#0a0a0f] font-bold text-sm px-4 py-2.5 rounded-xl transition-colors shadow-lg shadow-primary-500/20 whitespace-nowrap"
