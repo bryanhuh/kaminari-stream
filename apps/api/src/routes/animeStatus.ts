@@ -59,6 +59,31 @@ router.post("/:animeId", async (req: Request, res: Response, next: NextFunction)
   }
 });
 
+// POST /api/status/batch — bulk upsert statuses
+router.post("/batch", async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const batchSchema = z.object({
+      updates: z.array(
+        z.object({
+          animeId: z.number().int().positive(),
+          animeTitle: z.string().min(1),
+          animeCover: z.string().nullable().optional(),
+          status: z.enum(STATUS_VALUES),
+        })
+      ).min(1).max(100),
+    });
+    const { updates } = batchSchema.parse(req.body);
+    await Promise.all(
+      updates.map((u) =>
+        setAnimeStatus({ ...u, userId: req.userId })
+      )
+    );
+    res.json({ data: { ok: true, count: updates.length } });
+  } catch (err) {
+    next(err);
+  }
+});
+
 // DELETE /api/status/:animeId — remove status
 router.delete("/:animeId", async (req: Request, res: Response, next: NextFunction) => {
   try {
