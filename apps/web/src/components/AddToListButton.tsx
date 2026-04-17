@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { useCustomLists, useAddToCustomList, useRemoveFromCustomList, useCustomListEntries } from "../hooks/useCustomLists";
+import { useCustomLists, useAddToCustomList, useRemoveFromCustomList } from "../hooks/useCustomLists";
 import { useAuth } from "../context/AuthContext";
 
 interface Props {
@@ -21,7 +21,6 @@ export default function AddToListButton({ animeId, animeTitle, animeCover }: Pro
   // We query each list's entries only when the dropdown is open to avoid N queries
   // Instead, track membership via mutation responses in local state
   const [inLists, setInLists] = useState<Set<number>>(new Set());
-  const initialized = useRef(false);
 
   // Close on outside click
   useEffect(() => {
