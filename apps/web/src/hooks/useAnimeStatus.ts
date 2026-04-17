@@ -70,3 +70,29 @@ export function useRemoveAnimeStatus() {
     },
   });
 }
+
+export function useAllAnimeStatuses() {
+  const { user, isLoggedIn } = useAuth();
+  return useQuery<AnimeStatusEntry[]>({
+    queryKey: ["status", user?.id],
+    queryFn: () => api.get<AnimeStatusEntry[]>("/api/status"),
+    enabled: isLoggedIn,
+    staleTime: 60_000,
+  });
+}
+
+interface BatchStatusInput {
+  updates: { animeId: number; animeTitle: string; animeCover?: string | null; status: AnimeStatusValue }[];
+}
+
+export function useBatchSetAnimeStatus() {
+  const { user } = useAuth();
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (input: BatchStatusInput) =>
+      api.post<{ ok: boolean; count: number }>("/api/status/batch", input),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["status", user?.id] });
+    },
+  });
+}
