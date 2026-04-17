@@ -4,6 +4,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { api } from "../lib/api";
 import type { AnimeDetail } from "../hooks/useAnime";
 import WatchlistButton from "./WatchlistButton";
+import LazyImage from "./LazyImage";
 
 interface AnimeCardProps {
   id: number;
@@ -24,6 +25,7 @@ export default function AnimeCard({
   format,
   status,
   episodes,
+  color,
 }: AnimeCardProps) {
   const queryClient = useQueryClient();
   const prefetchTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -53,12 +55,15 @@ export default function AnimeCard({
       onMouseLeave={handleMouseLeave}
     >
       {/* Cover image */}
-      <div className="relative overflow-hidden rounded-xl aspect-[3/4] bg-[#111118]">
+      <div
+        className="relative overflow-hidden rounded-xl aspect-[3/4]"
+        style={{ backgroundColor: color ?? "#111118" }}
+      >
         {coverImage ? (
-          <img
+          <LazyImage
             src={coverImage}
             alt={title}
-            className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+            className="w-full h-full object-cover group-hover:scale-105"
           />
         ) : (
           <div className="w-full h-full flex items-center justify-center text-[#5d6169] text-sm">
